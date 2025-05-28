@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import SmartTextWithTooltips from "@/components/smart-text-with-tooltips";
+import { useTranslation } from "@/contexts/TranslationContext";
 import { 
   ArrowLeft, 
   Edit, 

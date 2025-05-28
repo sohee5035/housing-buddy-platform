@@ -110,10 +110,22 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
                 
                 <div className="flex items-center text-sm text-neutral-500 mb-3">
                   <MapPin className="h-4 w-4 mr-1" />
-                  <span>{displayAddress}</span>
+                  <span>
+                    <SmartTextWithTooltips 
+                      text={displayAddress}
+                      originalText={property.address}
+                      isTranslated={isTranslated}
+                    />
+                  </span>
                 </div>
                 
-                <p className="text-neutral-600 mb-4 line-clamp-2">{displayDescription}</p>
+                <p className="text-neutral-600 mb-4 line-clamp-2">
+                  <SmartTextWithTooltips 
+                    text={displayDescription}
+                    originalText={property.description}
+                    isTranslated={isTranslated}
+                  />
+                </p>
                 
                 <div className="flex items-center space-x-4 text-sm text-neutral-600 mb-4">
                   <span className="flex items-center">
@@ -209,7 +221,11 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
             <span className="text-lg">{getPropertyTypeIcon(property.propertyType)}</span>
             <Link href={`/property/${property.id}`}>
               <h3 className="text-xl font-semibold text-neutral-900 hover:text-primary transition-colors cursor-pointer">
-                {property.title}
+                <SmartTextWithTooltips 
+                  text={displayTitle}
+                  originalText={property.title}
+                  isTranslated={isTranslated}
+                />
               </h3>
             </Link>
           </div>
@@ -225,7 +241,13 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
           </Button>
         </div>
         
-        <p className="text-neutral-600 mb-4 line-clamp-2">{property.description}</p>
+        <p className="text-neutral-600 mb-4 line-clamp-2">
+          <SmartTextWithTooltips 
+            text={displayDescription}
+            originalText={property.description}
+            isTranslated={isTranslated}
+          />
+        </p>
         
         <div className="flex items-center text-sm text-neutral-500 mb-4">
           <MapPin className="h-4 w-4 mr-1" />
