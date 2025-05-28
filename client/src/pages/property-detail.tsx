@@ -338,6 +338,34 @@ export default function PropertyDetail() {
                   </div>
                 )}
 
+                {/* 지도 섹션 */}
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-neutral-900 mb-3">위치</h3>
+                  <div className="bg-neutral-100 rounded-lg overflow-hidden">
+                    <iframe
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(property.address)}&output=embed&z=16`}
+                      width="100%"
+                      height="300"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`${property.title} 위치`}
+                    />
+                  </div>
+                  <div className="mt-2 flex items-center justify-between text-sm text-neutral-600">
+                    <span>📍 {getTranslatedPropertyText('address') || property.address}</span>
+                    <a
+                      href={`https://maps.google.com/maps?q=${encodeURIComponent(property.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Google Maps에서 보기 →
+                    </a>
+                  </div>
+                </div>
+
                 {property.originalUrl && (
                   <div className="mt-6">
                     <h3 className="text-lg font-semibold text-neutral-900 mb-2">원본 링크</h3>
