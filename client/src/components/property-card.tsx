@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Languages, Bed, Bath, Square, MapPin } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 interface PropertyCardProps {
   property: Property;
@@ -14,6 +15,7 @@ interface PropertyCardProps {
 
 export default function PropertyCard({ property, onTranslate, viewMode = "grid" }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const { getTranslatedText } = useTranslation();
 
   const formatPrice = (price: number, listingType: string) => {
     return listingType === "rent" 
@@ -73,17 +75,17 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
                   <span className="text-lg">{getPropertyTypeIcon(property.propertyType)}</span>
                   <Link href={`/property/${property.id}`}>
                     <h3 className="text-xl font-semibold text-neutral-900 hover:text-primary transition-colors cursor-pointer">
-                      {property.title}
+                      {getTranslatedText(property.title, `title_${property.id}`)}
                     </h3>
                   </Link>
                 </div>
                 
                 <div className="flex items-center text-sm text-neutral-500 mb-3">
                   <MapPin className="h-4 w-4 mr-1" />
-                  <span>{property.address}</span>
+                  <span>{getTranslatedText(property.address, `address_${property.id}`)}</span>
                 </div>
                 
-                <p className="text-neutral-600 mb-4 line-clamp-2">{property.description}</p>
+                <p className="text-neutral-600 mb-4 line-clamp-2">{getTranslatedText(property.description, `description_${property.id}`)}</p>
                 
                 <div className="flex items-center space-x-4 text-sm text-neutral-600 mb-4">
                   <span className="flex items-center">
