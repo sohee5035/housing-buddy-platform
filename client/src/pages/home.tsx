@@ -36,10 +36,18 @@ export default function Home() {
               <HomeIcon className="h-8 w-8 text-primary mr-3" />
               <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
             </div>
-            <Button onClick={() => setShowCreateModal(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              매물 등록
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Link href="/trash">
+                <Button variant="outline">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  휴지통
+                </Button>
+              </Link>
+              <Button onClick={() => setShowCreateModal(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                매물 등록
+              </Button>
+            </div>
           </div>
         </div>
       </header>

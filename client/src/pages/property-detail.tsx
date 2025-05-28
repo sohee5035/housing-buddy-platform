@@ -365,6 +365,108 @@ export default function PropertyDetail() {
         </div>
       </div>
 
+      {/* Translation Modal */}
+      <Dialog open={showTranslationModal} onOpenChange={setShowTranslationModal}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>매물 번역</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">번역할 언어 선택</label>
+              <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                <SelectTrigger>
+                  <SelectValue placeholder="언어를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  {supportedLanguages.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex space-x-3">
+              <Button 
+                onClick={handleTranslate} 
+                disabled={!selectedLanguage || isTranslating}
+                className="flex-1"
+              >
+                {isTranslating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    번역 중...
+                  </>
+                ) : (
+                  <>
+                    <Languages className="h-4 w-4 mr-2" />
+                    번역하기
+                  </>
+                )}
+              </Button>
+              <Button variant="outline" onClick={() => setShowTranslationModal(false)}>
+                닫기
+              </Button>
+            </div>
+
+            {translatedContent && (
+              <div className="mt-6 space-y-4 border-t pt-4">
+                <h3 className="font-semibold text-lg">번역 결과</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-600 mb-1">원본</h4>
+                    <p className="text-sm border rounded p-2 bg-neutral-50">{property?.title}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-600 mb-1">번역</h4>
+                    <p className="text-sm border rounded p-2 bg-blue-50">{translatedContent.title}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-600 mb-1">주소 (원본)</h4>
+                    <p className="text-sm border rounded p-2 bg-neutral-50">{property?.address}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-600 mb-1">주소 (번역)</h4>
+                    <p className="text-sm border rounded p-2 bg-blue-50">{translatedContent.address}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-600 mb-1">설명 (원본)</h4>
+                    <p className="text-sm border rounded p-2 bg-neutral-50 max-h-32 overflow-y-auto">{property?.description}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm text-neutral-600 mb-1">설명 (번역)</h4>
+                    <p className="text-sm border rounded p-2 bg-blue-50 max-h-32 overflow-y-auto">{translatedContent.description}</p>
+                  </div>
+                </div>
+
+                {property?.otherInfo && translatedContent.otherInfo && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium text-sm text-neutral-600 mb-1">기타 정보 (원본)</h4>
+                      <p className="text-sm border rounded p-2 bg-neutral-50">{property.otherInfo}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm text-neutral-600 mb-1">기타 정보 (번역)</h4>
+                      <p className="text-sm border rounded p-2 bg-blue-50">{translatedContent.otherInfo}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Property Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
