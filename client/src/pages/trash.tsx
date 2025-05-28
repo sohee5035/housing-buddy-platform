@@ -20,9 +20,9 @@ export default function Trash() {
   const queryClient = useQueryClient();
 
   const { data: deletedProperties = [], isLoading } = useQuery<Property[]>({
-    queryKey: ["/api/properties/trash"],
+    queryKey: ["/api/trash"],
     queryFn: async () => {
-      const response = await fetch("/api/properties/trash");
+      const response = await fetch("/api/trash");
       if (!response.ok) throw new Error("Failed to fetch deleted properties");
       return response.json();
     },

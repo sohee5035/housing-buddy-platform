@@ -15,8 +15,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/properties/trash - Get deleted properties (MUST be before /:id route)
-  app.get("/api/properties/trash", async (req: Request, res: Response) => {
+  // GET /api/trash - Get deleted properties (Changed path to avoid conflicts)
+  app.get("/api/trash", async (req: Request, res: Response) => {
     try {
       console.log("=== Trash endpoint called ===");
       const deletedProperties = await storage.getDeletedProperties();
@@ -106,8 +106,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // POST /api/properties/:id/restore - Restore a property from trash
-  app.post("/api/properties/:id/restore", async (req: Request, res: Response) => {
+  // POST /api/trash/:id/restore - Restore a property from trash
+  app.post("/api/trash/:id/restore", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const restoredProperty = await storage.restoreProperty(id);
@@ -123,8 +123,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // DELETE /api/properties/:id/permanent - Permanently delete a property
-  app.delete("/api/properties/:id/permanent", async (req: Request, res: Response) => {
+  // DELETE /api/trash/:id - Permanently delete a property
+  app.delete("/api/trash/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.permanentDeleteProperty(id);
