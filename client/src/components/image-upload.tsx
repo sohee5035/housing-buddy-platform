@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Clipboard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ImageUploadProps {
@@ -17,53 +17,85 @@ export default function ImageUpload({
 }: ImageUploadProps) {
   const [images, setImages] = useState<string[]>(initialImages);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isPasteReady, setIsPasteReady] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const handleFileSelect = (files: FileList) => {
-    const newImages: string[] = [];
-    const totalImages = images.length + files.length;
+  // 클립보드 붙여넣기 이벤트 리스너
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      // 드롭존이 포커스되어 있을 때만 동작
+      if (!isPasteReady) return;
+      
+      const items = e.clipboardData?.items;
+      if (!items) return;
 
-    if (totalImages > maxImages) {
+      let hasImage = false;
+      Array.from(items).forEach((item) => {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          hasImage = true;
+          const file = item.getAsFile();
+          if (file) {
+            processImageFile(file);
+          }
+        }
+      });
+
+      if (hasImage) {
+        toast({
+          title: "이미지 붙여넣기 완료",
+          description: "클립보드의 이미지가 추가되었습니다.",
+        });
+      }
+    };
+
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [isPasteReady, images.length, maxImages]);
+
+  const processImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
       toast({
-        title: "Too many images",
-        description: `You can only upload up to ${maxImages} images.`,
+        title: "잘못된 파일 형식",
+        description: "이미지 파일만 업로드할 수 있습니다.",
         variant: "destructive",
       });
       return;
     }
 
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "파일 크기 초과",
+        description: "이미지는 5MB 이하여야 합니다.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (images.length >= maxImages) {
+      toast({
+        title: "이미지 개수 초과",
+        description: `최대 ${maxImages}개의 이미지만 업로드할 수 있습니다.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      const updatedImages = [...images, result];
+      setImages(updatedImages);
+      onImagesChange(updatedImages);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileSelect = (files: FileList) => {
     Array.from(files).forEach((file) => {
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Invalid file type",
-          description: "Please only upload image files.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({
-          title: "File too large",
-          description: "Images must be smaller than 5MB.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        newImages.push(result);
-        
-        if (newImages.length === Array.from(files).length) {
-          const updatedImages = [...images, ...newImages];
-          setImages(updatedImages);
-          onImagesChange(updatedImages);
-        }
-      };
-      reader.readAsDataURL(file);
+      processImageFile(file);
     });
   };
 
@@ -103,29 +135,51 @@ export default function ImageUpload({
     <div className="space-y-4">
       {/* Upload Area */}
       <Card
+        ref={dropZoneRef}
         className={`border-2 border-dashed p-8 text-center transition-colors cursor-pointer ${
           isDragOver
             ? "border-primary bg-primary/5"
+            : isPasteReady 
+            ? "border-blue-400 bg-blue-50"
             : "border-neutral-300 hover:border-primary"
         }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onMouseEnter={() => setIsPasteReady(true)}
+        onMouseLeave={() => setIsPasteReady(false)}
+        onFocus={() => setIsPasteReady(true)}
+        onBlur={() => setIsPasteReady(false)}
         onClick={() => fileInputRef.current?.click()}
+        tabIndex={0}
       >
         <div className="flex flex-col items-center">
-          <Upload className="h-12 w-12 text-neutral-400 mb-4" />
+          <div className="flex items-center justify-center mb-4">
+            <Upload className="h-12 w-12 text-neutral-400 mr-2" />
+            {isPasteReady && <Clipboard className="h-8 w-8 text-blue-500" />}
+          </div>
           <div className="text-lg font-medium text-neutral-700 mb-2">
-            Upload Property Photos
+            매물 사진 업로드
           </div>
           <div className="text-neutral-500 mb-4">
-            Drag and drop images here, or click to browse
+            {isPasteReady 
+              ? "Ctrl+V로 클립보드 이미지 붙여넣기 또는 파일 선택"
+              : "이미지를 드래그하거나 클릭해서 파일 선택"
+            }
           </div>
-          <Button type="button" variant="outline">
-            Choose Files
-          </Button>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline">
+              파일 선택
+            </Button>
+            {isPasteReady && (
+              <Button type="button" variant="outline" className="bg-blue-50">
+                <Clipboard className="h-4 w-4 mr-2" />
+                붙여넣기 준비됨
+              </Button>
+            )}
+          </div>
           <div className="text-xs text-neutral-500 mt-2">
-            Max {maxImages} images, 5MB each
+            최대 {maxImages}개 이미지, 각각 5MB 이하
           </div>
         </div>
       </Card>
