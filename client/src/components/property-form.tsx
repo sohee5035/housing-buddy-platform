@@ -16,7 +16,7 @@ import ImageUpload from "./image-upload";
 interface PropertyFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
-  initialData?: Partial<InsertProperty>;
+  initialData?: Property;
 }
 
 export default function PropertyForm({ onSuccess, onCancel, initialData }: PropertyFormProps) {
@@ -40,21 +40,28 @@ export default function PropertyForm({ onSuccess, onCancel, initialData }: Prope
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertProperty) => {
-      const response = await apiRequest("POST", "/api/properties", data);
-      return response.json();
+      if (initialData?.id) {
+        // Update existing property
+        const response = await apiRequest("PUT", `/api/properties/${initialData.id}`, data);
+        return response.json();
+      } else {
+        // Create new property
+        const response = await apiRequest("POST", "/api/properties", data);
+        return response.json();
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
       toast({
-        title: "Success",
-        description: "Property created successfully!",
+        title: initialData?.id ? "수정 완료" : "등록 완료",
+        description: initialData?.id ? "매물이 성공적으로 수정되었습니다." : "매물이 성공적으로 등록되었습니다.",
       });
       onSuccess?.();
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to create property",
+        title: "오류",
+        description: error.message || "처리 중 오류가 발생했습니다.",
         variant: "destructive",
       });
     },
@@ -167,7 +174,11 @@ export default function PropertyForm({ onSuccess, onCancel, initialData }: Prope
               <FormItem>
                 <FormLabel>기타 정보 (선택)</FormLabel>
                 <FormControl>
-                  <Input placeholder="추가 정보를 입력하세요 (예: 주차 가능, 엘리베이터 등)" {...field} />
+                  <Input 
+                    placeholder="추가 정보를 입력하세요 (예: 주차 가능, 엘리베이터 등)" 
+                    {...field}
+                    value={field.value || ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -277,27 +277,29 @@ export default function PropertyDetail() {
             </div>
           </div>
 
-          {/* Contact Card */}
+          {/* Property Summary Card */}
           <div className="lg:col-span-1">
             <Card className="sticky top-6">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold text-neutral-900 mb-4">문의하기</h3>
+                <h3 className="text-xl font-semibold text-neutral-900 mb-4">매물 요약</h3>
                 
-                <div className="space-y-3 mb-6">
-                  <Button className="w-full" size="lg">
-                    전화 문의
-                  </Button>
-                  <Button variant="outline" className="w-full" size="lg">
-                    메시지 보내기
-                  </Button>
-                  <Button variant="outline" className="w-full" size="lg">
-                    방문 예약
-                  </Button>
-                </div>
-                
-                <div className="text-sm text-neutral-600 text-center">
-                  <p>전화 문의 시간: 오전 9시 ~ 오후 6시</p>
-                  <p>주말, 공휴일 상담 가능</p>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-neutral-600">보증금</span>
+                    <span className="font-medium">{(property.deposit / 10000).toLocaleString()}만원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-600">월세</span>
+                    <span className="font-medium">{(property.monthlyRent / 10000).toLocaleString()}만원</span>
+                  </div>
+                  <div className="border-t border-neutral-200 pt-3">
+                    <div className="flex justify-between">
+                      <span className="text-neutral-600">등록일</span>
+                      <span className="font-medium">
+                        {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
