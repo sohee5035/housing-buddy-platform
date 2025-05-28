@@ -104,7 +104,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-
+  // GET /api/trash - Get all deleted properties
+  app.get("/api/trash", async (req: Request, res: Response) => {
+    try {
+      const deletedProperties = await storage.getDeletedProperties();
+      res.json(deletedProperties);
+    } catch (error: any) {
+      console.error("Error fetching deleted properties:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
   // POST /api/trash/:id/restore - Restore a property from trash
   app.post("/api/trash/:id/restore", async (req: Request, res: Response) => {
