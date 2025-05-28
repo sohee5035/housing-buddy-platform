@@ -6,7 +6,8 @@ import AdminAuth from "@/components/admin-auth";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 export default function Home() {
@@ -14,6 +15,8 @@ export default function Home() {
   const [showAdminAuth, setShowAdminAuth] = useState(false);
   const [adminAction, setAdminAction] = useState<'create' | 'trash'>('create');
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [showAddCategory, setShowAddCategory] = useState(false);
   const [, setLocation] = useLocation();
 
   const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
@@ -37,10 +40,27 @@ export default function Home() {
     return property.category === selectedCategory;
   });
 
-  // 사용 가능한 카테고리 목록 생성
+  // 사용 가능한 카테고리 목록 생성 (매물에서 실제 사용된 카테고리들)
   const availableCategories = ['전체', ...Array.from(new Set(properties.map(p => p.category || '기타')))];
 
-  const categories = ['전체', '원룸', '투룸', '쓰리룸', '오피스텔', '아파트', '빌라', '상가', '사무실', '기타'];
+  // 새 카테고리 추가 함수
+  const handleAddCategory = () => {
+    if (newCategoryName.trim() && !availableCategories.includes(newCategoryName.trim())) {
+      setSelectedCategory(newCategoryName.trim());
+      setNewCategoryName('');
+      setShowAddCategory(false);
+    }
+  };
+
+  // 카테고리 삭제 함수 (해당 카테고리 매물이 없을 때만)
+  const handleRemoveCategory = (categoryToRemove: string) => {
+    const categoryHasProperties = properties.some(p => p.category === categoryToRemove);
+    if (!categoryHasProperties && categoryToRemove !== '전체') {
+      if (selectedCategory === categoryToRemove) {
+        setSelectedCategory('전체');
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -78,18 +98,74 @@ export default function Home() {
       {/* Category Filter */}
       <div className="bg-white border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Tags className="h-4 w-4 text-neutral-600" />
+            <span className="text-sm font-medium text-neutral-700">카테고리</span>
+          </div>
           <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className="text-sm"
-              >
-                {category}
-              </Button>
+            {availableCategories.map((category: string) => (
+              <div key={category} className="flex items-center">
+                <Button
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category)}
+                  className="text-sm"
+                >
+                  {category}
+                </Button>
+                {category !== '전체' && !properties.some(p => p.category === category) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveCategory(category)}
+                    className="ml-1 h-6 w-6 p-0 text-neutral-400 hover:text-red-500"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
             ))}
+            
+            {/* 새 카테고리 추가 */}
+            {showAddCategory ? (
+              <div className="flex items-center gap-1">
+                <Input
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="새 카테고리명"
+                  className="h-8 w-24 text-xs"
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                />
+                <Button
+                  size="sm"
+                  onClick={handleAddCategory}
+                  className="h-8 px-2 text-xs"
+                >
+                  추가
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowAddCategory(false);
+                    setNewCategoryName('');
+                  }}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAddCategory(true)}
+                className="text-sm border-dashed"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                새 카테고리
+              </Button>
+            )}
           </div>
         </div>
       </div>
