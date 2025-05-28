@@ -7,12 +7,13 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
   const [adminAction, setAdminAction] = useState<'create' | 'trash'>('create');
+  const [, setLocation] = useLocation();
 
   const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -157,7 +158,7 @@ export default function Home() {
           if (adminAction === 'create') {
             setShowCreateModal(true);
           } else if (adminAction === 'trash') {
-            window.location.href = '/trash';
+            setLocation('/trash');
           }
         }}
         title={adminAction === 'create' ? "매물 등록 권한 확인" : "휴지통 접근 권한 확인"}
