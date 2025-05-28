@@ -17,14 +17,18 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
   const [isFavorite, setIsFavorite] = useState(false);
   const { getTranslatedText, translatedData, isTranslated } = useTranslation();
   
-  // 디버깅용 로그
-  console.log('PropertyCard render:', {
-    propertyId: property.id,
-    isTranslated,
-    translatedData,
-    titleKey: `title_${property.id}`,
-    translatedTitle: getTranslatedText(property.title, `title_${property.id}`)
-  });
+  // 번역된 텍스트 직접 계산 - 재렌더링 보장
+  const displayTitle = isTranslated && translatedData[`title_${property.id}`] 
+    ? translatedData[`title_${property.id}`] 
+    : property.title;
+    
+  const displayAddress = isTranslated && translatedData[`address_${property.id}`] 
+    ? translatedData[`address_${property.id}`] 
+    : property.address;
+    
+  const displayDescription = isTranslated && translatedData[`description_${property.id}`] 
+    ? translatedData[`description_${property.id}`] 
+    : property.description;
 
   const formatPrice = (price: number, listingType: string) => {
     return listingType === "rent" 
@@ -84,17 +88,17 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
                   <span className="text-lg">{getPropertyTypeIcon(property.propertyType)}</span>
                   <Link href={`/property/${property.id}`}>
                     <h3 className="text-xl font-semibold text-neutral-900 hover:text-primary transition-colors cursor-pointer">
-                      {getTranslatedText(property.title, `title_${property.id}`)}
+                      {displayTitle}
                     </h3>
                   </Link>
                 </div>
                 
                 <div className="flex items-center text-sm text-neutral-500 mb-3">
                   <MapPin className="h-4 w-4 mr-1" />
-                  <span>{getTranslatedText(property.address, `address_${property.id}`)}</span>
+                  <span>{displayAddress}</span>
                 </div>
                 
-                <p className="text-neutral-600 mb-4 line-clamp-2">{getTranslatedText(property.description, `description_${property.id}`)}</p>
+                <p className="text-neutral-600 mb-4 line-clamp-2">{displayDescription}</p>
                 
                 <div className="flex items-center space-x-4 text-sm text-neutral-600 mb-4">
                   <span className="flex items-center">
