@@ -291,6 +291,7 @@ export default function Home() {
               refetch();
             }}
             onCancel={() => setShowCreateModal(false)}
+            availableCategories={allCategories}
           />
         </DialogContent>
       </Dialog>

@@ -17,9 +17,10 @@ interface PropertyFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
   initialData?: Property;
+  availableCategories?: string[];
 }
 
-export default function PropertyForm({ onSuccess, onCancel, initialData }: PropertyFormProps) {
+export default function PropertyForm({ onSuccess, onCancel, initialData, availableCategories = [] }: PropertyFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [photos, setPhotos] = useState<string[]>(initialData?.photos || []);
@@ -213,15 +214,27 @@ export default function PropertyForm({ onSuccess, onCancel, initialData }: Prope
                       <SelectValue placeholder="카테고리를 선택하세요" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="원룸">원룸</SelectItem>
-                      <SelectItem value="투룸">투룸</SelectItem>
-                      <SelectItem value="쓰리룸">쓰리룸</SelectItem>
-                      <SelectItem value="오피스텔">오피스텔</SelectItem>
-                      <SelectItem value="아파트">아파트</SelectItem>
-                      <SelectItem value="빌라">빌라</SelectItem>
-                      <SelectItem value="상가">상가</SelectItem>
-                      <SelectItem value="사무실">사무실</SelectItem>
-                      <SelectItem value="기타">기타</SelectItem>
+                      {availableCategories.length > 0 ? (
+                        availableCategories
+                          .filter(cat => cat !== '전체')
+                          .map(category => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))
+                      ) : (
+                        <>
+                          <SelectItem value="원룸">원룸</SelectItem>
+                          <SelectItem value="투룸">투룸</SelectItem>
+                          <SelectItem value="쓰리룸">쓰리룸</SelectItem>
+                          <SelectItem value="오피스텔">오피스텔</SelectItem>
+                          <SelectItem value="아파트">아파트</SelectItem>
+                          <SelectItem value="빌라">빌라</SelectItem>
+                          <SelectItem value="상가">상가</SelectItem>
+                          <SelectItem value="사무실">사무실</SelectItem>
+                          <SelectItem value="기타">기타</SelectItem>
+                        </>
+                      )}
                     </SelectContent>
                   </Select>
                 </FormControl>
