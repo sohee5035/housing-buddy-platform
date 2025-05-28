@@ -43,6 +43,19 @@ export default function PropertyDetail() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // 모든 매물 데이터를 가져와서 카테고리 목록 구성
+  const { data: allProperties = [] } = useQuery<Property[]>({
+    queryKey: ["/api/properties"],
+    queryFn: async () => {
+      const response = await fetch("/api/properties");
+      if (!response.ok) throw new Error("Failed to fetch properties");
+      return response.json();
+    },
+  });
+
+  // 사용 가능한 카테고리 목록 생성
+  const availableCategories = Array.from(new Set(allProperties.map(p => p.category || '기타').filter(Boolean)));
+
   const supportedLanguages = [
     { code: "ko", name: "한국어 (원본)" },
     { code: "en", name: "English (영어)" },
@@ -589,6 +602,7 @@ export default function PropertyDetail() {
               });
             }}
             onCancel={() => setShowEditModal(false)}
+            availableCategories={availableCategories}
           />
         </DialogContent>
       </Dialog>
