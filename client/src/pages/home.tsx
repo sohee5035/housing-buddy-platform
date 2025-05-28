@@ -79,7 +79,10 @@ export default function Home() {
     },
     onSuccess: (translations) => {
       console.log('Translation successful, setting data:', translations);
-      setTranslatedData(translations);
+      setTranslatedData(prevData => ({
+        ...prevData,
+        ...translations
+      }));
       setIsTranslated(true);
       setTargetLanguage(targetLanguage);
       toast({

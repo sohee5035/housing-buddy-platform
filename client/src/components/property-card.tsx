@@ -30,6 +30,16 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
     ? translatedData[`description_${property.id}`] 
     : property.description;
 
+  // 디버깅: Context 업데이트 감지
+  React.useEffect(() => {
+    console.log(`🛠 PropertyCard ${property.id}: translations 업데이트됨`, {
+      isTranslated,
+      dataKeys: Object.keys(translatedData),
+      titleKey: `title_${property.id}`,
+      hasTitle: !!translatedData[`title_${property.id}`]
+    });
+  }, [translatedData, isTranslated, property.id]);
+
   const formatPrice = (price: number, listingType: string) => {
     return listingType === "rent" 
       ? `$${price.toLocaleString()}/mo`
