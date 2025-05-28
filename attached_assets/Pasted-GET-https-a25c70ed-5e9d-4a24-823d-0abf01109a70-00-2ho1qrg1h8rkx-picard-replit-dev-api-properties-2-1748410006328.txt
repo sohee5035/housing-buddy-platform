@@ -1,0 +1,156 @@
+GET https://a25c70ed-5e9d-4a24-823d-0abf01109a70-00-2ho1qrg1h8rkx.picard.replit.dev/api/properties/24 404 (Not Found)
+window.fetch @ Network.js:219
+queryFn @ property-detail.tsx:88
+fetchFn @ @tanstack_react-query.js?v=a0880fa9:840
+run @ @tanstack_react-query.js?v=a0880fa9:494
+start @ @tanstack_react-query.js?v=a0880fa9:536
+fetch @ @tanstack_react-query.js?v=a0880fa9:926
+(anonymous) @ @tanstack_react-query.js?v=a0880fa9:1726
+(anonymous) @ @tanstack_react-query.js?v=a0880fa9:1725
+batch @ @tanstack_react-query.js?v=a0880fa9:583
+refetchQueries @ @tanstack_react-query.js?v=a0880fa9:1724
+(anonymous) @ @tanstack_react-query.js?v=a0880fa9:1716
+batch @ @tanstack_react-query.js?v=a0880fa9:583
+invalidateQueries @ @tanstack_react-query.js?v=a0880fa9:1705
+onSuccess @ property-detail.tsx:69
+execute @ @tanstack_react-query.js?v=a0880fa9:1233
+await in execute
+mutate @ @tanstack_react-query.js?v=a0880fa9:2630
+(anonymous) @ @tanstack_react-query.js?v=a0880fa9:3295
+handleDelete @ property-detail.tsx:118
+callCallback2 @ chunk-RPCDYKBN.js?v=a0880fa9:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=a0880fa9:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=a0880fa9:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=a0880fa9:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=a0880fa9:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=a0880fa9:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=a0880fa9:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=a0880fa9:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=a0880fa9:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=a0880fa9:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=a0880fa9:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=a0880fa9:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=a0880fa9:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=a0880fa9:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=a0880fa9:5449Understand this error
+Console.js:61 Fetching trash data...
+Console.js:61 Trash response status: 200
+Console.js:61 Raw response: <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type="module">
+import { createHotContext } from "/@vite/client";
+const hot = createHotContext("/__dummy__runtime-error-plugin");
+
+function sendError(error) {
+  if (!(error instanceof Error)) {
+    error = new Error("(unknown runtime error)");
+  }
+  const serialized = {
+    message: error.message,
+    stack: error.stack,
+  };
+  hot.send("runtime-error-plugin:error", serialized);
+}
+
+window.addEventListener("error", (evt) => {
+  sendError(evt.error);
+});
+
+window.addEventListener("unhandledrejection", (evt) => {
+  sendError(evt.reason);
+});
+</script>
+
+    <script type="module">
+import RefreshRuntime from "/@react-refresh"
+RefreshRuntime.injectIntoGlobalHook(window)
+window.$RefreshReg$ = () => {}
+window.$RefreshSig$ = () => (type) => type
+window.__vite_plugin_react_preamble_installed__ = true
+</script>
+
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <script type="module">"use strict";(()=>{var P="0.2.5";var T={HIGHLIGHT_COLOR:"#0079F2",HIGHLIGHT_BG:"#0079F210",ALLOWED_DOMAIN:".replit.dev"},Q=`
+  [contenteditable] {
+    outline: none !important;
+  }
+
+  [contenteditable]:focus {
+    outline: none !important;
+  }
+`,Z=`
+  .beacon-highlighter {
+    content: '';
+    position: absolute;
+    z-index: ${Number.MAX_SAFE_INTEGER-3};
+    box-sizing: border-box;
+    pointer-events: none;
+    outline: 2px dashed ${T.HIGHLIGHT_COLOR} !important;
+    outline-offset: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    background: ${T.HIGHLIGHT_BG} !important;
+    opacity: 0;
+  }
+  
+  .beacon-hover-highlighter {
+    position: fixed;
+    z-index: ${Number.MAX_SAFE_INTEGER};
+  }
+  
+  .beacon-selected-highlighter {
+    position: fixed;
+    pointer-events: none;
+    outline: 2px solid ${T.HIGHLIGHT_COLOR} !important;
+    outline-offset: 3px !important;
+    background: none !important;
+  }
+  
+  .beacon-label {
+    position: absolute;
+    background-color: ${T.HIGHLIGHT_COLOR};
+    color: #FFFFFF;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: monospace;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transform: translateY(-100%);
+    margin-top: -4px;
+    left: 0;
+    z-index: ${Number.MAX_SAFE_INTEGER-2};
+    pointer-events: none;
+    opacity: 0;
+  }
+  
+  .beacon-hover-label {
+    position: fixed;
+    z-index: ${Number.MAX_SAFE_INTEGER};
+  }
+  
+  .beacon-selected-label {
+    position: fixed;
+    pointer-events: none;
+  }
+  
+  .beacon-sibling-highlighter {
+    position: fixed;
+    pointer-events: none;
+    outline: 2px dashed ${T.HIGHLIGHT_COLOR} !important;
+    outline-offset: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    background: ${T.HIGHLIGHT_BG} !important;
+  }
+`;function Ne(e,i){return e[13]=1,e[14]=i>>8,e[15]=i&255,e[16]=i>>8,e[17]=i&255,e}var oe=112,le=72,ae=89,ce=115,W;function De(){let e=new Int32Array(256);for(let i=0;i<256;i++){let t=i;for(let n=0;n<8;n++)t=t&1?3988292384^t>>>1:t>>>1;e[i]=t}return e}function Ie(e){let i=-1;W||(W=De());for(let t=0;t<e.length;t++)i=W[(i^e[t])&255]^i>>>8;return i^-1}function Me(e){let i=e.length-1;for(let t=i;t>=4;t--)if(e[t-4]===9&&e[t-3]===oe&&e[t-2]===le&&e[t-1]===ae&&e[t]===ce)return t-3;return 0}function _e(e,i,t=!1){let n=new Uint8Array(13);i*=39.3701,n[0]=oe,n[1]=le,n[2]=ae,n[3]=ce,n[4]=i>>>24,n[5]=i>>>16,n[6]=i>>>8,n[7]=i&255,n[8]=n[4],n[9]=n[5],n[10]=n[6],n[11]=n[7],n[12]=1;let o=Ie(n),r=new Uint8Array(4);if(r[0]=o>>>24,r[1]=o>>>16,r[2]=o>>>8,r[3]=o&255,t){let l=Me(e);return e.set(n,l),e.set(r,l+13),e}else{let l=new Uint8Array(4);l[0]=0,l[1]=0,l[2]=0,l[3]=9;let s=new Uint8Array(54);return s.set(e,0),s.set(l,33),s.set(n,37),s.set(r,50),s}}var he="[modern-screenshot]",H=typeof window<"u",Re=H&&"Worker"in window,Oe=H&&"atob"in window,jt=H&&"btoa"in window,V=H?window.navigator?.userAgent:"",de=V.includes("Chrome"),F=V.includes("AppleWebKit")&&!de,j=V.includes("Firefox"),Pe=e=>e&&"__CONTEXT__"in e,Fe=e=>e.constructor.name==="CSSFontFaceRule",ke=e=>e.constructor.name==="CSSImportRule",v=e=>e.nodeType===1,I=e=>typeof e.className=="object",ge=e=>e.tagName==="image",Ue=e=>e.tagName==="use",x=e=>v(e)&&typeof e.style<"u"&&!I(e),$e=e=>e.nodeType===8,Be=e=>e.nodeType===3,L=e=>e.tagName==="IMG",k=e=>e.tagName==="VIDEO",We=e=>e.tagName==="CANVAS",Ge=e=>e.tagName==="TEXTAREA",Ve=e=>e.tagName==="INPUT",je=e=>e.tagName==="STYLE",ze=e=>e.tagName==="SCRIPT",qe=e=>e.tagName==="SELECT",Xe=e=>e.tagName==="SLOT",Ye=e=>e.tagName==="IFRAME",Ke=(...e)=>console.warn(he,...e);function Je(e){let i=e?.createElement?.("canvas");return i&&(i.height=i.width=1),!!i&&"toDataURL"in i&&!!i.toDataURL("image/webp").includes("image/webp")}var G=e=>e.startsWith("data:");function ue(e,i){if(e.match(/^[a-z]+:\/\//i))return e;if(H&&e.match(/^\/\//))retu
+Console.js:61 JSON parse error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at queryFn (trash.tsx:36:21)

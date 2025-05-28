@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPropertySchema } from "@shared/schema";
@@ -15,8 +15,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/trash - Get deleted properties (Changed path to avoid conflicts)
-  app.get("/api/trash", async (req: Request, res: Response) => {
+  // GET /api/trash - Get deleted properties
+  app.get("/api/trash", async (req, res) => {
     try {
       console.log("=== Trash endpoint called ===");
       const deletedProperties = await storage.getDeletedProperties();
