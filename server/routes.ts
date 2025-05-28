@@ -107,7 +107,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/trash - Get all deleted properties
   app.get("/api/trash", async (req: Request, res: Response) => {
     try {
+      console.log("=== TRASH ENDPOINT CALLED ===");
       const deletedProperties = await storage.getDeletedProperties();
+      console.log("=== RETURNING DELETED PROPERTIES ===", deletedProperties.length);
       res.json(deletedProperties);
     } catch (error: any) {
       console.error("Error fetching deleted properties:", error);
@@ -152,17 +154,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/translate - Translate text
   app.post("/api/translate", async (req: Request, res: Response) => {
     try {
+      console.log("=== TRANSLATE ENDPOINT CALLED ===");
       const { text, targetLang } = req.body;
+      console.log("Request data:", { text, targetLang });
       
       if (!text || !targetLang) {
+        console.log("Missing required fields");
         return res.status(400).json({ message: "Text and target language are required" });
       }
 
       const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
       if (!apiKey) {
+        console.log("No API key found");
         return res.status(500).json({ message: "Translation service not configured" });
       }
 
+      console.log("Making API request to Google Translate...");
       const response = await fetch(
         `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
         {
@@ -178,7 +185,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       );
 
+      console.log("API response status:", response.status);
       if (!response.ok) {
+        const errorText = await response.text();
+        console.log("API error response:", errorText);
         throw new Error(`Translation API error: ${response.statusText}`);
       }
 
