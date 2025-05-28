@@ -171,6 +171,7 @@ export class MemStorage implements IStorage {
     // Soft delete - move to trash
     const updatedProperty: Property = {
       ...property,
+      isActive: 0,
       isDeleted: 1,
       deletedAt: new Date(),
     };
@@ -196,6 +197,7 @@ export class MemStorage implements IStorage {
     
     const restoredProperty: Property = {
       ...property,
+      isActive: 1,
       isDeleted: 0,
       deletedAt: null,
     };
