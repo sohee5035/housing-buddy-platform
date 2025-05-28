@@ -121,10 +121,31 @@ export default function Home() {
     });
   };
 
+  // UI 텍스트 번역 함수
+  const translateUI = (koreanText: string) => {
+    if (!isTranslated) return koreanText;
+    
+    const uiTranslations: Record<string, string> = {
+      '보증금': 'Deposit',
+      '월세': 'Monthly Rent',
+      '관리비': 'Maintenance Fee',
+      '만원': 'K KRW',
+      '전체': 'All',
+      '기타': 'Others',
+      '매물 등록': 'Add Property',
+      '휴지통': 'Trash',
+      '상세보기': 'View Details',
+      '미정': 'TBD',
+      '알 수 없음': 'Unknown'
+    };
+    
+    return uiTranslations[koreanText] || koreanText;
+  };
+
   const formatPrice = (deposit: number, monthlyRent: number) => {
     const depositStr = deposit ? (deposit / 10000).toLocaleString() : '0';
     const rentStr = monthlyRent ? (monthlyRent / 10000).toLocaleString() : '0';
-    return `보증금 ${depositStr}만원 / 월세 ${rentStr}만원`;
+    return `${translateUI('보증금')} ${depositStr}${translateUI('만원')} / ${translateUI('월세')} ${rentStr}${translateUI('만원')}`;
   };
 
   // 카테고리별 매물 필터링
@@ -222,14 +243,14 @@ export default function Home() {
                 }}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                휴지통
+                {translateUI('휴지통')}
               </Button>
               <Button onClick={() => {
                 setAdminAction('create');
                 setShowAdminAuth(true);
               }}>
                 <Plus className="h-4 w-4 mr-2" />
-                매물 등록
+                {translateUI('매물 등록')}
               </Button>
             </div>
           </div>
@@ -252,7 +273,7 @@ export default function Home() {
                 onClick={() => setSelectedCategory(category)}
                 className="text-sm"
               >
-                {category}
+                {translateUI(category)}
               </Button>
             ))}
           </div>
@@ -348,7 +369,7 @@ export default function Home() {
                       {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
                     </div>
                     <Link href={`/property/${property.id}`}>
-                      <Button size="sm" variant="outline">상세보기</Button>
+                      <Button size="sm" variant="outline">{translateUI('상세보기')}</Button>
                     </Link>
                   </div>
                 </CardContent>
