@@ -67,8 +67,16 @@ export default function TranslationModal({ isOpen, onClose, property }: Translat
   });
 
   const handleTranslate = () => {
-    if (!property?.description) return;
+    console.log("=== TRANSLATE BUTTON CLICKED ===");
+    console.log("Property:", property);
+    console.log("Target language:", targetLanguage);
     
+    if (!property?.description) {
+      console.log("No property description found!");
+      return;
+    }
+    
+    console.log("About to call translateMutation.mutate");
     translateMutation.mutate({
       text: property.description,
       targetLang: targetLanguage,

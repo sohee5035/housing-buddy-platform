@@ -1,0 +1,190 @@
+Replit version 764c8ebe, pid2 version 0.0.1342
+_app-4b2a1d3821d04258.js:38 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] LaunchDarkly client initialized
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62b35a865152ab14c5942820/eyJrZXkiOiI0MzE4MjIzMSIsImtpbmQiOiJ1c2VyIiwiYW5vbnltb3VzIjpmYWxzZX0
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Closing stream connection
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62b35a865152ab14c5942820/eyJrZXkiOiI0MzE4MjIzMSIsImtpbmQiOiJ1c2VyIiwibmFtZSI6Indzb2hlZTUwMzUiLCJyb2xlcyI6WyJpbnRlbnRfYnVzaW5lc3MiLCJvbmJvYXJkaW5nX2pvYl9tYXJrZXRpbmciLCJvbmJvYXJkaW5nX3JvbGVfbWFuYWdlciJdLCJlbWFpbCI6Indzb2hlZTUwMzVAZ21haWwuY29tIiwidGltZV9jcmVhdGVkIjoxNzQ4MzQ3NDg5MDE5LCJfbWV0YSI6eyJwcml2YXRlQXR0cmlidXRlcyI6WyJlbWFpbCJdfX0
+/~:1 Attestation check for Topics on https://replit.com/ failed.Understand this error
+/~:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Closing stream connection
+framework-5ac0d5cf12c7cbb3.js:1 Unable to preventDefault inside passive event listener invocation.
+preventDefault @ framework-5ac0d5cf12c7cbb3.js:1Understand this error
+framework-5ac0d5cf12c7cbb3.js:1 Unable to preventDefault inside passive event listener invocation.
+preventDefault @ framework-5ac0d5cf12c7cbb3.js:1Understand this error
+framework-5ac0d5cf12c7cbb3.js:1 Unable to preventDefault inside passive event listener invocation.
+preventDefault @ framework-5ac0d5cf12c7cbb3.js:1Understand this error
+framework-5ac0d5cf12c7cbb3.js:1 Unable to preventDefault inside passive event listener invocation.
+preventDefault @ framework-5ac0d5cf12c7cbb3.js:1Understand this error
+framework-5ac0d5cf12c7cbb3.js:1 Unable to preventDefault inside passive event listener invocation.
+preventDefault @ framework-5ac0d5cf12c7cbb3.js:1Understand this error
+framework-5ac0d5cf12c7cbb3.js:1 Unable to preventDefault inside passive event listener invocation.
+preventDefault @ framework-5ac0d5cf12c7cbb3.js:1Understand this error
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62b35a865152ab14c5942820/eyJrZXkiOiI0MzE4MjIzMSIsImtpbmQiOiJ1c2VyIiwibmFtZSI6Indzb2hlZTUwMzUiLCJyb2xlcyI6WyJpbnRlbnRfYnVzaW5lc3MiLCJvbmJvYXJkaW5nX2pvYl9tYXJrZXRpbmciLCJvbmJvYXJkaW5nX3JvbGVfbWFuYWdlciJdLCJlbWFpbCI6Indzb2hlZTUwMzVAZ21haWwuY29tIiwidGltZV9jcmVhdGVkIjoxNzQ4MzQ3NDg5MDE5LCJfbWV0YSI6eyJwcml2YXRlQXR0cmlidXRlcyI6WyJlbWFpbCJdfX0
+8Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'battery'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+framework-5ac0d5cf12c7cbb3.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-5ac0d5cf12c7cbb3.js:1Understand this warning
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Error on stream connection: {"isTrusted":true}, will continue retrying after 707 milliseconds.
+push.98553.e7 @ _app-4b2a1d3821d04258.js:38Understand this warning
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Closing stream connection
+clientstream.launchdarkly.com/eval/62b35a865152ab14c5942820/eyJrZXkiOiI0MzE4MjIzMSIsImtpbmQiOiJ1c2VyIiwibmFtZSI6Indzb2hlZTUwMzUiLCJyb2xlcyI6WyJpbnRlbnRfYnVzaW5lc3MiLCJvbmJvYXJkaW5nX2pvYl9tYXJrZXRpbmciLCJvbmJvYXJkaW5nX3JvbGVfbWFuYWdlciJdLCJlbWFpbCI6Indzb2hlZTUwMzVAZ21haWwuY29tIiwidGltZV9jcmVhdGVkIjoxNzQ4MzQ3NDg5MDE5LCJfbWV0YSI6eyJwcml2YXRlQXR0cmlidXRlcyI6WyJlbWFpbCJdfX0:1 
+            
+            
+           Failed to load resource: net::ERR_NETWORK_IO_SUSPENDEDUnderstand this error
+4899-651713a6d5cf3023.js:1 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSW1JVGF3UVlTQmdpM29OckJCaUlHY0dsallYSmtNQUE2aHdJS0pHRXlOV00zTUdWa0xUVmxPV1F0TkdFeU5DMDRNak5rTFRCaFltWXdNVEV3T1dFM01CSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpRFZKbFlXeEZjM1JoZEdWUWNtOHFDbmR6YjJobFpUVXdNelZDVkFvWmNtVndiR2wwTFhKbGNHd3RZbXh2WTJ0ekxYQnBZMkZ5WkJJWGNtVndiR2wwTFhKbGNHd3RiV1YwWVMxd2FXTmhjbVFhSG5KbGNHeHBkQzF0WVhKbllYSnBibVV0WW14dlkydHpMWEJwWTJGeVpFb0hDSmZSeXhRUUFWQUFXZzlwYm5SbGJuUmZZblZ6YVc1bGMzTmFHRzl1WW05aGNtUnBibWRmYW05aVgyMWhjbXRsZEdsdVoxb1hiMjVpYjJGeVpHbHVaMTl5YjJ4bFgyMWhibUZuWlhKNEFGSWxDQUVRZ0lDQWdBZ1pBQUFBQUFBQThEOGhBQUFBQUFBQThEOG9nSUNBZ01nQk1BRTRBR0FBYWhFSWw5SExGQklLZDNOdmFHVmxOVEF6TlhJWmRYTmxMV3hoZFc1amFHUmhjbXRzZVMxa2FYSmxZM1JzZVlJQkFpb0FpZ0VqQ0FFUWdJQ0FnQ0FaQUFBQUFBQUFFRUFoQUFBQUFBQUFFRUFvZ0lDQWdNZ0JNQUNhQVFvS0NEQXVNQzR4TXpReW9BRULReYqwZOAvZBuPuJUGeE897n3TpNhoMLRiKY592pRHDDSqj7TuSKJ7jVu-5WPApoO_ygVwJXICVfdohj6p8FYC.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 4899-651713a6d5cf3023.js:1Understand this error
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62b35a865152ab14c5942820/eyJrZXkiOiI0MzE4MjIzMSIsImtpbmQiOiJ1c2VyIiwibmFtZSI6Indzb2hlZTUwMzUiLCJyb2xlcyI6WyJpbnRlbnRfYnVzaW5lc3MiLCJvbmJvYXJkaW5nX2pvYl9tYXJrZXRpbmciLCJvbmJvYXJkaW5nX3JvbGVfbWFuYWdlciJdLCJlbWFpbCI6Indzb2hlZTUwMzVAZ21haWwuY29tIiwidGltZV9jcmVhdGVkIjoxNzQ4MzQ3NDg5MDE5LCJfbWV0YSI6eyJwcml2YXRlQXR0cmlidXRlcyI6WyJlbWFpbCJdfX0
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Error on stream connection: {"isTrusted":true}, will continue retrying after 930 milliseconds.
+push.98553.e7 @ _app-4b2a1d3821d04258.js:38Understand this warning
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Closing stream connection
+clientstream.launchdarkly.com/eval/62b35a865152ab14c5942820/eyJrZXkiOiI0MzE4MjIzMSIsImtpbmQiOiJ1c2VyIiwibmFtZSI6Indzb2hlZTUwMzUiLCJyb2xlcyI6WyJpbnRlbnRfYnVzaW5lc3MiLCJvbmJvYXJkaW5nX2pvYl9tYXJrZXRpbmciLCJvbmJvYXJkaW5nX3JvbGVfbWFuYWdlciJdLCJlbWFpbCI6Indzb2hlZTUwMzVAZ21haWwuY29tIiwidGltZV9jcmVhdGVkIjoxNzQ4MzQ3NDg5MDE5LCJfbWV0YSI6eyJwcml2YXRlQXR0cmlidXRlcyI6WyJlbWFpbCJdfX0:1 
+            
+            
+           Failed to load resource: net::ERR_NETWORK_IO_SUSPENDEDUnderstand this error
+4899-651713a6d5cf3023.js:1 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSW1JVGF3UVlTQmdpM29OckJCaUlHY0dsallYSmtNQUE2aHdJS0pHRXlOV00zTUdWa0xUVmxPV1F0TkdFeU5DMDRNak5rTFRCaFltWXdNVEV3T1dFM01CSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpRFZKbFlXeEZjM1JoZEdWUWNtOHFDbmR6YjJobFpUVXdNelZDVkFvWmNtVndiR2wwTFhKbGNHd3RZbXh2WTJ0ekxYQnBZMkZ5WkJJWGNtVndiR2wwTFhKbGNHd3RiV1YwWVMxd2FXTmhjbVFhSG5KbGNHeHBkQzF0WVhKbllYSnBibVV0WW14dlkydHpMWEJwWTJGeVpFb0hDSmZSeXhRUUFWQUFXZzlwYm5SbGJuUmZZblZ6YVc1bGMzTmFHRzl1WW05aGNtUnBibWRmYW05aVgyMWhjbXRsZEdsdVoxb1hiMjVpYjJGeVpHbHVaMTl5YjJ4bFgyMWhibUZuWlhKNEFGSWxDQUVRZ0lDQWdBZ1pBQUFBQUFBQThEOGhBQUFBQUFBQThEOG9nSUNBZ01nQk1BRTRBR0FBYWhFSWw5SExGQklLZDNOdmFHVmxOVEF6TlhJWmRYTmxMV3hoZFc1amFHUmhjbXRzZVMxa2FYSmxZM1JzZVlJQkFpb0FpZ0VqQ0FFUWdJQ0FnQ0FaQUFBQUFBQUFFRUFoQUFBQUFBQUFFRUFvZ0lDQWdNZ0JNQUNhQVFvS0NEQXVNQzR4TXpReW9BRULReYqwZOAvZBuPuJUGeE897n3TpNhoMLRiKY592pRHDDSqj7TuSKJ7jVu-5WPApoO_ygVwJXICVfdohj6p8FYC.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 4899-651713a6d5cf3023.js:1Understand this error
+_app-4b2a1d3821d04258.js:38 [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62b35a865152ab14c5942820/eyJrZXkiOiI0MzE4MjIzMSIsImtpbmQiOiJ1c2VyIiwibmFtZSI6Indzb2hlZTUwMzUiLCJyb2xlcyI6WyJpbnRlbnRfYnVzaW5lc3MiLCJvbmJvYXJkaW5nX2pvYl9tYXJrZXRpbmciLCJvbmJvYXJkaW5nX3JvbGVfbWFuYWdlciJdLCJlbWFpbCI6Indzb2hlZTUwMzVAZ21haWwuY29tIiwidGltZV9jcmVhdGVkIjoxNzQ4MzQ3NDg5MDE5LCJfbWV0YSI6eyJwcml2YXRlQXR0cmlidXRlcyI6WyJlbWFpbCJdfX0
+workspace_iframe.html:32 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'battery'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'layout-animations'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'navigation-override'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'oversized-images'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'unsized-media'.Understand this warning
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+a25c70ed-5e9d-4a24-823d-0abf01109a70-00-2ho1qrg1h8rkx.picard.replit.dev/api/properties/16:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+a25c70ed-5e9d-4a24-823d-0abf01109a70-00-2ho1qrg1h8rkx.picard.replit.dev/api/properties/17:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+a25c70ed-5e9d-4a24-823d-0abf01109a70-00-2ho1qrg1h8rkx.picard.replit.dev/api/properties/18:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+a25c70ed-5e9d-4a24-823d-0abf01109a70-00-2ho1qrg1h8rkx.picard.replit.dev/api/properties/19:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61Understand this warning
+Console.js:61 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+Mt.forEach.n.<computed> @ Console.js:61Understand this error
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61Understand this warning
+a25c70ed-5e9d-4a24-823d-0abf01109a70-00-2ho1qrg1h8rkx.picard.replit.dev/api/properties/20:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+a25c70ed-5e9d-4a24-823d-0abf01109a70-00-2ho1qrg1h8rkx.picard.replit.dev/api/properties/3:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+Console.js:61 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+Mt.forEach.n.<computed> @ Console.js:61Understand this error
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61Understand this warning
+Console.js:61 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+Mt.forEach.n.<computed> @ Console.js:61Understand this error
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61Understand this warning
+Console.js:61 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+Mt.forEach.n.<computed> @ Console.js:61Understand this error
+2Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61Understand this warning
+a25c70ed-5e9d-4a24-823d-0abf01109a70-00-2ho1qrg1h8rkx.picard.replit.dev/api/properties/23:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+Console.js:61 Fetching trash data...
+Console.js:61 Trash response status: 200
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61Understand this warning
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61Understand this warning
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.Understand this warning
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ @radix-ui_react-dialog.js?v=a0880fa9:335
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=a0880fa9:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=a0880fa9:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=a0880fa9:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=a0880fa9:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=a0880fa9:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=a0880fa9:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=a0880fa9:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=a0880fa9:19416
+commitRoot @ chunk-RPCDYKBN.js?v=a0880fa9:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=a0880fa9:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=a0880fa9:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=a0880fa9:18627Understand this warning
