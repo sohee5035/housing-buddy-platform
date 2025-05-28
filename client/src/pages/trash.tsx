@@ -71,7 +71,7 @@ export default function Trash() {
 
   const permanentDeleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await apiRequest("DELETE", `/api/properties/${id}/permanent`);
+      const response = await apiRequest("DELETE", `/api/trash/${id}`);
       if (!response.ok) throw new Error("Failed to permanently delete property");
       return response.json();
     },
