@@ -96,15 +96,30 @@ export default function Trash() {
   });
 
   const handleRestore = (id: number) => {
-    if (window.confirm("이 매물을 복원하시겠습니까?")) {
-      restoreMutation.mutate(id);
-    }
+    setSelectedPropertyId(id);
+    setAdminAction('restore');
+    setShowAdminAuth(true);
   };
 
   const handlePermanentDelete = (id: number) => {
-    if (window.confirm("정말로 이 매물을 영구적으로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
-      permanentDeleteMutation.mutate(id);
+    setSelectedPropertyId(id);
+    setAdminAction('delete');
+    setShowAdminAuth(true);
+  };
+
+  const executeAction = () => {
+    if (!selectedPropertyId) return;
+    
+    if (adminAction === 'restore') {
+      if (window.confirm("이 매물을 복원하시겠습니까?")) {
+        restoreMutation.mutate(selectedPropertyId);
+      }
+    } else if (adminAction === 'delete') {
+      if (window.confirm("정말로 이 매물을 영구적으로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+        permanentDeleteMutation.mutate(selectedPropertyId);
+      }
     }
+    setSelectedPropertyId(null);
   };
 
   const formatPrice = (deposit: number, monthlyRent: number) => {
@@ -242,6 +257,21 @@ export default function Trash() {
           </div>
         )}
       </main>
+
+      {/* Admin Authentication */}
+      <AdminAuth
+        isOpen={showAdminAuth}
+        onClose={() => {
+          setShowAdminAuth(false);
+          setSelectedPropertyId(null);
+        }}
+        onSuccess={() => {
+          setShowAdminAuth(false);
+          executeAction();
+        }}
+        title={adminAction === 'restore' ? "매물 복원 권한 확인" : "매물 영구삭제 권한 확인"}
+        description={adminAction === 'restore' ? "매물을 복원하려면 관리자 비밀번호가 필요합니다." : "매물을 영구삭제하려면 관리자 비밀번호가 필요합니다."}
+      />
     </div>
   );
 }
