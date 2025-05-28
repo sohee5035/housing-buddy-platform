@@ -142,54 +142,58 @@ export default function Home() {
       {/* Simple Header */}
       <header className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+          <div className="flex justify-between items-center min-h-16 py-3">
+            <div className="flex items-center flex-shrink-0">
               <HomeIcon className="h-8 w-8 text-primary mr-3" />
-              <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
+              <h1 className="text-2xl font-bold text-neutral-900 whitespace-nowrap">부동산 매물</h1>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {/* Translation Controls */}
-              {!isTranslated ? (
-                <div className="flex items-center space-x-2">
-                  <Select value={targetLanguage} onValueChange={setTargetLanguage}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {supportedLanguages.map((lang) => (
-                        <SelectItem key={lang.code} value={lang.code}>
-                          {lang.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              <div className="flex flex-wrap items-center gap-2">
+                {!isTranslated ? (
+                  <>
+                    <Select value={targetLanguage} onValueChange={setTargetLanguage}>
+                      <SelectTrigger className="w-32 sm:w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {supportedLanguages.map((lang) => (
+                          <SelectItem key={lang.code} value={lang.code}>
+                            {lang.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button 
+                      variant="outline"
+                      onClick={handleTranslateAll}
+                      disabled={translateMutation.isPending}
+                      size="sm"
+                    >
+                      {translateMutation.isPending ? (
+                        <>
+                          <Languages className="h-4 w-4 mr-1 animate-spin" />
+                          번역중
+                        </>
+                      ) : (
+                        <>
+                          <Globe className="h-4 w-4 mr-1" />
+                          전체번역
+                        </>
+                      )}
+                    </Button>
+                  </>
+                ) : (
                   <Button 
                     variant="outline"
-                    onClick={handleTranslateAll}
-                    disabled={translateMutation.isPending}
+                    onClick={handleRestoreOriginal}
+                    size="sm"
                   >
-                    {translateMutation.isPending ? (
-                      <>
-                        <Languages className="h-4 w-4 mr-2 animate-spin" />
-                        번역 중...
-                      </>
-                    ) : (
-                      <>
-                        <Globe className="h-4 w-4 mr-2" />
-                        전체 번역
-                      </>
-                    )}
+                    <RotateCcw className="h-4 w-4 mr-1" />
+                    원본복원
                   </Button>
-                </div>
-              ) : (
-                <Button 
-                  variant="outline"
-                  onClick={handleRestoreOriginal}
-                >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  원본 복원
-                </Button>
-              )}
+                )}
+              </div>
 
               <Button 
                 variant="outline"
