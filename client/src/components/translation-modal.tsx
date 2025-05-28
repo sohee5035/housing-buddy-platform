@@ -46,12 +46,18 @@ export default function TranslationModal({ isOpen, onClose, property }: Translat
 
   const translateMutation = useMutation({
     mutationFn: async ({ text, targetLang }: { text: string; targetLang: string }) => {
-      return translateText(text, targetLang);
+      console.log("Translation mutation called with:", { text, targetLang });
+      const result = await translateText(text, targetLang);
+      console.log("Translation mutation result:", result);
+      return result;
     },
     onSuccess: (data) => {
+      console.log("Translation success, data:", data);
       setTranslatedText(data.translatedText);
+      console.log("Translation text set to:", data.translatedText);
     },
-    onError: () => {
+    onError: (error) => {
+      console.log("Translation error:", error);
       toast({
         title: "Translation Failed",
         description: "Unable to translate the text. Please try again.",
