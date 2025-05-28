@@ -194,10 +194,10 @@ export default function PropertyForm({ onSuccess, onCancel, initialData }: Prope
 
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-2">
-              Property Photos (Max 10)
+              매물 사진 (최대 5장)
             </label>
             <ImageUpload
-              maxImages={10}
+              maxImages={5}
               onImagesChange={handlePhotosChange}
               initialImages={photos}
             />

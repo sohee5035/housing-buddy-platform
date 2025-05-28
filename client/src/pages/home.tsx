@@ -1,267 +1,136 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
-import Navbar from "@/components/navbar";
-import SearchForm from "@/components/search-form";
-import PropertyCard from "@/components/property-card";
 import PropertyForm from "@/components/property-form";
-import TranslationModal from "@/components/translation-modal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Grid3X3, List } from "lucide-react";
-
-interface SearchFilters {
-  city?: string;
-  propertyType?: string;
-  priceRange?: string;
-  listingType?: string;
-  search?: string;
-}
+import { Plus, Home as HomeIcon, MapPin, Calendar } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Home() {
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showTranslationModal, setShowTranslationModal] = useState(false);
-  const [selectedPropertyForTranslation, setSelectedPropertyForTranslation] = useState<Property | null>(null);
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
-    queryKey: ["/api/properties", searchFilters],
+    queryKey: ["/api/properties"],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      
-      if (searchFilters.city) params.append("city", searchFilters.city);
-      if (searchFilters.propertyType) params.append("propertyType", searchFilters.propertyType);
-      if (searchFilters.listingType) params.append("listingType", searchFilters.listingType);
-      if (searchFilters.search) params.append("search", searchFilters.search);
-      
-      // Handle price range
-      if (searchFilters.priceRange && searchFilters.priceRange !== "any") {
-        const ranges: Record<string, { min: number; max: number }> = {
-          "100k-300k": { min: 100000, max: 300000 },
-          "300k-500k": { min: 300000, max: 500000 },
-          "500k-1m": { min: 500000, max: 1000000 },
-          "1m+": { min: 1000000, max: Infinity },
-        };
-        const range = ranges[searchFilters.priceRange];
-        if (range) {
-          params.append("minPrice", range.min.toString());
-          if (range.max !== Infinity) {
-            params.append("maxPrice", range.max.toString());
-          }
-        }
-      }
-
-      const response = await fetch(`/api/properties?${params.toString()}`);
+      const response = await fetch("/api/properties");
       if (!response.ok) throw new Error("Failed to fetch properties");
       return response.json();
     },
   });
 
-  const handleSearch = (filters: SearchFilters) => {
-    setSearchFilters(filters);
-  };
-
-  const handleTranslate = (property: Property) => {
-    setSelectedPropertyForTranslation(property);
-    setShowTranslationModal(true);
-  };
-
-  const filteredProperties = properties.filter(property => {
-    if (activeFilter === "all") return true;
-    if (activeFilter === "sale") return property.listingType === "sale";
-    if (activeFilter === "rent") return property.listingType === "rent";
-    return true;
-  });
-
-  const stats = {
-    totalListings: properties.length,
-    citiesCovered: new Set(properties.map(p => p.city)).size,
-    happyClients: "98%",
-    languages: "23"
+  const formatPrice = (deposit: number, monthlyRent: number) => {
+    const depositStr = deposit ? (deposit / 10000).toLocaleString() : '0';
+    const rentStr = monthlyRent ? (monthlyRent / 10000).toLocaleString() : '0';
+    return `보증금 ${depositStr}만원 / 월세 ${rentStr}만원`;
   };
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <Navbar onCreateListing={() => setShowCreateModal(true)} />
-      
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary to-secondary text-white py-16 lg:py-24">
+      {/* Simple Header */}
+      <header className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-              Find Your Dream Property
-            </h1>
-            <p className="text-xl sm:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Discover premium real estate listings with advanced search, multi-language support, and stunning visuals
-            </p>
-          </div>
-          
-          <SearchForm onSearch={handleSearch} />
-        </div>
-      </section>
-
-      {/* Featured Properties */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">Featured Properties</h2>
-            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">Discover our handpicked premium listings from around the world</p>
-          </div>
-
-          {/* Filter Controls */}
-          <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
-            <div className="flex flex-wrap gap-2">
-              {[
-                { key: "all", label: "All" },
-                { key: "sale", label: "For Sale" },
-                { key: "rent", label: "For Rent" },
-              ].map((filter) => (
-                <Button
-                  key={filter.key}
-                  variant={activeFilter === filter.key ? "default" : "secondary"}
-                  size="sm"
-                  className="rounded-full"
-                  onClick={() => setActiveFilter(filter.key)}
-                >
-                  {filter.label}
-                </Button>
-              ))}
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <HomeIcon className="h-8 w-8 text-primary mr-3" />
+              <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
             </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="flex border border-neutral-300 rounded-lg">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  className="rounded-l-lg rounded-r-none"
-                  onClick={() => setViewMode("grid")}
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  className="rounded-r-lg rounded-l-none"
-                  onClick={() => setViewMode("list")}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Properties Grid */}
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
-                <Card key={i} className="overflow-hidden">
-                  <div className="h-64 bg-neutral-200 animate-pulse" />
-                  <CardContent className="p-6 space-y-3">
-                    <div className="h-4 bg-neutral-200 rounded animate-pulse" />
-                    <div className="h-3 bg-neutral-200 rounded animate-pulse w-3/4" />
-                    <div className="h-6 bg-neutral-200 rounded animate-pulse w-1/2" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : filteredProperties.length === 0 ? (
-            <div className="text-center py-16">
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">No properties found</h3>
-              <p className="text-neutral-600 mb-6">Try adjusting your search filters or create a new listing</p>
-              <Button onClick={() => setShowCreateModal(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create New Listing
-              </Button>
-            </div>
-          ) : (
-            <div className={`grid gap-8 mb-12 ${
-              viewMode === "grid" 
-                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
-                : "grid-cols-1"
-            }`}>
-              {filteredProperties.map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  onTranslate={() => handleTranslate(property)}
-                  viewMode={viewMode}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-neutral-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">{stats.totalListings}</div>
-              <div className="text-neutral-600">Active Listings</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">{stats.citiesCovered}</div>
-              <div className="text-neutral-600">Cities Covered</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">{stats.happyClients}</div>
-              <div className="text-neutral-600">Client Satisfaction</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">{stats.languages}</div>
-              <div className="text-neutral-600">Languages Supported</div>
-            </div>
+            <Button onClick={() => setShowCreateModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              매물 등록
+            </Button>
           </div>
         </div>
-      </section>
+      </header>
 
-      {/* Footer */}
-      <footer className="bg-neutral-800 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center mb-6">
-                <div className="text-primary text-2xl mr-2">🏠</div>
-                <span className="text-xl font-bold">PropertyHub</span>
-              </div>
-              <p className="text-neutral-300 mb-6 max-w-md">
-                Your premier destination for discovering exceptional real estate opportunities worldwide. 
-                We connect buyers, sellers, and renters with premium properties across the globe.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-2 text-neutral-300">
-                <li>Browse Properties</li>
-                <li>List Your Property</li>
-                <li>Find Agents</li>
-                <li>Market Insights</li>
-                <li>About Us</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-neutral-300">
-                <li>Help Center</li>
-                <li>Contact Us</li>
-                <li>Privacy Policy</li>
-                <li>Terms of Service</li>
-                <li>Careers</li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-neutral-700 pt-8 text-center text-neutral-400">
-            <p>&copy; 2024 PropertyHub. All rights reserved. | Powered by React & TypeScript</p>
-          </div>
+      {/* Property List */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6">
+          <h2 className="text-3xl font-bold text-neutral-900 mb-2">등록된 매물</h2>
+          <p className="text-neutral-600">총 {properties.length}개의 매물이 등록되어 있습니다.</p>
         </div>
-      </footer>
 
-      {/* Modals */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <Card key={i} className="overflow-hidden">
+                <div className="h-48 bg-neutral-200 animate-pulse" />
+                <CardContent className="p-4 space-y-3">
+                  <div className="h-4 bg-neutral-200 rounded animate-pulse" />
+                  <div className="h-3 bg-neutral-200 rounded animate-pulse w-3/4" />
+                  <div className="h-6 bg-neutral-200 rounded animate-pulse w-1/2" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : properties.length === 0 ? (
+          <div className="text-center py-16">
+            <HomeIcon className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-neutral-900 mb-2">등록된 매물이 없습니다</h3>
+            <p className="text-neutral-600 mb-6">첫 번째 매물을 등록해보세요!</p>
+            <Button onClick={() => setShowCreateModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              매물 등록하기
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {properties.map((property) => (
+              <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Link href={`/property/${property.id}`}>
+                  <div className="relative h-48 bg-neutral-200">
+                    {property.photos && property.photos.length > 0 ? (
+                      <img
+                        src={property.photos[0]}
+                        alt={property.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-neutral-500">
+                        <HomeIcon className="h-12 w-12" />
+                      </div>
+                    )}
+                  </div>
+                </Link>
+                
+                <CardContent className="p-4">
+                  <Link href={`/property/${property.id}`}>
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2 hover:text-primary transition-colors cursor-pointer line-clamp-1">
+                      {property.title}
+                    </h3>
+                  </Link>
+                  
+                  <div className="flex items-center text-sm text-neutral-500 mb-2">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    <span className="line-clamp-1">{property.address}</span>
+                  </div>
+                  
+                  <div className="text-sm font-medium text-primary mb-3">
+                    {formatPrice(property.deposit, property.monthlyRent)}
+                  </div>
+                  
+                  <p className="text-sm text-neutral-600 line-clamp-2 mb-3">
+                    {property.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-xs text-neutral-400">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
+                    </div>
+                    <Link href={`/property/${property.id}`}>
+                      <Button size="sm" variant="outline">상세보기</Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </main>
+
+      {/* Create Property Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <PropertyForm 
@@ -273,12 +142,6 @@ export default function Home() {
           />
         </DialogContent>
       </Dialog>
-
-      <TranslationModal
-        isOpen={showTranslationModal}
-        onClose={() => setShowTranslationModal(false)}
-        property={selectedPropertyForTranslation}
-      />
 
       {/* Floating Action Button (Mobile) */}
       <Button

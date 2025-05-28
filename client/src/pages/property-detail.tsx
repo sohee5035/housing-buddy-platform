@@ -1,29 +1,23 @@
 import { useParams, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import { useState } from "react";
-import Navbar from "@/components/navbar";
-import TranslationModal from "@/components/translation-modal";
+import PropertyForm from "@/components/property-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
-  Share, 
-  Heart, 
-  Languages, 
-  Bed, 
-  Bath, 
-  Square, 
-  Car, 
-  Calendar, 
-  PawPrint,
+  Edit, 
+  Trash2, 
+  Home as HomeIcon,
+  MapPin,
+  Calendar,
   ChevronLeft,
-  ChevronRight,
-  Phone,
-  Mail,
-  CalendarDays
+  ChevronRight
 } from "lucide-react";
 
 export default function PropertyDetail() {
