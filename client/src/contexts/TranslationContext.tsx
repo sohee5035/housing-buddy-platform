@@ -19,10 +19,25 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   const [targetLanguage, setTargetLanguage] = useState('en');
 
   const getTranslatedText = (originalText: string, key?: string) => {
+    console.log('getTranslatedText 호출:', {
+      originalText: originalText?.substring(0, 30) + '...',
+      key,
+      isTranslated,
+      hasData: Object.keys(translatedData).length > 0,
+      translatedValue: translatedData[key || ''],
+      allKeys: Object.keys(translatedData).slice(0, 5)
+    });
+    
     if (!isTranslated || !originalText) return originalText;
     
     const lookupKey = key || originalText;
-    return translatedData[lookupKey] || originalText;
+    const result = translatedData[lookupKey] || originalText;
+    
+    if (key && translatedData[key]) {
+      console.log(`번역 성공: ${key} → ${result}`);
+    }
+    
+    return result;
   };
 
   const clearTranslations = () => {
