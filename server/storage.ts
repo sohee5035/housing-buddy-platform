@@ -229,10 +229,28 @@ export class MemStorage implements IStorage {
   }
 
   async permanentDeleteProperty(id: number): Promise<boolean> {
-    const property = this.properties.get(id);
-    if (!property || property.isDeleted !== 1) return false;
+    console.log("=== PERMANENT DELETE CALLED ===");
+    console.log("Attempting to permanently delete property ID:", id);
     
-    return this.properties.delete(id);
+    const property = this.properties.get(id);
+    console.log("Found property:", property ? "Yes" : "No");
+    
+    if (!property) {
+      console.log("Property not found");
+      return false;
+    }
+    
+    if (property.isDeleted !== 1) {
+      console.log("Property is not deleted (isDeleted:", property.isDeleted, ")");
+      return false;
+    }
+    
+    console.log("Deleting property from memory...");
+    const result = this.properties.delete(id);
+    console.log("Delete result:", result);
+    console.log("Properties remaining:", this.properties.size);
+    
+    return result;
   }
 }
 
