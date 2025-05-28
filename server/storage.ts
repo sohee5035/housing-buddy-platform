@@ -40,6 +40,8 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800"
         ],
         isActive: 1,
+        isDeleted: 0,
+        deletedAt: null,
         createdAt: new Date(),
       },
       {
@@ -54,6 +56,8 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
         ],
         isActive: 1,
+        isDeleted: 0,
+        deletedAt: null,
         createdAt: new Date(),
       },
       {
@@ -68,6 +72,8 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
         ],
         isActive: 1,
+        isDeleted: 0,
+        deletedAt: null,
         createdAt: new Date(),
       },
       {
@@ -82,6 +88,8 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
         ],
         isActive: 1,
+        isDeleted: 0,
+        deletedAt: null,
         createdAt: new Date(),
       },
       {
@@ -96,6 +104,8 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
         ],
         isActive: 1,
+        isDeleted: 0,
+        deletedAt: null,
         createdAt: new Date(),
       }
     ];
@@ -130,6 +140,8 @@ export class MemStorage implements IStorage {
       otherInfo: insertProperty.otherInfo || null,
       photos: insertProperty.photos || [],
       isActive: 1,
+      isDeleted: 0,
+      deletedAt: null,
       createdAt: new Date(),
     };
     this.properties.set(id, property);
