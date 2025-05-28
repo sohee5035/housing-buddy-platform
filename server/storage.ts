@@ -51,6 +51,7 @@ export class MemStorage implements IStorage {
         address: "서울특별시 마포구 홍익로 67-8",
         deposit: 8000000,
         monthlyRent: 1200000,
+        maintenanceFee: 80000,
         description: "홍대입구역 도보 3분, 복층 구조의 넓은 투룸 오피스텔입니다. 최신 시설과 가전제품이 완비되어 있습니다.",
         otherInfo: "복층, 세탁기, 에어컨, 인터넷 무료",
         photos: [

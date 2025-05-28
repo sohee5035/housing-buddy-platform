@@ -116,10 +116,18 @@ export default function PropertyDetail() {
     }
   };
 
-  const formatPrice = (deposit: number, monthlyRent: number) => {
+  const formatPrice = (deposit: number, monthlyRent: number, maintenanceFee?: number | null) => {
     const depositStr = deposit ? (deposit / 10000).toLocaleString() : '0';
     const rentStr = monthlyRent ? (monthlyRent / 10000).toLocaleString() : '0';
-    return `보증금 ${depositStr}만원 / 월세 ${rentStr}만원`;
+    const maintenanceStr = maintenanceFee ? (maintenanceFee / 10000).toLocaleString() : null;
+    
+    let priceText = `보증금 ${depositStr}만원 / 월세 ${rentStr}만원`;
+    if (maintenanceStr) {
+      priceText += ` / 관리비 ${maintenanceStr}만원`;
+    } else {
+      priceText += ' / 관리비 알 수 없음';
+    }
+    return priceText;
   };
 
   const handleDelete = () => {
@@ -365,7 +373,7 @@ export default function PropertyDetail() {
                 <span>{property.address}</span>
               </div>
               <div className="text-2xl font-bold text-primary">
-                {formatPrice(property.deposit, property.monthlyRent)}
+                {formatPrice(property.deposit, property.monthlyRent, property.maintenanceFee)}
               </div>
             </div>
 
