@@ -31,6 +31,17 @@ export default function Home() {
     return `보증금 ${depositStr}만원 / 월세 ${rentStr}만원`;
   };
 
+  // 카테고리별 매물 필터링
+  const filteredProperties = properties.filter(property => {
+    if (selectedCategory === '전체') return true;
+    return property.category === selectedCategory;
+  });
+
+  // 사용 가능한 카테고리 목록 생성
+  const availableCategories = ['전체', ...Array.from(new Set(properties.map(p => p.category || '기타')))];
+
+  const categories = ['전체', '원룸', '투룸', '쓰리룸', '오피스텔', '아파트', '빌라', '상가', '사무실', '기타'];
+
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Simple Header */}
@@ -64,11 +75,35 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Category Filter */}
+      <div className="bg-white border-b border-neutral-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                className="text-sm"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Property List */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <h2 className="text-3xl font-bold text-neutral-900 mb-2">등록된 매물</h2>
-          <p className="text-neutral-600">총 {properties.length}개의 매물이 등록되어 있습니다.</p>
+          <p className="text-neutral-600">
+            {selectedCategory === '전체' 
+              ? `총 ${properties.length}개의 매물이 등록되어 있습니다.`
+              : `'${selectedCategory}' 카테고리에 ${filteredProperties.length}개의 매물이 있습니다.`
+            }
+          </p>
         </div>
 
         {isLoading ? (
@@ -84,7 +119,7 @@ export default function Home() {
               </Card>
             ))}
           </div>
-        ) : properties.length === 0 ? (
+        ) : filteredProperties.length === 0 ? (
           <div className="text-center py-16">
             <HomeIcon className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-neutral-900 mb-2">등록된 매물이 없습니다</h3>
@@ -96,7 +131,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {properties.map((property) => (
+            {filteredProperties.map((property) => (
               <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <Link href={`/property/${property.id}`}>
                   <div className="relative h-48 bg-neutral-200">
