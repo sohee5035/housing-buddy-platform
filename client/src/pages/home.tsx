@@ -28,6 +28,7 @@ export default function Home() {
   // Translation context
   const { 
     isTranslated, 
+    translatedData,
     targetLanguage, 
     setTargetLanguage, 
     setTranslatedData, 
