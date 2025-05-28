@@ -252,14 +252,20 @@ export default function PropertyDetail() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => setShowEditModal(true)}
+                onClick={() => {
+                  setAdminAction('edit');
+                  setShowAdminAuth(true);
+                }}
               >
                 <Edit className="h-4 w-4 mr-2" />
                 수정
               </Button>
               <Button
                 variant="destructive"
-                onClick={handleDelete}
+                onClick={() => {
+                  setAdminAction('delete');
+                  setShowAdminAuth(true);
+                }}
                 disabled={deleteMutation.isPending}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -522,6 +528,22 @@ export default function PropertyDetail() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Admin Authentication */}
+      <AdminAuth
+        isOpen={showAdminAuth}
+        onClose={() => setShowAdminAuth(false)}
+        onSuccess={() => {
+          setShowAdminAuth(false);
+          if (adminAction === 'edit') {
+            setShowEditModal(true);
+          } else if (adminAction === 'delete') {
+            handleDelete();
+          }
+        }}
+        title={adminAction === 'edit' ? "매물 수정 권한 확인" : "매물 삭제 권한 확인"}
+        description={adminAction === 'edit' ? "매물을 수정하려면 관리자 비밀번호가 필요합니다." : "매물을 삭제하려면 관리자 비밀번호가 필요합니다."}
+      />
 
       {/* Edit Property Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
