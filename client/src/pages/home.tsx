@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import PropertyForm from "@/components/property-form";
 import AdminAuth from "@/components/admin-auth";
@@ -8,8 +8,12 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X, Settings } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X, Settings, Languages, Globe, RotateCcw } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "@/contexts/TranslationContext";
+import { translateText, supportedLanguages } from "@/lib/translate";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -20,6 +24,18 @@ export default function Home() {
 
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [, setLocation] = useLocation();
+  
+  // Translation context
+  const { 
+    isTranslated, 
+    targetLanguage, 
+    setTargetLanguage, 
+    setTranslatedData, 
+    setIsTranslated, 
+    clearTranslations,
+    getTranslatedText 
+  } = useTranslation();
+  const { toast } = useToast();
 
   const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -29,6 +45,75 @@ export default function Home() {
       return response.json();
     },
   });
+
+  // Translation mutation for bulk translating all properties
+  const translateMutation = useMutation({
+    mutationFn: async ({ targetLang }: { targetLang: string }) => {
+      const translations: Record<string, string> = {};
+      
+      for (const property of properties) {
+        // Translate each text field
+        const fieldsToTranslate = [
+          { key: `title_${property.id}`, text: property.title },
+          { key: `address_${property.id}`, text: property.address },
+          { key: `description_${property.id}`, text: property.description },
+          { key: `category_${property.id}`, text: property.category || '기타' },
+        ];
+        
+        if (property.otherInfo) {
+          fieldsToTranslate.push({ key: `otherInfo_${property.id}`, text: property.otherInfo });
+        }
+
+        for (const field of fieldsToTranslate) {
+          try {
+            const result = await translateText(field.text, targetLang);
+            translations[field.key] = result.translatedText;
+          } catch (error) {
+            console.error(`Failed to translate ${field.key}:`, error);
+            translations[field.key] = field.text; // Fallback to original
+          }
+        }
+      }
+      
+      return translations;
+    },
+    onSuccess: (translations) => {
+      setTranslatedData(translations);
+      setIsTranslated(true);
+      toast({
+        title: "번역 완료",
+        description: `모든 매물이 ${supportedLanguages.find(l => l.code === targetLanguage)?.name}로 번역되었습니다.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "번역 실패",
+        description: "번역 중 오류가 발생했습니다. 다시 시도해주세요.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleTranslateAll = () => {
+    if (properties.length === 0) {
+      toast({
+        title: "번역할 매물이 없습니다",
+        description: "먼저 매물을 등록해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    translateMutation.mutate({ targetLang: targetLanguage });
+  };
+
+  const handleRestoreOriginal = () => {
+    clearTranslations();
+    toast({
+      title: "원본 복원",
+      description: "모든 매물이 원래 한국어로 복원되었습니다.",
+    });
+  };
 
   const formatPrice = (deposit: number, monthlyRent: number) => {
     const depositStr = deposit ? (deposit / 10000).toLocaleString() : '0';
@@ -47,9 +132,8 @@ export default function Home() {
   const allCategories = Array.from(new Set([...propertyCategories, ...customCategories]));
   const availableCategories = ['전체', ...allCategories];
   
-  console.log('customCategories:', customCategories);
-  console.log('allCategories:', allCategories);
-  console.log('availableCategories:', availableCategories);
+  // 매물 등록 폼에 전달할 전체 카테고리 목록
+  const formCategories = Array.from(new Set([...allCategories, ...customCategories]));
 
 
 
@@ -64,6 +148,49 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
             </div>
             <div className="flex items-center space-x-3">
+              {/* Translation Controls */}
+              {!isTranslated ? (
+                <div className="flex items-center space-x-2">
+                  <Select value={targetLanguage} onValueChange={setTargetLanguage}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {supportedLanguages.map((lang) => (
+                        <SelectItem key={lang.code} value={lang.code}>
+                          {lang.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    variant="outline"
+                    onClick={handleTranslateAll}
+                    disabled={translateMutation.isPending}
+                  >
+                    {translateMutation.isPending ? (
+                      <>
+                        <Languages className="h-4 w-4 mr-2 animate-spin" />
+                        번역 중...
+                      </>
+                    ) : (
+                      <>
+                        <Globe className="h-4 w-4 mr-2" />
+                        전체 번역
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  variant="outline"
+                  onClick={handleRestoreOriginal}
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  원본 복원
+                </Button>
+              )}
+
               <Button 
                 variant="outline"
                 onClick={() => {
@@ -245,7 +372,7 @@ export default function Home() {
               refetch();
             }}
             onCancel={() => setShowCreateModal(false)}
-            availableCategories={Array.from(new Set([...allCategories, ...customCategories]))}
+            availableCategories={formCategories}
             key={`${allCategories.join(',')}-${customCategories.join(',')}`}
           />
         </DialogContent>
