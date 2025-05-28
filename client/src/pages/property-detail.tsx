@@ -36,11 +36,26 @@ export default function PropertyDetail() {
   const queryClient = useQueryClient();
 
   const supportedLanguages = [
-    { code: "en", name: "English" },
-    { code: "ja", name: "日本語" },
-    { code: "zh", name: "中文" },
-    { code: "es", name: "Español" },
-    { code: "fr", name: "Français" }
+    { code: "en", name: "English (영어)" },
+    { code: "ja", name: "日本語 (일본어)" },
+    { code: "zh", name: "中文 (중국어)" },
+    { code: "zh-TW", name: "繁體中文 (번체중국어)" },
+    { code: "es", name: "Español (스페인어)" },
+    { code: "fr", name: "Français (프랑스어)" },
+    { code: "de", name: "Deutsch (독일어)" },
+    { code: "it", name: "Italiano (이탈리아어)" },
+    { code: "pt", name: "Português (포르투갈어)" },
+    { code: "ru", name: "Русский (러시아어)" },
+    { code: "ar", name: "العربية (아랍어)" },
+    { code: "hi", name: "हिन्दी (힌디어)" },
+    { code: "th", name: "ไทย (태국어)" },
+    { code: "vi", name: "Tiếng Việt (베트남어)" },
+    { code: "nl", name: "Nederlands (네덜란드어)" },
+    { code: "sv", name: "Svenska (스웨덴어)" },
+    { code: "da", name: "Dansk (덴마크어)" },
+    { code: "no", name: "Norsk (노르웨이어)" },
+    { code: "fi", name: "Suomi (핀란드어)" },
+    { code: "pl", name: "Polski (폴란드어)" }
   ];
 
   // Add delete mutation
