@@ -16,20 +16,20 @@ interface PropertyCardProps {
 
 export default function PropertyCard({ property, onTranslate, viewMode = "grid" }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
-  const { getTranslatedText, translatedData, isTranslated } = useTranslation();
+  const { translatedData, isTranslated } = useTranslation();
   
-  // 번역된 텍스트 직접 계산 - 재렌더링 보장
-  const displayTitle = isTranslated && translatedData[`title_${property.id}`] 
-    ? translatedData[`title_${property.id}`] 
-    : property.title;
-    
-  const displayAddress = isTranslated && translatedData[`address_${property.id}`] 
-    ? translatedData[`address_${property.id}`] 
-    : property.address;
-    
-  const displayDescription = isTranslated && translatedData[`description_${property.id}`] 
-    ? translatedData[`description_${property.id}`] 
-    : property.description;
+  // 강제 리렌더링을 위한 key
+  const forceRender = `${property.id}-${isTranslated}-${Object.keys(translatedData).length}`;
+  
+  // 번역된 텍스트 계산
+  const getDisplayText = (field: string) => {
+    const key = `${field}_${property.id}`;
+    return isTranslated && translatedData[key] ? translatedData[key] : property[field as keyof Property];
+  };
+  
+  const displayTitle = getDisplayText('title') as string;
+  const displayAddress = getDisplayText('address') as string;
+  const displayDescription = getDisplayText('description') as string;
 
   // 디버깅: Context 업데이트 감지
   useEffect(() => {

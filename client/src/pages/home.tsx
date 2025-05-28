@@ -316,13 +316,19 @@ export default function Home() {
                 <CardContent className="p-4">
                   <Link href={`/property/${property.id}`}>
                     <h3 className="text-lg font-semibold text-neutral-900 mb-2 hover:text-primary transition-colors cursor-pointer line-clamp-1">
-                      {property.title}
+                      {isTranslated && translatedData[`title_${property.id}`] 
+                        ? translatedData[`title_${property.id}`] 
+                        : property.title}
                     </h3>
                   </Link>
                   
                   <div className="flex items-center text-sm text-neutral-500 mb-2">
                     <MapPin className="h-4 w-4 mr-1" />
-                    <span className="line-clamp-1">{property.address}</span>
+                    <span className="line-clamp-1">
+                      {isTranslated && translatedData[`address_${property.id}`] 
+                        ? translatedData[`address_${property.id}`] 
+                        : property.address}
+                    </span>
                   </div>
                   
                   <div className="text-sm font-medium text-primary mb-3">
@@ -330,7 +336,9 @@ export default function Home() {
                   </div>
                   
                   <p className="text-sm text-neutral-600 line-clamp-2 mb-3">
-                    {property.description}
+                    {isTranslated && translatedData[`description_${property.id}`] 
+                      ? translatedData[`description_${property.id}`] 
+                      : property.description}
                   </p>
                   
                   <div className="flex items-center justify-between">
