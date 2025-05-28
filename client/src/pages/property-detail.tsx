@@ -30,8 +30,13 @@ export default function PropertyDetail() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showTranslationModal, setShowTranslationModal] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("");
-  const [translatedContent, setTranslatedContent] = useState<any>(null);
+  const [translatedContent, setTranslatedContent] = useState<{
+    title?: string;
+    description?: string;
+    otherInfo?: string;
+  }>({});
   const [isTranslating, setIsTranslating] = useState(false);
+  const [showOriginal, setShowOriginal] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -123,22 +128,25 @@ export default function PropertyDetail() {
     if (!selectedLanguage || !property) return;
     
     setIsTranslating(true);
+    setShowTranslationModal(false);
+    
     try {
       const translations = await Promise.all([
         apiRequest("POST", "/api/translate", { text: property.title, targetLang: selectedLanguage }),
         apiRequest("POST", "/api/translate", { text: property.description, targetLang: selectedLanguage }),
-        apiRequest("POST", "/api/translate", { text: property.address, targetLang: selectedLanguage }),
         property.otherInfo ? apiRequest("POST", "/api/translate", { text: property.otherInfo, targetLang: selectedLanguage }) : null
       ]);
 
-      const [titleRes, descRes, addressRes, otherInfoRes] = translations;
+      const [titleRes, descRes, otherInfoRes] = translations;
       
-      setTranslatedContent({
+      const translatedData = {
         title: (await titleRes.json()).translatedText,
         description: (await descRes.json()).translatedText,
-        address: (await addressRes.json()).translatedText,
-        otherInfo: otherInfoRes ? (await otherInfoRes.json()).translatedText : null
-      });
+        otherInfo: otherInfoRes ? (await otherInfoRes.json()).translatedText : property.otherInfo
+      };
+      
+      setTranslatedContent(translatedData);
+      setShowOriginal(false);
       
       toast({
         title: "번역 완료",
@@ -316,7 +324,20 @@ export default function PropertyDetail() {
           <div className="lg:col-span-2">
             {/* Header */}
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-neutral-900 mb-2">{property.title}</h1>
+              <div className="flex items-center justify-between mb-2">
+                <h1 className="text-3xl font-bold text-neutral-900">
+                  {showOriginal ? property.title : (translatedContent.title || property.title)}
+                </h1>
+                {!showOriginal && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowOriginal(true)}
+                  >
+                    원본 보기
+                  </Button>
+                )}
+              </div>
               <div className="flex items-center text-neutral-500 mb-4">
                 <MapPin className="h-4 w-4 mr-2" />
                 <span>{property.address}</span>
@@ -329,14 +350,18 @@ export default function PropertyDetail() {
             {/* Description */}
             <div className="mb-8">
               <h3 className="text-xl font-semibold text-neutral-900 mb-4">상세 설명</h3>
-              <p className="text-neutral-600 leading-relaxed">{property.description}</p>
+              <p className="text-neutral-600 leading-relaxed">
+                {showOriginal ? property.description : (translatedContent.description || property.description)}
+              </p>
             </div>
 
             {/* Other Info */}
             {property.otherInfo && (
               <div className="mb-8">
                 <h3 className="text-xl font-semibold text-neutral-900 mb-4">기타 정보</h3>
-                <p className="text-neutral-600">{property.otherInfo}</p>
+                <p className="text-neutral-600">
+                  {showOriginal ? property.otherInfo : (translatedContent.otherInfo || property.otherInfo)}
+                </p>
               </div>
             )}
 
