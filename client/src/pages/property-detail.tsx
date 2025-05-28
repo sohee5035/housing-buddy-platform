@@ -41,6 +41,7 @@ export default function PropertyDetail() {
   const queryClient = useQueryClient();
 
   const supportedLanguages = [
+    { code: "ko", name: "한국어 (원본)" },
     { code: "en", name: "English (영어)" },
     { code: "ja", name: "日本語 (일본어)" },
     { code: "zh", name: "中文 (중국어)" },
@@ -129,6 +130,18 @@ export default function PropertyDetail() {
     
     setIsTranslating(true);
     setShowTranslationModal(false);
+    
+    // 한국어를 선택한 경우 원본으로 돌아가기
+    if (selectedLanguage === "ko") {
+      setShowOriginal(true);
+      setTranslatedContent({});
+      setIsTranslating(false);
+      toast({
+        title: "원본 표시",
+        description: "한국어 원본으로 되돌렸습니다.",
+      });
+      return;
+    }
     
     try {
       const translations = await Promise.all([
