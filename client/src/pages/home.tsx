@@ -5,7 +5,7 @@ import PropertyForm from "@/components/property-form";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Home as HomeIcon, MapPin, Calendar } from "lucide-react";
+import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
