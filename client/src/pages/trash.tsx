@@ -25,9 +25,21 @@ export default function Trash() {
       console.log("Fetching trash data...");
       const response = await fetch("/api/trash");
       console.log("Trash response status:", response.status);
+      
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
+      
       if (!response.ok) throw new Error("Failed to fetch deleted properties");
-      const data = await response.json();
-      console.log("Trash data received:", data);
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log("Parsed trash data:", data);
+      } catch (e) {
+        console.log("JSON parse error:", e);
+        throw new Error("Invalid JSON response");
+      }
+      
       return data;
     },
     staleTime: 0,
