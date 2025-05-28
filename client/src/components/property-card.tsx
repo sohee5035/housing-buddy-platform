@@ -15,7 +15,16 @@ interface PropertyCardProps {
 
 export default function PropertyCard({ property, onTranslate, viewMode = "grid" }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
-  const { getTranslatedText } = useTranslation();
+  const { getTranslatedText, translatedData, isTranslated } = useTranslation();
+  
+  // 디버깅용 로그
+  console.log('PropertyCard render:', {
+    propertyId: property.id,
+    isTranslated,
+    translatedData,
+    titleKey: `title_${property.id}`,
+    translatedTitle: getTranslatedText(property.title, `title_${property.id}`)
+  });
 
   const formatPrice = (price: number, listingType: string) => {
     return listingType === "rent" 

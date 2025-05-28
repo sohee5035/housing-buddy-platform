@@ -78,8 +78,10 @@ export default function Home() {
       return translations;
     },
     onSuccess: (translations) => {
+      console.log('Translation successful, setting data:', translations);
       setTranslatedData(translations);
       setIsTranslated(true);
+      setTargetLanguage(targetLanguage);
       toast({
         title: "번역 완료",
         description: `모든 매물이 ${supportedLanguages.find(l => l.code === targetLanguage)?.name}로 번역되었습니다.`,
@@ -139,14 +141,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Simple Header */}
+      {/* Header */}
       <header className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center min-h-16 py-3">
-            <div className="flex items-center flex-shrink-0">
-              <HomeIcon className="h-8 w-8 text-primary mr-3" />
-              <h1 className="text-2xl font-bold text-neutral-900 whitespace-nowrap">부동산 매물</h1>
-            </div>
+          {/* Title Row */}
+          <div className="flex items-center justify-center py-4 border-b border-neutral-100">
+            <HomeIcon className="h-8 w-8 text-primary mr-3" />
+            <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
+          </div>
+          
+          {/* Controls Row */}
+          <div className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {/* Translation Controls */}
               <div className="flex flex-wrap items-center gap-2">
