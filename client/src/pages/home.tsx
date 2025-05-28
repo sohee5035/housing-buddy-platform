@@ -3,17 +3,19 @@ import { useQuery } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import PropertyForm from "@/components/property-form";
 import AdminAuth from "@/components/admin-auth";
+import CategoryManager from "@/components/category-manager";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X } from "lucide-react";
+import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
-  const [adminAction, setAdminAction] = useState<'create' | 'trash'>('create');
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [adminAction, setAdminAction] = useState<'create' | 'trash' | 'category'>('create');
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [newCategoryName, setNewCategoryName] = useState('');
   const [showAddCategory, setShowAddCategory] = useState(false);
@@ -78,6 +80,16 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
             </div>
             <div className="flex items-center space-x-3">
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setAdminAction('category');
+                  setShowAdminAuth(true);
+                }}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                카테고리 관리
+              </Button>
               <Button 
                 variant="outline"
                 onClick={() => {
@@ -276,10 +288,20 @@ export default function Home() {
             setShowCreateModal(true);
           } else if (adminAction === 'trash') {
             setLocation('/trash');
+          } else if (adminAction === 'category') {
+            setShowCategoryManager(true);
           }
         }}
-        title={adminAction === 'create' ? "매물 등록 권한 확인" : "휴지통 접근 권한 확인"}
-        description={adminAction === 'create' ? "매물을 등록하려면 관리자 비밀번호가 필요합니다." : "휴지통에 접근하려면 관리자 비밀번호가 필요합니다."}
+        title={
+          adminAction === 'create' ? "매물 등록 권한 확인" : 
+          adminAction === 'trash' ? "휴지통 접근 권한 확인" :
+          "카테고리 관리 권한 확인"
+        }
+        description={
+          adminAction === 'create' ? "매물을 등록하려면 관리자 비밀번호가 필요합니다." : 
+          adminAction === 'trash' ? "휴지통에 접근하려면 관리자 비밀번호가 필요합니다." :
+          "카테고리를 관리하려면 관리자 비밀번호가 필요합니다."
+        }
       />
 
       {/* Create Property Modal */}
