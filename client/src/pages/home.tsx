@@ -17,6 +17,7 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [newCategoryName, setNewCategoryName] = useState('');
   const [showAddCategory, setShowAddCategory] = useState(false);
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [, setLocation] = useLocation();
 
   const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
@@ -40,12 +41,15 @@ export default function Home() {
     return property.category === selectedCategory;
   });
 
-  // 사용 가능한 카테고리 목록 생성 (매물에서 실제 사용된 카테고리들)
-  const availableCategories = ['전체', ...Array.from(new Set(properties.map(p => p.category || '기타')))];
+  // 사용 가능한 카테고리 목록 생성 (매물에서 실제 사용된 카테고리들 + 커스텀 카테고리들)
+  const propertyCategories = Array.from(new Set(properties.map(p => p.category || '기타').filter(Boolean)));
+  const allCategories = Array.from(new Set([...propertyCategories, ...customCategories]));
+  const availableCategories = ['전체', ...allCategories];
 
   // 새 카테고리 추가 함수
   const handleAddCategory = () => {
     if (newCategoryName.trim() && !availableCategories.includes(newCategoryName.trim())) {
+      setCustomCategories(prev => [...prev, newCategoryName.trim()]);
       setSelectedCategory(newCategoryName.trim());
       setNewCategoryName('');
       setShowAddCategory(false);
@@ -56,6 +60,7 @@ export default function Home() {
   const handleRemoveCategory = (categoryToRemove: string) => {
     const categoryHasProperties = properties.some(p => p.category === categoryToRemove);
     if (!categoryHasProperties && categoryToRemove !== '전체') {
+      setCustomCategories(prev => prev.filter(cat => cat !== categoryToRemove));
       if (selectedCategory === categoryToRemove) {
         setSelectedCategory('전체');
       }
