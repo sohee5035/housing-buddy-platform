@@ -202,9 +202,11 @@ export class MemStorage implements IStorage {
     });
     
     // Sort by deletion date (newest first)
-    return deletedProperties.sort((a, b) => 
-      new Date(b.deletedAt!).getTime() - new Date(a.deletedAt!).getTime()
-    );
+    return deletedProperties.sort((a, b) => {
+      const dateA = a.deletedAt instanceof Date ? a.deletedAt : new Date(a.deletedAt!);
+      const dateB = b.deletedAt instanceof Date ? b.deletedAt : new Date(b.deletedAt!);
+      return dateB.getTime() - dateA.getTime();
+    });
   }
 
   async restoreProperty(id: number): Promise<Property | undefined> {
