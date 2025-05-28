@@ -41,10 +41,18 @@ export default function Home() {
   const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
     queryFn: async () => {
-      const response = await fetch("/api/properties");
+      const response = await fetch("/api/properties", {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (!response.ok) throw new Error("Failed to fetch properties");
       return response.json();
     },
+    staleTime: 0, // 즉시 stale로 만들어서 항상 새로 가져오기
+    cacheTime: 0, // 캐시 시간을 0으로 설정
   });
 
   // Translation mutation for bulk translating all properties
