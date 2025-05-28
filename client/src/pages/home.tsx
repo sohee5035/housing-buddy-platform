@@ -46,6 +46,10 @@ export default function Home() {
   const propertyCategories = Array.from(new Set(properties.map(p => p.category || '기타').filter(Boolean)));
   const allCategories = Array.from(new Set([...propertyCategories, ...customCategories]));
   const availableCategories = ['전체', ...allCategories];
+  
+  console.log('customCategories:', customCategories);
+  console.log('allCategories:', allCategories);
+  console.log('availableCategories:', availableCategories);
 
 
 

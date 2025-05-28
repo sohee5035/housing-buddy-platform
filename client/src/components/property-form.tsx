@@ -24,6 +24,8 @@ export default function PropertyForm({ onSuccess, onCancel, initialData, availab
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [photos, setPhotos] = useState<string[]>(initialData?.photos || []);
+  
+  console.log('PropertyForm received categories:', availableCategories);
 
   const form = useForm<InsertProperty>({
     resolver: zodResolver(insertPropertySchema),
@@ -36,7 +38,7 @@ export default function PropertyForm({ onSuccess, onCancel, initialData, availab
       otherInfo: initialData?.otherInfo || "",
       photos: photos,
       isActive: initialData?.isActive || 1,
-      category: initialData?.category || "",
+      category: initialData?.category || "기타",
       maintenanceFee: initialData?.maintenanceFee || 0,
       originalUrl: initialData?.originalUrl || "",
     },
@@ -57,71 +59,61 @@ export default function PropertyForm({ onSuccess, onCancel, initialData, availab
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
       toast({
-        title: initialData?.id ? "수정 완료" : "등록 완료",
-        description: initialData?.id ? "매물이 성공적으로 수정되었습니다." : "매물이 성공적으로 등록되었습니다.",
+        title: initialData ? "매물 수정 완료" : "매물 등록 완료",
+        description: initialData ? "매물이 성공적으로 수정되었습니다." : "새 매물이 성공적으로 등록되었습니다.",
       });
       onSuccess?.();
     },
     onError: (error: any) => {
       toast({
-        title: "오류",
-        description: error.message || "처리 중 오류가 발생했습니다.",
+        title: "오류 발생",
+        description: error.message || "매물 처리 중 오류가 발생했습니다.",
         variant: "destructive",
       });
     },
   });
 
   const onSubmit = (data: InsertProperty) => {
-    const propertyData = {
-      ...data,
-      photos,
-    };
-    createMutation.mutate(propertyData);
+    createMutation.mutate({ ...data, photos });
   };
 
   const handlePhotosChange = (newPhotos: string[]) => {
     setPhotos(newPhotos);
-    form.setValue("photos", newPhotos);
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-neutral-900">Create New Listing</h2>
-        <Button variant="ghost" size="icon" onClick={onCancel}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-
+    <div className="space-y-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>매물 제목 *</FormLabel>
-                <FormControl>
-                  <Input placeholder="매물 제목을 입력하세요" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>매물 제목 *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="매물 제목을 입력하세요" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>주소 *</FormLabel>
-                <FormControl>
-                  <Input placeholder="전체 주소를 입력하세요" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>주소 *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="주소를 입력하세요" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FormField
@@ -217,27 +209,14 @@ export default function PropertyForm({ onSuccess, onCancel, initialData, availab
                       <SelectValue placeholder="카테고리를 선택하세요" />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableCategories.length > 0 ? (
-                        availableCategories
-                          .filter(cat => cat !== '전체')
-                          .map(category => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))
-                      ) : (
-                        <>
-                          <SelectItem value="원룸">원룸</SelectItem>
-                          <SelectItem value="투룸">투룸</SelectItem>
-                          <SelectItem value="쓰리룸">쓰리룸</SelectItem>
-                          <SelectItem value="오피스텔">오피스텔</SelectItem>
-                          <SelectItem value="아파트">아파트</SelectItem>
-                          <SelectItem value="빌라">빌라</SelectItem>
-                          <SelectItem value="상가">상가</SelectItem>
-                          <SelectItem value="사무실">사무실</SelectItem>
-                          <SelectItem value="기타">기타</SelectItem>
-                        </>
-                      )}
+                      <SelectItem value="기타">기타</SelectItem>
+                      {availableCategories
+                        .filter(cat => cat !== '전체' && cat !== '기타')
+                        .map(category => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -302,31 +281,24 @@ export default function PropertyForm({ onSuccess, onCancel, initialData, availab
 
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-2">
-              매물 사진 (최대 5장)
+              매물 사진
             </label>
-            <ImageUpload
-              maxImages={5}
+            <ImageUpload 
+              maxImages={10}
               onImagesChange={handlePhotosChange}
               initialImages={photos}
             />
           </div>
 
-          <div className="flex justify-end space-x-4 pt-6 border-t border-neutral-200">
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
+          <div className="flex justify-end space-x-4">
+            {onCancel && (
+              <Button type="button" variant="outline" onClick={onCancel}>
+                취소
+              </Button>
+            )}
             <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Listing
-                </>
-              )}
+              {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {initialData ? "수정" : "등록"}
             </Button>
           </div>
         </form>
