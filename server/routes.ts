@@ -15,6 +15,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/properties/trash - Get deleted properties (MUST be before /:id route)
+  app.get("/api/properties/trash", async (req: Request, res: Response) => {
+    try {
+      console.log("=== Trash endpoint called ===");
+      const deletedProperties = await storage.getDeletedProperties();
+      console.log("Deleted properties returned:", deletedProperties.length);
+      res.json(deletedProperties);
+    } catch (error: any) {
+      console.error("Error fetching deleted properties:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get single property by ID
   app.get("/api/properties/:id", async (req, res) => {
     try {
@@ -87,16 +100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/properties/trash - Get deleted properties
-  app.get("/api/properties/trash", async (req: Request, res: Response) => {
-    try {
-      const deletedProperties = await storage.getDeletedProperties();
-      res.json(deletedProperties);
-    } catch (error: any) {
-      console.error("Error fetching deleted properties:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
+
 
   // POST /api/properties/:id/restore - Restore a property from trash
   app.post("/api/properties/:id/restore", async (req: Request, res: Response) => {
