@@ -178,7 +178,7 @@ export default function PropertyDetail() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <HomeIcon className="h-8 w-8 text-primary mr-3" />
-              <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
+              <h1 className="text-2xl font-bold text-neutral-900 whitespace-nowrap">부동산 매물</h1>
             </div>
             <div className="flex items-center space-x-4">
               <Button
