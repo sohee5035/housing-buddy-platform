@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import { useState } from "react";
 import PropertyForm from "@/components/property-form";
+import AdminAuth from "@/components/admin-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,6 +38,8 @@ export default function PropertyDetail() {
   }>({});
   const [isTranslating, setIsTranslating] = useState(false);
   const [showOriginal, setShowOriginal] = useState(true);
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
+  const [adminAction, setAdminAction] = useState<'edit' | 'delete'>('edit');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

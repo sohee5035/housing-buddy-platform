@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import PropertyForm from "@/components/property-form";
+import AdminAuth from "@/components/admin-auth";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { Link } from "wouter";
 
 export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
 
   const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -43,7 +45,7 @@ export default function Home() {
                   휴지통
                 </Button>
               </Link>
-              <Button onClick={() => setShowCreateModal(true)}>
+              <Button onClick={() => setShowAdminAuth(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 매물 등록
               </Button>
@@ -138,6 +140,18 @@ export default function Home() {
         )}
       </main>
 
+      {/* Admin Authentication */}
+      <AdminAuth
+        isOpen={showAdminAuth}
+        onClose={() => setShowAdminAuth(false)}
+        onSuccess={() => {
+          setShowAdminAuth(false);
+          setShowCreateModal(true);
+        }}
+        title="매물 등록 권한 확인"
+        description="매물을 등록하려면 관리자 비밀번호가 필요합니다."
+      />
+
       {/* Create Property Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -155,7 +169,7 @@ export default function Home() {
       <Button
         className="fixed bottom-6 right-6 rounded-full h-14 w-14 md:hidden shadow-lg"
         size="icon"
-        onClick={() => setShowCreateModal(true)}
+        onClick={() => setShowAdminAuth(true)}
       >
         <Plus className="h-6 w-6" />
       </Button>
