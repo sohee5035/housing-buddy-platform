@@ -1,10 +1,10 @@
+import React, { useState, useEffect } from "react";
 import { Property } from "@shared/schema";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Languages, Bed, Bath, Square, MapPin } from "lucide-react";
-import { useState } from "react";
 import { useTranslation } from "@/contexts/TranslationContext";
 import SmartTextWithTooltips from "./smart-text-with-tooltips";
 
@@ -32,7 +32,7 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
     : property.description;
 
   // 디버깅: Context 업데이트 감지
-  React.useEffect(() => {
+  useEffect(() => {
     console.log(`🛠 PropertyCard ${property.id}: translations 업데이트됨`, {
       isTranslated,
       dataKeys: Object.keys(translatedData),
