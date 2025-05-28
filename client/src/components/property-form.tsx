@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { insertPropertySchema, type InsertProperty } from "@shared/schema";
+import { insertPropertySchema, type InsertProperty, type Property } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -197,6 +197,56 @@ export default function PropertyForm({ onSuccess, onCancel, initialData }: Prope
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>카테고리 *</FormLabel>
+                <FormControl>
+                  <Select 
+                    value={field.value || "기타"} 
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="카테고리를 선택하세요" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="원룸">원룸</SelectItem>
+                      <SelectItem value="투룸">투룸</SelectItem>
+                      <SelectItem value="쓰리룸">쓰리룸</SelectItem>
+                      <SelectItem value="오피스텔">오피스텔</SelectItem>
+                      <SelectItem value="아파트">아파트</SelectItem>
+                      <SelectItem value="빌라">빌라</SelectItem>
+                      <SelectItem value="상가">상가</SelectItem>
+                      <SelectItem value="사무실">사무실</SelectItem>
+                      <SelectItem value="기타">기타</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="originalUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>원본 페이지 링크 (선택)</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="원본 매물 페이지 URL을 입력하세요" 
+                    {...field}
+                    value={field.value || ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}

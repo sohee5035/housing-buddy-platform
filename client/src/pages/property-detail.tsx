@@ -395,12 +395,34 @@ export default function PropertyDetail() {
               </div>
             )}
 
+            {/* Original URL */}
+            {property.originalUrl && (
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-neutral-900 mb-4">원본 페이지</h3>
+                <a 
+                  href={property.originalUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-primary hover:text-primary/80 underline"
+                >
+                  원본 매물 페이지 보기
+                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            )}
+
             {/* Created Date */}
             <div className="mb-8">
               <h3 className="text-xl font-semibold text-neutral-900 mb-4">등록 정보</h3>
-              <div className="flex items-center text-neutral-600">
+              <div className="flex items-center text-neutral-600 mb-2">
                 <Calendar className="h-4 w-4 mr-2" />
                 <span>등록일: {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}</span>
+              </div>
+              <div className="flex items-center text-neutral-600">
+                <span className="w-4 h-4 mr-2 text-center">📂</span>
+                <span>카테고리: {property.category || '기타'}</span>
               </div>
             </div>
           </div>

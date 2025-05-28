@@ -13,6 +13,7 @@ export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
   const [adminAction, setAdminAction] = useState<'create' | 'trash'>('create');
+  const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [, setLocation] = useLocation();
 
   const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
