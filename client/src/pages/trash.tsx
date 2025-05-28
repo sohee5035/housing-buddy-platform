@@ -48,15 +48,15 @@ export default function Trash() {
 
   const restoreMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await apiRequest("POST", `/api/properties/${id}/restore`);
+      const response = await apiRequest("POST", `/api/trash/${id}/restore`);
       if (!response.ok) throw new Error("Failed to restore property");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/properties/trash"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trash"] });
       queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
       toast({
-        title: "복원 완료",
+        title: "매물 복원 성공",
         description: "매물이 성공적으로 복원되었습니다.",
       });
     },
