@@ -245,8 +245,8 @@ export default function Home() {
               refetch();
             }}
             onCancel={() => setShowCreateModal(false)}
-            availableCategories={[...allCategories, ...customCategories]}
-            key={allCategories.join(',')}
+            availableCategories={Array.from(new Set([...allCategories, ...customCategories]))}
+            key={`${allCategories.join(',')}-${customCategories.join(',')}`}
           />
         </DialogContent>
       </Dialog>
