@@ -16,16 +16,15 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private properties: Map<number, Property>;
-  private currentPropertyId: number;
-
-  constructor() {
-    this.properties = new Map();
-    this.currentPropertyId = 1;
-    
-    // Initialize with some sample properties
-    this.initializeProperties();
-  }
+  // Disabled - using database storage now
+  async getProperties(): Promise<Property[]> { return []; }
+  async getProperty(id: number): Promise<Property | undefined> { return undefined; }
+  async createProperty(property: InsertProperty): Promise<Property> { throw new Error("Use DatabaseStorage"); }
+  async updateProperty(id: number, property: Partial<InsertProperty>): Promise<Property | undefined> { throw new Error("Use DatabaseStorage"); }
+  async deleteProperty(id: number): Promise<boolean> { throw new Error("Use DatabaseStorage"); }
+  async getDeletedProperties(): Promise<Property[]> { return []; }
+  async restoreProperty(id: number): Promise<Property | undefined> { throw new Error("Use DatabaseStorage"); }
+  async permanentDeleteProperty(id: number): Promise<boolean> { throw new Error("Use DatabaseStorage"); }
 
   private initializeProperties() {
     const sampleProperties: Property[] = [

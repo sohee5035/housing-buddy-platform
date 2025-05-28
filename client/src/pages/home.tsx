@@ -52,7 +52,7 @@ export default function Home() {
       return response.json();
     },
     staleTime: 0, // 즉시 stale로 만들어서 항상 새로 가져오기
-    cacheTime: 0, // 캐시 시간을 0으로 설정
+    gcTime: 0, // 캐시 시간을 0으로 설정 (React Query v5에서는 gcTime 사용)
   });
 
   // Translation mutation for bulk translating all properties
