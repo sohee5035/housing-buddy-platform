@@ -88,7 +88,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/properties/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      console.log("=== DELETE REQUEST ===");
+      console.log("Deleting property ID:", id);
       const success = await storage.deleteProperty(id);
+      console.log("Delete operation success:", success);
       
       if (!success) {
         return res.status(404).json({ message: "Property not found" });
@@ -96,6 +99,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "Property deleted successfully" });
     } catch (error) {
+      console.error("Error in delete route:", error);
       res.status(500).json({ message: "Failed to delete property" });
     }
   });
