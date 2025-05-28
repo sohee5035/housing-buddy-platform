@@ -245,7 +245,7 @@ export default function Home() {
               refetch();
             }}
             onCancel={() => setShowCreateModal(false)}
-            availableCategories={allCategories}
+            availableCategories={[...allCategories, ...customCategories]}
             key={allCategories.join(',')}
           />
         </DialogContent>
