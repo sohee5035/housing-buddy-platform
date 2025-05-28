@@ -22,10 +22,16 @@ export default function Trash() {
   const { data: deletedProperties = [], isLoading } = useQuery<Property[]>({
     queryKey: ["/api/trash"],
     queryFn: async () => {
+      console.log("Fetching trash data...");
       const response = await fetch("/api/trash");
+      console.log("Trash response status:", response.status);
       if (!response.ok) throw new Error("Failed to fetch deleted properties");
-      return response.json();
+      const data = await response.json();
+      console.log("Trash data received:", data);
+      return data;
     },
+    staleTime: 0,
+    cacheTime: 0,
   });
 
   const restoreMutation = useMutation({
