@@ -80,7 +80,7 @@ export default function Trash() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/properties/trash"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trash"] });
       toast({
         title: "영구 삭제 완료",
         description: "매물이 영구적으로 삭제되었습니다.",
