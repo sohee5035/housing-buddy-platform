@@ -241,7 +241,7 @@ export default function Home() {
               refetch();
             }}
             onCancel={() => setShowCreateModal(false)}
-            availableCategories={availableCategories.filter(cat => cat !== '전체')}
+            availableCategories={allCategories}
           />
         </DialogContent>
       </Dialog>
