@@ -156,10 +156,47 @@ export class MemStorage implements IStorage {
       return false;
     }
 
-    // Soft delete
-    property.isActive = 0;
-    this.properties.set(id, property);
+    // Soft delete - move to trash
+    const updatedProperty: Property = {
+      ...property,
+      isDeleted: 1,
+      deletedAt: new Date(),
+    };
+    
+    this.properties.set(id, updatedProperty);
     return true;
+  }
+
+  async getDeletedProperties(): Promise<Property[]> {
+    const deletedProperties = Array.from(this.properties.values()).filter(
+      (property) => property.isDeleted === 1
+    );
+    
+    // Sort by deletion date (newest first)
+    return deletedProperties.sort((a, b) => 
+      new Date(b.deletedAt!).getTime() - new Date(a.deletedAt!).getTime()
+    );
+  }
+
+  async restoreProperty(id: number): Promise<Property | undefined> {
+    const property = this.properties.get(id);
+    if (!property || property.isDeleted !== 1) return undefined;
+    
+    const restoredProperty: Property = {
+      ...property,
+      isDeleted: 0,
+      deletedAt: null,
+    };
+    
+    this.properties.set(id, restoredProperty);
+    return restoredProperty;
+  }
+
+  async permanentDeleteProperty(id: number): Promise<boolean> {
+    const property = this.properties.get(id);
+    if (!property || property.isDeleted !== 1) return false;
+    
+    return this.properties.delete(id);
   }
 }
 

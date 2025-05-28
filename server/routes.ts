@@ -87,7 +87,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/properties/trash - Get deleted properties
+  app.get("/api/properties/trash", async (req: Request, res: Response) => {
+    try {
+      const deletedProperties = await storage.getDeletedProperties();
+      res.json(deletedProperties);
+    } catch (error: any) {
+      console.error("Error fetching deleted properties:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
+  // POST /api/properties/:id/restore - Restore a property from trash
+  app.post("/api/properties/:id/restore", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const restoredProperty = await storage.restoreProperty(id);
+      
+      if (!restoredProperty) {
+        return res.status(404).json({ message: "Property not found in trash" });
+      }
+      
+      res.json(restoredProperty);
+    } catch (error: any) {
+      console.error("Error restoring property:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // DELETE /api/properties/:id/permanent - Permanently delete a property
+  app.delete("/api/properties/:id/permanent", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.permanentDeleteProperty(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Property not found in trash" });
+      }
+      
+      res.json({ message: "Property permanently deleted" });
+    } catch (error: any) {
+      console.error("Error permanently deleting property:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // POST /api/translate - Translate text
+  app.post("/api/translate", async (req: Request, res: Response) => {
+    try {
+      const { text, targetLang } = req.body;
+      
+      if (!text || !targetLang) {
+        return res.status(400).json({ message: "Text and target language are required" });
+      }
+
+      const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: "Translation service not configured" });
+      }
+
+      const response = await fetch(
+        `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            q: text,
+            target: targetLang,
+            source: 'ko',
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Translation API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const translatedText = data.data.translations[0].translatedText;
+      
+      res.json({ translatedText });
+    } catch (error: any) {
+      console.error("Error translating text:", error);
+      res.status(500).json({ message: "Translation failed" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

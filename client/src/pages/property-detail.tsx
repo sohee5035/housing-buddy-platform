@@ -6,7 +6,8 @@ import PropertyForm from "@/components/property-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -17,7 +18,9 @@ import {
   MapPin,
   Calendar,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Languages,
+  Loader2
 } from "lucide-react";
 
 export default function PropertyDetail() {
@@ -25,8 +28,20 @@ export default function PropertyDetail() {
   const [, setLocation] = useLocation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showTranslationModal, setShowTranslationModal] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
+  const [translatedContent, setTranslatedContent] = useState<any>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const supportedLanguages = [
+    { code: "en", name: "English" },
+    { code: "ja", name: "日本語" },
+    { code: "zh", name: "中文" },
+    { code: "es", name: "Español" },
+    { code: "fr", name: "Français" }
+  ];
 
   // Add delete mutation
   const deleteMutation = useMutation({
@@ -86,6 +101,42 @@ export default function PropertyDetail() {
   const handleDelete = () => {
     if (window.confirm("정말로 이 매물을 삭제하시겠습니까?")) {
       deleteMutation.mutate();
+    }
+  };
+
+  const handleTranslate = async () => {
+    if (!selectedLanguage || !property) return;
+    
+    setIsTranslating(true);
+    try {
+      const translations = await Promise.all([
+        apiRequest("POST", "/api/translate", { text: property.title, targetLang: selectedLanguage }),
+        apiRequest("POST", "/api/translate", { text: property.description, targetLang: selectedLanguage }),
+        apiRequest("POST", "/api/translate", { text: property.address, targetLang: selectedLanguage }),
+        property.otherInfo ? apiRequest("POST", "/api/translate", { text: property.otherInfo, targetLang: selectedLanguage }) : null
+      ]);
+
+      const [titleRes, descRes, addressRes, otherInfoRes] = translations;
+      
+      setTranslatedContent({
+        title: (await titleRes.json()).translatedText,
+        description: (await descRes.json()).translatedText,
+        address: (await addressRes.json()).translatedText,
+        otherInfo: otherInfoRes ? (await otherInfoRes.json()).translatedText : null
+      });
+      
+      toast({
+        title: "번역 완료",
+        description: "매물 정보가 성공적으로 번역되었습니다.",
+      });
+    } catch (error) {
+      toast({
+        title: "번역 실패",
+        description: "번역 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranslating(false);
     }
   };
 
@@ -153,6 +204,13 @@ export default function PropertyDetail() {
               <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
             </div>
             <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowTranslationModal(true)}
+              >
+                <Languages className="h-4 w-4 mr-2" />
+                번역
+              </Button>
               <Button
                 variant="outline"
                 onClick={() => setShowEditModal(true)}
