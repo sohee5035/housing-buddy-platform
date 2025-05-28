@@ -36,6 +36,9 @@ export default function PropertyForm({ onSuccess, onCancel, initialData, availab
       otherInfo: initialData?.otherInfo || "",
       photos: photos,
       isActive: initialData?.isActive || 1,
+      category: initialData?.category || "",
+      maintenanceFee: initialData?.maintenanceFee || 0,
+      originalUrl: initialData?.originalUrl || "",
     },
   });
 

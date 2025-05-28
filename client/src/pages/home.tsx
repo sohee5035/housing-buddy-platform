@@ -242,6 +242,7 @@ export default function Home() {
             }}
             onCancel={() => setShowCreateModal(false)}
             availableCategories={allCategories}
+            key={allCategories.join(',')}
           />
         </DialogContent>
       </Dialog>
