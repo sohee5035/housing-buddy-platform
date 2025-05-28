@@ -164,7 +164,10 @@ export class MemStorage implements IStorage {
 
   async deleteProperty(id: number): Promise<boolean> {
     const property = this.properties.get(id);
+    console.log("Deleting property:", id, property);
+    
     if (!property || property.isActive === 0) {
+      console.log("Property not found or already inactive");
       return false;
     }
 
@@ -176,14 +179,21 @@ export class MemStorage implements IStorage {
       deletedAt: new Date(),
     };
     
+    console.log("Updated property:", updatedProperty);
     this.properties.set(id, updatedProperty);
+    console.log("Property stored in map");
     return true;
   }
 
   async getDeletedProperties(): Promise<Property[]> {
-    const deletedProperties = Array.from(this.properties.values()).filter(
+    const allProperties = Array.from(this.properties.values());
+    console.log("All properties:", allProperties.map(p => ({ id: p.id, isDeleted: p.isDeleted, deletedAt: p.deletedAt })));
+    
+    const deletedProperties = allProperties.filter(
       (property) => property.isDeleted === 1
     );
+    
+    console.log("Deleted properties found:", deletedProperties.length);
     
     // Sort by deletion date (newest first)
     return deletedProperties.sort((a, b) => 
