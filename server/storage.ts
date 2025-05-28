@@ -187,13 +187,19 @@ export class MemStorage implements IStorage {
 
   async getDeletedProperties(): Promise<Property[]> {
     const allProperties = Array.from(this.properties.values());
-    console.log("All properties:", allProperties.map(p => ({ id: p.id, isDeleted: p.isDeleted, deletedAt: p.deletedAt })));
+    console.log("=== DEBUG: All properties ===");
+    allProperties.forEach(p => {
+      console.log(`ID: ${p.id}, isDeleted: ${p.isDeleted}, deletedAt: ${p.deletedAt}, isActive: ${p.isActive}`);
+    });
     
     const deletedProperties = allProperties.filter(
       (property) => property.isDeleted === 1
     );
     
-    console.log("Deleted properties found:", deletedProperties.length);
+    console.log("=== DEBUG: Deleted properties found ===", deletedProperties.length);
+    deletedProperties.forEach(p => {
+      console.log(`Deleted property: ID ${p.id}, title: ${p.title}`);
+    });
     
     // Sort by deletion date (newest first)
     return deletedProperties.sort((a, b) => 
