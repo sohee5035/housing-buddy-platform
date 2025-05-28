@@ -12,6 +12,8 @@ export const properties = pgTable("properties", {
   otherInfo: text("other_info"), // 기타 입력 (옵션 필드)
   photos: text("photos").array().default([]),
   isActive: integer("is_active").default(1),
+  isDeleted: integer("is_deleted").default(0), // 0 = active, 1 = deleted (in trash)
+  deletedAt: timestamp("deleted_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

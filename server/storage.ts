@@ -6,7 +6,11 @@ export interface IStorage {
   getProperty(id: number): Promise<Property | undefined>;
   createProperty(property: InsertProperty): Promise<Property>;
   updateProperty(id: number, property: Partial<InsertProperty>): Promise<Property | undefined>;
-  deleteProperty(id: number): Promise<boolean>;
+  deleteProperty(id: number): Promise<boolean>; // Soft delete (move to trash)
+  // Trash methods
+  getDeletedProperties(): Promise<Property[]>;
+  restoreProperty(id: number): Promise<Property | undefined>;
+  permanentDeleteProperty(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -106,7 +110,7 @@ export class MemStorage implements IStorage {
 
   async getProperties(): Promise<Property[]> {
     const filteredProperties = Array.from(this.properties.values()).filter(
-      (property) => property.isActive === 1
+      (property) => property.isActive === 1 && (!property.isDeleted || property.isDeleted === 0)
     );
 
     // Sort by creation date (newest first)
