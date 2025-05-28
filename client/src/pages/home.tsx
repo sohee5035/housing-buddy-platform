@@ -12,6 +12,7 @@ import { Link } from "wouter";
 export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
+  const [adminAction, setAdminAction] = useState<'create' | 'trash'>('create');
 
   const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -39,13 +40,20 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
             </div>
             <div className="flex items-center space-x-3">
-              <Link href="/trash">
-                <Button variant="outline">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  휴지통
-                </Button>
-              </Link>
-              <Button onClick={() => setShowAdminAuth(true)}>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setAdminAction('trash');
+                  setShowAdminAuth(true);
+                }}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                휴지통
+              </Button>
+              <Button onClick={() => {
+                setAdminAction('create');
+                setShowAdminAuth(true);
+              }}>
                 <Plus className="h-4 w-4 mr-2" />
                 매물 등록
               </Button>
@@ -146,10 +154,14 @@ export default function Home() {
         onClose={() => setShowAdminAuth(false)}
         onSuccess={() => {
           setShowAdminAuth(false);
-          setShowCreateModal(true);
+          if (adminAction === 'create') {
+            setShowCreateModal(true);
+          } else if (adminAction === 'trash') {
+            window.location.href = '/trash';
+          }
         }}
-        title="매물 등록 권한 확인"
-        description="매물을 등록하려면 관리자 비밀번호가 필요합니다."
+        title={adminAction === 'create' ? "매물 등록 권한 확인" : "휴지통 접근 권한 확인"}
+        description={adminAction === 'create' ? "매물을 등록하려면 관리자 비밀번호가 필요합니다." : "휴지통에 접근하려면 관리자 비밀번호가 필요합니다."}
       />
 
       {/* Create Property Modal */}

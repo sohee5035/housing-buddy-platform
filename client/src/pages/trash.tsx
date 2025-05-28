@@ -3,6 +3,7 @@ import { Property } from "@shared/schema";
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import AdminAuth from "@/components/admin-auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -16,6 +17,9 @@ import {
 } from "lucide-react";
 
 export default function Trash() {
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
+  const [adminAction, setAdminAction] = useState<'restore' | 'delete'>('restore');
+  const [selectedPropertyId, setSelectedPropertyId] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
