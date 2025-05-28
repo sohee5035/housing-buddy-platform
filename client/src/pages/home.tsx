@@ -318,6 +318,15 @@ export default function Home() {
         </DialogContent>
       </Dialog>
 
+      {/* Category Manager */}
+      <CategoryManager
+        isOpen={showCategoryManager}
+        onClose={() => setShowCategoryManager(false)}
+        customCategories={customCategories}
+        onUpdateCategories={setCustomCategories}
+        propertyCategories={propertyCategories}
+      />
+
       {/* Floating Action Button (Mobile) */}
       <Button
         className="fixed bottom-6 right-6 rounded-full h-14 w-14 md:hidden shadow-lg"
