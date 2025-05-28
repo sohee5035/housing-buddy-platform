@@ -5,16 +5,12 @@ import { z } from "zod";
 export const properties = pgTable("properties", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
-  description: text("description").notNull(),
-  propertyType: text("property_type").notNull(),
-  city: text("city").notNull(),
   address: text("address").notNull(),
-  price: integer("price").notNull(),
-  bedrooms: integer("bedrooms").default(1),
-  bathrooms: integer("bathrooms").default(1),
-  squareFeet: integer("square_feet"),
+  deposit: integer("deposit").notNull(),
+  monthlyRent: integer("monthly_rent").notNull(),
+  description: text("description").notNull(),
+  otherInfo: text("other_info"), // 기타 입력 (옵션 필드)
   photos: text("photos").array().default([]),
-  listingType: text("listing_type").notNull().default("sale"), // "sale" or "rent"
   isActive: integer("is_active").default(1),
   createdAt: timestamp("created_at").defaultNow(),
 });
