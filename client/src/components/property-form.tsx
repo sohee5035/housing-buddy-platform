@@ -119,7 +119,7 @@ export default function PropertyForm({ onSuccess, onCancel, initialData }: Prope
             )}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FormField
               control={form.control}
               name="deposit"
@@ -159,6 +159,37 @@ export default function PropertyForm({ onSuccess, onCancel, initialData }: Prope
                         {...field}
                         onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                       />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="maintenanceFee"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>관리비</FormLabel>
+                  <FormControl>
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <span className="absolute left-3 top-3 text-neutral-500">₩</span>
+                        <Input
+                          type="number"
+                          placeholder="관리비 입력"
+                          className="pl-8"
+                          value={field.value || ""}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.onChange(value ? parseInt(value) : null);
+                          }}
+                        />
+                      </div>
+                      <div className="text-xs text-neutral-500">
+                        비워두면 "알 수 없음"으로 표시됩니다
+                      </div>
                     </div>
                   </FormControl>
                   <FormMessage />

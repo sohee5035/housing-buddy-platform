@@ -8,6 +8,7 @@ export const properties = pgTable("properties", {
   address: text("address").notNull(),
   deposit: integer("deposit").notNull(),
   monthlyRent: integer("monthly_rent").notNull(),
+  maintenanceFee: integer("maintenance_fee"), // 관리비 (null이면 "알 수 없음")
   description: text("description").notNull(),
   otherInfo: text("other_info"), // 기타 입력 (옵션 필드)
   photos: text("photos").array().default([]),

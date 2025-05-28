@@ -33,6 +33,7 @@ export class MemStorage implements IStorage {
         address: "서울특별시 강남구 역삼동 123-45",
         deposit: 5000000,
         monthlyRent: 800000,
+        maintenanceFee: 50000,
         description: "지하철역 도보 5분 거리에 위치한 깔끔한 신축 원룸입니다. 풀옵션으로 바로 입주 가능하며, 보안이 우수한 건물입니다.",
         otherInfo: "주차 가능, 엘리베이터 있음, 24시간 보안",
         photos: [
