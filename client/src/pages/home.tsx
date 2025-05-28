@@ -17,8 +17,7 @@ export default function Home() {
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [adminAction, setAdminAction] = useState<'create' | 'trash' | 'category'>('create');
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [showAddCategory, setShowAddCategory] = useState(false);
+
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [, setLocation] = useLocation();
 
@@ -48,26 +47,7 @@ export default function Home() {
   const allCategories = Array.from(new Set([...propertyCategories, ...customCategories]));
   const availableCategories = ['전체', ...allCategories];
 
-  // 새 카테고리 추가 함수
-  const handleAddCategory = () => {
-    if (newCategoryName.trim() && !availableCategories.includes(newCategoryName.trim())) {
-      setCustomCategories(prev => [...prev, newCategoryName.trim()]);
-      setSelectedCategory(newCategoryName.trim());
-      setNewCategoryName('');
-      setShowAddCategory(false);
-    }
-  };
 
-  // 카테고리 삭제 함수 (해당 카테고리 매물이 없을 때만)
-  const handleRemoveCategory = (categoryToRemove: string) => {
-    const categoryHasProperties = properties.some(p => p.category === categoryToRemove);
-    if (!categoryHasProperties && categoryToRemove !== '전체') {
-      setCustomCategories(prev => prev.filter(cat => cat !== categoryToRemove));
-      if (selectedCategory === categoryToRemove) {
-        setSelectedCategory('전체');
-      }
-    }
-  };
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -121,68 +101,16 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-2">
             {availableCategories.map((category: string) => (
-              <div key={category} className="flex items-center">
-                <Button
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                  className="text-sm"
-                >
-                  {category}
-                </Button>
-                {category !== '전체' && !properties.some(p => p.category === category) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleRemoveCategory(category)}
-                    className="ml-1 h-6 w-6 p-0 text-neutral-400 hover:text-red-500"
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            
-            {/* 새 카테고리 추가 */}
-            {showAddCategory ? (
-              <div className="flex items-center gap-1">
-                <Input
-                  value={newCategoryName}
-                  onChange={(e) => setNewCategoryName(e.target.value)}
-                  placeholder="새 카테고리명"
-                  className="h-8 w-24 text-xs"
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
-                />
-                <Button
-                  size="sm"
-                  onClick={handleAddCategory}
-                  className="h-8 px-2 text-xs"
-                >
-                  추가
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setShowAddCategory(false);
-                    setNewCategoryName('');
-                  }}
-                  className="h-8 w-8 p-0"
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            ) : (
               <Button
-                variant="outline"
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
                 size="sm"
-                onClick={() => setShowAddCategory(true)}
-                className="text-sm border-dashed"
+                onClick={() => setSelectedCategory(category)}
+                className="text-sm"
               >
-                <Plus className="h-3 w-3 mr-1" />
-                새 카테고리
+                {category}
               </Button>
-            )}
+            ))}
           </div>
         </div>
       </div>
