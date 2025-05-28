@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Languages, Bed, Bath, Square, MapPin } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "@/contexts/TranslationContext";
+import SmartTextWithTooltips from "./smart-text-with-tooltips";
 
 interface PropertyCardProps {
   property: Property;
@@ -98,7 +99,11 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
                   <span className="text-lg">{getPropertyTypeIcon(property.propertyType)}</span>
                   <Link href={`/property/${property.id}`}>
                     <h3 className="text-xl font-semibold text-neutral-900 hover:text-primary transition-colors cursor-pointer">
-                      {displayTitle}
+                      <SmartTextWithTooltips 
+                        text={displayTitle}
+                        originalText={property.title}
+                        isTranslated={isTranslated}
+                      />
                     </h3>
                   </Link>
                 </div>
