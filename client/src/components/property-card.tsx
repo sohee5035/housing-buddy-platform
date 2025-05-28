@@ -104,8 +104,16 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
               </div>
               
               <div className="text-right ml-4">
-                <div className="text-2xl font-bold text-primary mb-3">
-                  {formatPrice(property.price, property.listingType)}
+                <div className="text-right space-y-1 mb-3">
+                  <div className="text-lg font-bold text-primary">
+                    보증금 {property.deposit?.toLocaleString()}만원
+                  </div>
+                  <div className="text-lg font-bold text-primary">
+                    월세 {property.monthlyRent?.toLocaleString()}만원
+                  </div>
+                  <div className="text-sm text-neutral-600">
+                    관리비 {property.maintenanceFee ? `${property.maintenanceFee.toLocaleString()}만원` : '알 수 없음'}
+                  </div>
                 </div>
                 
                 <div className="flex gap-2">
