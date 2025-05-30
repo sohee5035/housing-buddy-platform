@@ -164,6 +164,10 @@ export default function Home() {
     if (selectedCategory === '전체') return true;
     return property.category === selectedCategory;
   });
+  
+  console.log("properties 배열:", properties);
+  console.log("filteredProperties 배열:", filteredProperties);
+  console.log("실제 렌더링될 매물 개수:", filteredProperties.length);
 
   // 사용 가능한 카테고리 목록 생성 (매물에서 실제 사용된 카테고리들 + 커스텀 카테고리들)
   const propertyCategories = Array.from(new Set(properties.map(p => p.category || '기타').filter(Boolean)));
