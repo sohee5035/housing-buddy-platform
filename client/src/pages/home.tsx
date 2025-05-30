@@ -186,8 +186,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Title Row */}
           <div className="flex items-center justify-center py-4 border-b border-neutral-100">
-            <HomeIcon className="h-8 w-8 text-primary mr-3" />
-            <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
+            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity cursor-pointer">
+              <HomeIcon className="h-8 w-8 text-primary mr-3" />
+              <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
+            </Link>
           </div>
           
           {/* Controls Row */}

@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useLocation, Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import { useState } from "react";
@@ -177,8 +177,10 @@ export default function PropertyDetail() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <HomeIcon className="h-8 w-8 text-primary mr-3" />
-              <h1 className="text-2xl font-bold text-neutral-900 whitespace-nowrap">부동산 매물</h1>
+              <Link href="/" className="flex items-center hover:opacity-80 transition-opacity cursor-pointer">
+                <HomeIcon className="h-8 w-8 text-primary mr-3" />
+                <h1 className="text-2xl font-bold text-neutral-900 whitespace-nowrap">부동산 매물</h1>
+              </Link>
             </div>
             <div className="flex items-center space-x-4">
               <Button
