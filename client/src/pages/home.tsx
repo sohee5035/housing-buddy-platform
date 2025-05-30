@@ -49,7 +49,10 @@ export default function Home() {
         }
       });
       if (!response.ok) throw new Error("Failed to fetch properties");
-      return response.json();
+      const data = await response.json();
+      console.log("실제로 받은 매물 데이터:", data);
+      console.log("매물 개수:", data.length);
+      return data;
     },
     staleTime: 0, // 즉시 stale로 만들어서 항상 새로 가져오기
     gcTime: 0, // 캐시 시간을 0으로 설정 (React Query v5에서는 gcTime 사용)
