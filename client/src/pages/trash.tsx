@@ -116,13 +116,16 @@ export default function Trash() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div 
-                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer"
-                onClick={() => window.location.href = "/"}
+              <button 
+                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "/";
+                }}
               >
                 <HomeIcon className="h-8 w-8 text-primary mr-3" />
                 <h1 className="text-2xl font-bold text-neutral-900">휴지통</h1>
-              </div>
+              </button>
             </div>
             <Link href="/">
               <Button variant="outline">
