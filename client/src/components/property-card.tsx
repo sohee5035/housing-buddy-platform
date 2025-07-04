@@ -72,8 +72,8 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
             </Link>
             
             <div className="absolute top-4 left-4">
-              <Badge variant={property.listingType === "sale" ? "default" : "secondary"}>
-                For {property.listingType === "sale" ? "Sale" : "Rent"}
+              <Badge variant="secondary">
+                임대
               </Badge>
             </div>
             
@@ -96,7 +96,7 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">{getPropertyTypeIcon(property.propertyType)}</span>
+                  <span className="text-lg">🏠</span>
                   <Link href={`/property/${property.id}`}>
                     <h3 className="text-xl font-semibold text-neutral-900 hover:text-primary transition-colors cursor-pointer">
                       <SmartTextWithTooltips 
@@ -129,32 +129,41 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
                 
                 <div className="flex items-center space-x-4 text-sm text-neutral-600 mb-4">
                   <span className="flex items-center">
-                    <Bed className="h-4 w-4 mr-1" />
-                    {property.bedrooms || 0} bed{property.bedrooms !== 1 ? 's' : ''}
-                  </span>
-                  <span className="flex items-center">
-                    <Bath className="h-4 w-4 mr-1" />
-                    {property.bathrooms || 0} bath{property.bathrooms !== 1 ? 's' : ''}
-                  </span>
-                  {property.squareFeet && (
-                    <span className="flex items-center">
-                      <Square className="h-4 w-4 mr-1" />
-                      {property.squareFeet.toLocaleString()} sqft
+                    <span className="text-neutral-500">카테고리:</span>
+                    <span className="ml-1 font-medium">
+                      <SmartTextWithTooltips 
+                        text={getTranslatedPropertyText('category') || property.category}
+                        originalText={property.category}
+                        isTranslated={isTranslated}
+                      />
                     </span>
-                  )}
+                  </span>
                 </div>
               </div>
               
               <div className="text-right ml-4">
-                <div className="text-right space-y-1 mb-3">
-                  <div className="text-lg font-bold text-primary">
-                    보증금 {property.deposit?.toLocaleString()}만원
-                  </div>
-                  <div className="text-lg font-bold text-primary">
-                    월세 {property.monthlyRent?.toLocaleString()}만원
-                  </div>
-                  <div className="text-sm text-neutral-600">
-                    관리비 {property.maintenanceFee ? `${property.maintenanceFee.toLocaleString()}만원` : '알 수 없음'}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-100 mb-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-neutral-600">보증금</span>
+                      <span className="text-lg font-bold text-blue-600">
+                        {(property.deposit / 10000).toLocaleString()}<span className="text-xs text-neutral-500 ml-1">만원</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-neutral-600">월세</span>
+                      <span className="text-lg font-bold text-indigo-600">
+                        {(property.monthlyRent / 10000).toLocaleString()}<span className="text-xs text-neutral-500 ml-1">만원</span>
+                      </span>
+                    </div>
+                    {property.maintenanceFee !== null && property.maintenanceFee > 0 && (
+                      <div className="flex items-center justify-between pt-1 border-t border-blue-200">
+                        <span className="text-xs text-neutral-600">관리비</span>
+                        <span className="text-sm font-semibold text-green-600">
+                          {(property.maintenanceFee / 10000).toLocaleString()}<span className="text-xs text-neutral-500 ml-1">만원</span>
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 

@@ -310,50 +310,82 @@ export default function PropertyDetail() {
                   </span>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="text-2xl font-bold text-primary">
-                    {formatPrice(property.deposit, property.monthlyRent)}
-                  </div>
-                  
-                  {property.maintenanceFee !== null && (
-                    <div className="text-lg text-neutral-700">
-                      {formatMaintenanceFee(property.maintenanceFee)}
+                <div className="space-y-4">
+                  {/* 가격 정보 - 더 예쁘게 표시 */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center">
+                        <div className="text-sm text-neutral-600 mb-1">{translateUI('보증금')}</div>
+                        <div className="text-xl font-bold text-blue-600">
+                          {(property.deposit / 10000).toLocaleString()}<span className="text-sm text-neutral-500">만원</span>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-sm text-neutral-600 mb-1">{translateUI('월세')}</div>
+                        <div className="text-xl font-bold text-indigo-600">
+                          {(property.monthlyRent / 10000).toLocaleString()}<span className="text-sm text-neutral-500">만원</span>
+                        </div>
+                      </div>
                     </div>
-                  )}
+                    {property.maintenanceFee !== null && property.maintenanceFee > 0 && (
+                      <div className="mt-3 pt-3 border-t border-blue-200">
+                        <div className="text-center">
+                          <div className="text-sm text-neutral-600 mb-1">{translateUI('관리비')}</div>
+                          <div className="text-lg font-semibold text-green-600">
+                            {(property.maintenanceFee / 10000).toLocaleString()}<span className="text-sm text-neutral-500">만원</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
+                {/* 상세 설명 - 더 예쁘게 표시 */}
                 <div className="mt-6">
-                  <h3 className="text-lg font-semibold text-neutral-900 mb-2">상세 설명</h3>
-                  <p className="text-neutral-700 whitespace-pre-wrap">
-                    <SmartTextWithTooltips
-                      text={getTranslatedPropertyText('description') || property.description}
-                      originalText={property.description}
-                      isTranslated={isTranslated}
-                    />
-                  </p>
-                </div>
-
-                {property.otherInfo && (
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">추가 정보</h3>
-                    <p className="text-neutral-700 whitespace-pre-wrap">
+                  <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
+                    <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
+                    상세 설명
+                  </h3>
+                  <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+                    <p className="text-neutral-700 whitespace-pre-wrap leading-relaxed">
                       <SmartTextWithTooltips
-                        text={getTranslatedPropertyText('otherInfo') || property.otherInfo}
-                        originalText={property.otherInfo}
+                        text={getTranslatedPropertyText('description') || property.description}
+                        originalText={property.description}
                         isTranslated={isTranslated}
                       />
                     </p>
                   </div>
+                </div>
+
+                {property.otherInfo && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
+                      <div className="w-1 h-6 bg-green-500 rounded-full mr-3"></div>
+                      추가 정보
+                    </h3>
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <p className="text-neutral-700 whitespace-pre-wrap leading-relaxed">
+                        <SmartTextWithTooltips
+                          text={getTranslatedPropertyText('otherInfo') || property.otherInfo}
+                          originalText={property.otherInfo}
+                          isTranslated={isTranslated}
+                        />
+                      </p>
+                    </div>
+                  </div>
                 )}
 
-                {/* 지도 섹션 */}
+                {/* 지도 섹션 - 마커 포함 */}
                 <div className="mt-6">
-                  <h3 className="text-lg font-semibold text-neutral-900 mb-3">위치</h3>
-                  <div className="bg-neutral-100 rounded-lg overflow-hidden">
+                  <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
+                    <div className="w-1 h-6 bg-red-500 rounded-full mr-3"></div>
+                    위치
+                  </h3>
+                  <div className="bg-neutral-100 rounded-lg overflow-hidden shadow-sm">
                     <iframe
-                      src={`https://maps.google.com/maps?q=${encodeURIComponent(property.address)}&output=embed&z=16`}
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(property.address)}&output=embed&z=16&markers=${encodeURIComponent(property.address)}`}
                       width="100%"
-                      height="300"
+                      height="350"
                       style={{ border: 0 }}
                       allowFullScreen
                       loading="lazy"
@@ -361,16 +393,21 @@ export default function PropertyDetail() {
                       title={`${property.title} 위치`}
                     />
                   </div>
-                  <div className="mt-2 flex items-center justify-between text-sm text-neutral-600">
-                    <span>📍 {getTranslatedPropertyText('address') || property.address}</span>
-                    <a
-                      href={`https://maps.google.com/maps?q=${encodeURIComponent(property.address)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:text-primary/80 transition-colors"
-                    >
-                      Google Maps에서 보기 →
-                    </a>
+                  <div className="mt-3 bg-white rounded-lg p-3 border border-neutral-200">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center text-neutral-700">
+                        <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                        <span>{getTranslatedPropertyText('address') || property.address}</span>
+                      </div>
+                      <a
+                        href={`https://maps.google.com/maps?q=${encodeURIComponent(property.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:text-primary/80 transition-colors font-medium"
+                      >
+                        Google Maps에서 보기 →
+                      </a>
+                    </div>
                   </div>
                 </div>
 
@@ -426,7 +463,7 @@ export default function PropertyDetail() {
           </DialogHeader>
           <PropertyForm
             initialData={property}
-            availableCategories={Array.from(new Set(allProperties.map(p => p.category).filter(Boolean)))}
+            availableCategories={Array.from(new Set(allProperties.map(p => p.category).filter((cat): cat is string => Boolean(cat))))}
             onSuccess={() => {
               setShowEditModal(false);
               queryClient.invalidateQueries({ queryKey: [`/api/properties/${id}`] });
