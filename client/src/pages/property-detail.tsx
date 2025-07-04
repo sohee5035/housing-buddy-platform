@@ -4,6 +4,7 @@ import { Property } from "@shared/schema";
 import { useState } from "react";
 import PropertyForm from "@/components/property-form";
 import AdminAuth from "@/components/admin-auth";
+import ImageGalleryModal from "@/components/image-gallery-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,6 +32,8 @@ export default function PropertyDetail() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
   const [adminAction, setAdminAction] = useState<'edit' | 'delete'>('edit');
+  const [showImageGallery, setShowImageGallery] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -232,7 +235,11 @@ export default function PropertyDetail() {
                   <img
                     src={property.photos[currentImageIndex]}
                     alt={getTranslatedPropertyText('title') || property.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                    onClick={() => {
+                      setSelectedImageIndex(currentImageIndex);
+                      setShowImageGallery(true);
+                    }}
                   />
                   {property.photos.length > 1 && (
                     <>
@@ -271,15 +278,18 @@ export default function PropertyDetail() {
                 {property.photos.map((photo, index) => (
                   <button
                     key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`h-16 bg-neutral-200 rounded overflow-hidden ${
+                    onClick={() => {
+                      setSelectedImageIndex(index);
+                      setShowImageGallery(true);
+                    }}
+                    className={`h-16 bg-neutral-200 rounded overflow-hidden hover:ring-2 hover:ring-primary/50 transition-all ${
                       currentImageIndex === index ? 'ring-2 ring-primary' : ''
                     }`}
                   >
                     <img
                       src={photo}
                       alt={`${getTranslatedPropertyText('title') || property.title} ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
                     />
                   </button>
                 ))}
@@ -477,6 +487,17 @@ export default function PropertyDetail() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Image Gallery Modal */}
+      {property && property.photos && property.photos.length > 0 && (
+        <ImageGalleryModal
+          isOpen={showImageGallery}
+          onClose={() => setShowImageGallery(false)}
+          images={property.photos}
+          initialIndex={selectedImageIndex}
+          title={getTranslatedPropertyText('title') || property.title}
+        />
+      )}
     </div>
   );
 }
