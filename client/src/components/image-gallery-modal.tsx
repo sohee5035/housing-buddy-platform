@@ -214,20 +214,20 @@ export default function ImageGalleryModal({
           {/* 헤더 */}
           <div className={`
             ${isMobile || isFullscreen
-              ? 'flex items-center justify-between p-4 bg-black/80 backdrop-blur-sm absolute top-0 left-0 right-0 z-20' 
+              ? 'flex items-center justify-between py-3 px-4 bg-black/80 backdrop-blur-sm absolute top-0 left-0 right-0 z-20 min-h-[70px]' 
               : 'absolute top-4 left-4 right-4 z-20 flex items-center justify-between'
             }
           `}>
-            <div className="text-white">
-              <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold truncate max-w-48`}>
+            <div className="text-white flex-1">
+              <h3 className={`${isMobile ? 'text-lg' : 'text-lg'} font-semibold truncate max-w-48`}>
                 {title}
               </h3>
-              <p className="text-sm text-gray-300">
+              <p className={`${isMobile ? 'text-base' : 'text-sm'} text-gray-300`}>
                 {currentIndex + 1} / {images.length}
               </p>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {!isMobile && (
                 <Button
                   variant="ghost"
@@ -240,20 +240,21 @@ export default function ImageGalleryModal({
               )}
               <Button
                 variant="ghost"
-                size="icon"
+                size={isMobile ? "default" : "icon"}
                 onClick={resetZoom}
-                className="text-white hover:bg-white/10"
+                className={`text-white hover:bg-white/10 ${isMobile ? 'px-4 py-3 rounded-lg' : ''}`}
                 disabled={scale === 1}
               >
-                <ZoomOut className="h-4 w-4" />
+                <ZoomOut className={isMobile ? "h-6 w-6" : "h-4 w-4"} />
               </Button>
               <Button
                 variant="ghost"
-                size="icon"
+                size={isMobile ? "default" : "icon"}
                 onClick={onClose}
-                className="text-white hover:bg-white/10"
+                className={`text-white hover:bg-white/10 ${isMobile ? 'px-4 py-3 min-w-[56px] rounded-lg bg-white/10' : ''}`}
               >
-                <X className="h-4 w-4" />
+                <X className={isMobile ? "h-6 w-6" : "h-4 w-4"} />
+                {isMobile && <span className="ml-1 text-sm">닫기</span>}
               </Button>
             </div>
           </div>
@@ -267,8 +268,8 @@ export default function ImageGalleryModal({
             onTouchEnd={handleTouchEnd}
             onClick={handleDoubleTap}
             style={{ 
-              paddingTop: isMobile || isFullscreen ? '80px' : '0',
-              paddingBottom: isMobile || isFullscreen ? '80px' : '0'
+              paddingTop: isMobile || isFullscreen ? '90px' : '0',
+              paddingBottom: isMobile || isFullscreen ? '90px' : '0'
             }}
           >
             <img
@@ -311,7 +312,7 @@ export default function ImageGalleryModal({
           {images.length > 1 && (
             <div className={`
               ${isMobile || isFullscreen
-                ? 'p-4 bg-black/80 backdrop-blur-sm absolute bottom-0 left-0 right-0' 
+                ? 'py-4 px-4 bg-black/80 backdrop-blur-sm absolute bottom-0 left-0 right-0 min-h-[90px] flex items-center' 
                 : 'absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20'
               }
             `}>
@@ -350,10 +351,10 @@ export default function ImageGalleryModal({
           )}
 
           {/* 모바일용 사용법 안내 */}
-          {isMobile && (
-            <div className="absolute top-20 left-4 right-4 text-white/70 text-sm z-10 text-center">
-              <div className="bg-black/50 rounded-lg p-2 mb-2">
-                <p>더블탭: 확대/축소 | 핀치: 줌 | 드래그: 이동</p>
+          {isMobile && scale === 1 && (
+            <div className="absolute top-24 left-4 right-4 text-white/70 text-sm z-10 text-center">
+              <div className="bg-black/60 rounded-lg p-3 mx-auto max-w-xs">
+                <p className="text-white/90">📱 더블탭: 확대 | 🤏 핀치: 줌 | ↔️ 스와이프: 전환</p>
               </div>
             </div>
           )}
