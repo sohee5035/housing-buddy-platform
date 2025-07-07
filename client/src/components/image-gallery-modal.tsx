@@ -217,49 +217,84 @@ export default function ImageGalleryModal({
           {/* 헤더 */}
           <div className={`
             ${isMobile || isFullscreen
-              ? 'flex items-center justify-between py-3 px-4 bg-black/80 backdrop-blur-sm absolute top-0 left-0 right-0 z-20 min-h-[70px]' 
+              ? 'bg-black/80 backdrop-blur-sm absolute top-0 left-0 right-0 z-20 px-3 py-2' 
               : 'absolute top-4 left-4 right-4 z-20 flex items-center justify-between'
             }
           `}>
-            <div className="text-white flex-1 min-w-0 mr-2">
-              <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold truncate`}>
-                {title}
-              </h3>
-              <p className={`${isMobile ? 'text-sm' : 'text-sm'} text-gray-300`}>
-                {currentIndex + 1} / {images.length}
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {!isMobile && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleFullscreen}
-                  className="text-white hover:bg-white/10"
-                >
-                  <Maximize className="h-4 w-4" />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size={isMobile ? "sm" : "icon"}
-                onClick={resetZoom}
-                className={`text-white hover:bg-white/10 ${isMobile ? 'px-3 py-2 rounded-lg' : ''}`}
-                disabled={scale === 1}
-              >
-                <ZoomOut className={isMobile ? "h-5 w-5" : "h-4 w-4"} />
-              </Button>
-              <Button
-                variant="ghost"
-                size={isMobile ? "sm" : "icon"}
-                onClick={onClose}
-                className={`text-white hover:bg-white/10 ${isMobile ? 'px-3 py-2 rounded-lg bg-white/10' : ''}`}
-              >
-                <X className={isMobile ? "h-5 w-5" : "h-4 w-4"} />
-                {isMobile && <span className="ml-1 text-xs">닫기</span>}
-              </Button>
-            </div>
+            {isMobile || isFullscreen ? (
+              <>
+                {/* 첫 번째 줄: 제목과 닫기 버튼 */}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-white flex-1 min-w-0 mr-2">
+                    <h3 className="text-base font-medium truncate">
+                      {title}
+                    </h3>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onClose}
+                    className="text-white hover:bg-white/10 bg-white/10 w-10 h-10 flex-shrink-0"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+                {/* 두 번째 줄: 페이지 정보와 줌 버튼 */}
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-300">
+                    {currentIndex + 1} / {images.length}
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={resetZoom}
+                    className="text-white hover:bg-white/10 w-10 h-10"
+                    disabled={scale === 1}
+                  >
+                    <ZoomOut className="h-5 w-5" />
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-white">
+                  <h3 className="text-lg font-semibold truncate max-w-48">
+                    {title}
+                  </h3>
+                  <p className="text-sm text-gray-300">
+                    {currentIndex + 1} / {images.length}
+                  </p>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleFullscreen}
+                    className="text-white hover:bg-white/10"
+                  >
+                    <Maximize className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={resetZoom}
+                    className="text-white hover:bg-white/10"
+                    disabled={scale === 1}
+                  >
+                    <ZoomOut className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onClose}
+                    className="text-white hover:bg-white/10"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
 
           {/* 이미지 컨테이너 */}
@@ -271,7 +306,7 @@ export default function ImageGalleryModal({
             onTouchEnd={handleTouchEnd}
             onClick={handleDoubleTap}
             style={{ 
-              paddingTop: isMobile || isFullscreen ? '90px' : '0',
+              paddingTop: isMobile || isFullscreen ? '100px' : '0',
               paddingBottom: isMobile || isFullscreen ? '90px' : '0'
             }}
           >
