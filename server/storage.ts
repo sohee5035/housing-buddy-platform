@@ -19,14 +19,13 @@ export class DatabaseStorage implements IStorage {
   async getProperties(): Promise<Property[]> {
     const result = await db.select().from(properties).where(eq(properties.isDeleted, 0));
     
-    // 썸네일용으로 첫 번째 이미지만 포함 (최대 200KB로 제한)
+    // 메인 화면용으로 첫 번째 이미지만 포함
     const propertiesWithThumbnail = result.map(prop => {
       let thumbnailPhoto: string[] = [];
       
       if (prop.photos && Array.isArray(prop.photos) && prop.photos.length > 0) {
         const firstPhoto = prop.photos[0];
-        // 이미지 크기가 200KB 미만인 경우에만 포함
-        if (firstPhoto && firstPhoto.length < 200000) {
+        if (firstPhoto) {
           thumbnailPhoto = [firstPhoto];
         }
       }
