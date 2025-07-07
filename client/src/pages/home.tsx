@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import PropertyForm from "@/components/property-form";
@@ -38,84 +38,11 @@ export default function Home() {
   } = useTranslation();
   const { toast } = useToast();
 
-  // 임시로 기본 데이터를 바로 설정 (데모용)
-  const [properties, setProperties] = useState<Property[]>([{
-    id: 8,
-    title: "상도동 원룸",
-    description: "교통이 편리한 상도동 원룸입니다. 지하철 7호선 상도역 도보 5분 거리에 위치하여 통학, 통근이 매우 편리합니다.",
-    propertyType: "원룸",
-    listingType: "월세",
-    deposit: 1000,
-    monthlyRent: 50,
-    maintenanceFee: 5,
-    city: "서울시 동작구",
-    district: "상도동",
-    fullAddress: "서울시 동작구 상도동 123-45",
-    size: 20,
-    floor: "2층",
-    totalFloors: "5층",
-    images: [],
-    category: "원룸",
-    contactInfo: "010-1234-5678",
-    originalListingUrl: "",
-    mapUrl: "",
-    isDeleted: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }, {
-    id: 9,
-    title: "노량진 투룸",
-    description: "넓은 투룸 매물입니다. 노량진 수산시장 인근으로 교통이 편리하며, 신축 건물로 시설이 깨끗합니다.",
-    propertyType: "투룸",
-    listingType: "월세",
-    deposit: 2000,
-    monthlyRent: 80,
-    maintenanceFee: 8,
-    city: "서울시 동작구",
-    district: "노량진동",
-    fullAddress: "서울시 동작구 노량진동 456-78",
-    size: 35,
-    floor: "3층",
-    totalFloors: "7층",
-    images: [],
-    category: "투룸",
-    contactInfo: "010-5678-9012",
-    originalListingUrl: "",
-    mapUrl: "",
-    isDeleted: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadProperties = async () => {
-    // 백그라운드에서 실제 데이터 시도
-    try {
-      console.log("🔄 백그라운드에서 실제 데이터 로딩 시도...");
-      const response = await fetch("/api/properties", {
-        headers: { 'Accept': 'application/json' },
-        cache: 'no-cache'
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          console.log("✅ 실제 데이터로 업데이트:", data);
-          setProperties(data);
-        }
-      }
-    } catch (err) {
-      console.log("🔄 실제 데이터 로딩 실패, 기본 데이터 유지");
-    }
-  };
-
-  const refetch = () => loadProperties();
-
-  useEffect(() => {
-    // 5초 후에 실제 데이터 로딩 시도 (비동기)
-    setTimeout(loadProperties, 5000);
-  }, []);
+  const { data: properties = [], isLoading, refetch, error } = useQuery<Property[]>({
+    queryKey: ["/api/properties"],
+    staleTime: 1000 * 60 * 5, // 5분
+    gcTime: 1000 * 60 * 10, // 10분
+  });
 
   // Translation mutation for bulk translating all properties
   const translateMutation = useMutation({
