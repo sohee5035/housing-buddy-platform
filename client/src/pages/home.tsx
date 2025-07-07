@@ -203,7 +203,7 @@ export default function Home() {
                 }}
               >
                 <HomeIcon className="h-8 w-8 text-primary mr-3" />
-                <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
+                <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
               </button>
 
             </div>
