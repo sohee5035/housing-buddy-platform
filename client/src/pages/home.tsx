@@ -40,8 +40,20 @@ export default function Home() {
 
   const { data: properties = [], isLoading, refetch, error } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
-    staleTime: 1000 * 60 * 5, // 5분
-    gcTime: 1000 * 60 * 10, // 10분
+    queryFn: async () => {
+      console.log("🔄 매물 데이터 호출 시작");
+      const response = await fetch("/api/properties");
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("✅ 매물 데이터 수신:", data?.length || 0, "개");
+      return data;
+    },
+    staleTime: 0,
+    gcTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   // Translation mutation for bulk translating all properties
