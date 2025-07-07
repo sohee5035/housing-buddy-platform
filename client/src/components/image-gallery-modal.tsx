@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X, ZoomOut, Maximize } from "lucide-react";
 
@@ -210,6 +210,9 @@ export default function ImageGalleryModal({
           : 'max-w-7xl w-screen h-screen p-0 bg-black/95'
         }
       `}>
+        <DialogTitle className="sr-only">
+          {title} - 이미지 갤러리
+        </DialogTitle>
         <div className="relative w-full h-full flex flex-col overflow-hidden">
           {/* 헤더 */}
           <div className={`
@@ -218,16 +221,16 @@ export default function ImageGalleryModal({
               : 'absolute top-4 left-4 right-4 z-20 flex items-center justify-between'
             }
           `}>
-            <div className="text-white flex-1">
-              <h3 className={`${isMobile ? 'text-lg' : 'text-lg'} font-semibold truncate max-w-48`}>
+            <div className="text-white flex-1 min-w-0 mr-2">
+              <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold truncate`}>
                 {title}
               </h3>
-              <p className={`${isMobile ? 'text-base' : 'text-sm'} text-gray-300`}>
+              <p className={`${isMobile ? 'text-sm' : 'text-sm'} text-gray-300`}>
                 {currentIndex + 1} / {images.length}
               </p>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-shrink-0">
               {!isMobile && (
                 <Button
                   variant="ghost"
@@ -240,21 +243,21 @@ export default function ImageGalleryModal({
               )}
               <Button
                 variant="ghost"
-                size={isMobile ? "default" : "icon"}
+                size={isMobile ? "sm" : "icon"}
                 onClick={resetZoom}
-                className={`text-white hover:bg-white/10 ${isMobile ? 'px-4 py-3 rounded-lg' : ''}`}
+                className={`text-white hover:bg-white/10 ${isMobile ? 'px-3 py-2 rounded-lg' : ''}`}
                 disabled={scale === 1}
               >
-                <ZoomOut className={isMobile ? "h-6 w-6" : "h-4 w-4"} />
+                <ZoomOut className={isMobile ? "h-5 w-5" : "h-4 w-4"} />
               </Button>
               <Button
                 variant="ghost"
-                size={isMobile ? "default" : "icon"}
+                size={isMobile ? "sm" : "icon"}
                 onClick={onClose}
-                className={`text-white hover:bg-white/10 ${isMobile ? 'px-4 py-3 min-w-[56px] rounded-lg bg-white/10' : ''}`}
+                className={`text-white hover:bg-white/10 ${isMobile ? 'px-3 py-2 rounded-lg bg-white/10' : ''}`}
               >
-                <X className={isMobile ? "h-6 w-6" : "h-4 w-4"} />
-                {isMobile && <span className="ml-1 text-sm">닫기</span>}
+                <X className={isMobile ? "h-5 w-5" : "h-4 w-4"} />
+                {isMobile && <span className="ml-1 text-xs">닫기</span>}
               </Button>
             </div>
           </div>
