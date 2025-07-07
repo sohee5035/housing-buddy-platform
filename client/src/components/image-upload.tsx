@@ -25,19 +25,32 @@ export default function ImageUpload({
   // 클립보드 붙여넣기 이벤트 리스너
   useEffect(() => {
     const handlePaste = (e: ClipboardEvent) => {
-      // 드롭존이 포커스되어 있을 때만 동작
-      if (!isPasteReady) return;
+      console.log('Paste event triggered, isPasteReady:', isPasteReady);
+      
+      // 매물 등록 폼이 열려있을 때는 항상 붙여넣기 허용
+      // (드롭존 호버 상태가 아니어도 동작하도록 개선)
+      const isInPropertyForm = document.querySelector('[data-property-form]') !== null;
+      if (!isPasteReady && !isInPropertyForm) {
+        console.log('Paste not ready and not in property form, ignoring');
+        return;
+      }
       
       const items = e.clipboardData?.items;
-      if (!items) return;
+      if (!items) {
+        console.log('No clipboard items');
+        return;
+      }
 
+      console.log('Checking clipboard items:', items.length);
       let hasImage = false;
-      Array.from(items).forEach((item) => {
+      Array.from(items).forEach((item, index) => {
+        console.log(`Item ${index}: type=${item.type}, kind=${item.kind}`);
         if (item.type.startsWith('image/')) {
           e.preventDefault();
           hasImage = true;
           const file = item.getAsFile();
           if (file) {
+            console.log('Processing pasted image file:', file.name, file.size);
             processImageFile(file);
           }
         }
@@ -48,6 +61,8 @@ export default function ImageUpload({
           title: "이미지 붙여넣기 완료",
           description: "클립보드의 이미지가 추가되었습니다.",
         });
+      } else {
+        console.log('No images found in clipboard');
       }
     };
 
@@ -74,11 +89,11 @@ export default function ImageUpload({
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 10 * 1024 * 1024) {
       console.error('File size too large:', file.size);
       toast({
         title: "파일 크기 초과",
-        description: "이미지는 5MB 이하여야 합니다.",
+        description: "이미지는 10MB 이하여야 합니다.",
         variant: "destructive",
       });
       return;
@@ -221,7 +236,7 @@ export default function ImageUpload({
             )}
           </div>
           <div className="text-xs text-neutral-500 mt-2">
-            최대 {maxImages}개 이미지, 각각 5MB 이하
+            최대 {maxImages}개 이미지, 각각 10MB 이하
           </div>
         </div>
       </Card>

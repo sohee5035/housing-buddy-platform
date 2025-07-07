@@ -82,7 +82,7 @@ export default function PropertyForm({ onSuccess, onCancel, initialData, availab
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-property-form>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
