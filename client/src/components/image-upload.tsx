@@ -56,7 +56,16 @@ export default function ImageUpload({
   }, [isPasteReady, images.length, maxImages]);
 
   const processImageFile = (file: File) => {
+    console.log('Processing image file:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      currentImagesCount: images.length,
+      maxImages
+    });
+
     if (!file.type.startsWith('image/')) {
+      console.error('Invalid file type:', file.type);
       toast({
         title: "잘못된 파일 형식",
         description: "이미지 파일만 업로드할 수 있습니다.",
@@ -66,6 +75,7 @@ export default function ImageUpload({
     }
 
     if (file.size > 5 * 1024 * 1024) {
+      console.error('File size too large:', file.size);
       toast({
         title: "파일 크기 초과",
         description: "이미지는 5MB 이하여야 합니다.",
@@ -75,6 +85,7 @@ export default function ImageUpload({
     }
 
     if (images.length >= maxImages) {
+      console.error('Too many images:', images.length, 'max:', maxImages);
       toast({
         title: "이미지 개수 초과",
         description: `최대 ${maxImages}개의 이미지만 업로드할 수 있습니다.`,
@@ -85,16 +96,47 @@ export default function ImageUpload({
 
     const reader = new FileReader();
     reader.onload = (e) => {
+      console.log('FileReader onload triggered');
       const result = e.target?.result as string;
-      const updatedImages = [...images, result];
-      setImages(updatedImages);
-      onImagesChange(updatedImages);
+      if (result) {
+        const updatedImages = [...images, result];
+        console.log('Adding image to state, new count:', updatedImages.length);
+        setImages(updatedImages);
+        onImagesChange(updatedImages);
+        toast({
+          title: "이미지 업로드 완료",
+          description: `${file.name}이(가) 성공적으로 추가되었습니다.`,
+        });
+      } else {
+        console.error('FileReader result is empty');
+        toast({
+          title: "이미지 업로드 실패",
+          description: "이미지를 읽는 중 오류가 발생했습니다.",
+          variant: "destructive",
+        });
+      }
     };
+    reader.onerror = (e) => {
+      console.error('FileReader error:', e);
+      toast({
+        title: "이미지 업로드 실패",
+        description: "이미지를 읽는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    };
+    console.log('Starting FileReader.readAsDataURL');
     reader.readAsDataURL(file);
   };
 
   const handleFileSelect = (files: FileList) => {
-    Array.from(files).forEach((file) => {
+    console.log('handleFileSelect called with', files.length, 'files');
+    if (files.length === 0) {
+      console.warn('No files selected');
+      return;
+    }
+    
+    Array.from(files).forEach((file, index) => {
+      console.log(`Processing file ${index + 1}/${files.length}:`, file.name);
       processImageFile(file);
     });
   };
