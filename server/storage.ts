@@ -19,13 +19,14 @@ export class DatabaseStorage implements IStorage {
   async getProperties(): Promise<Property[]> {
     const result = await db.select().from(properties).where(eq(properties.isDeleted, 0));
     
-    // 메인 화면용으로 첫 번째 이미지만 포함 (Cloudinary URL)
+    // 메인 화면용으로 Cloudinary URL만 포함 (base64는 제외)
     const propertiesWithThumbnail = result.map(prop => {
       let thumbnailPhoto: string[] = [];
       
       if (prop.photos && Array.isArray(prop.photos) && prop.photos.length > 0) {
         const firstPhoto = prop.photos[0];
-        if (firstPhoto) {
+        // Cloudinary URL인 경우만 포함
+        if (firstPhoto && firstPhoto.startsWith('https://res.cloudinary.com/')) {
           thumbnailPhoto = [firstPhoto];
         }
       }
