@@ -151,7 +151,12 @@ export default function Home() {
       '휴지통': 'Trash',
       '상세보기': 'View Details',
       '미정': 'TBD',
-      '알 수 없음': 'Unknown'
+      '알 수 없음': 'Unknown',
+      '등록된 매물': 'Property Listings',
+      '개의 매물이 등록되어 있습니다': 'properties are listed',
+      '총': 'Total',
+      '매물이 없습니다': 'No properties available',
+      '검색 결과가 없습니다': 'No search results found'
     };
     
     return uiTranslations[koreanText] || koreanText;
@@ -297,10 +302,10 @@ export default function Home() {
       {/* Property List */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-2">등록된 매물</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-2">{translateUI('등록된 매물')}</h2>
           <p className="text-neutral-600">
             {selectedCategory === '전체' 
-              ? `총 ${properties.length}개의 매물이 등록되어 있습니다.`
+              ? `${translateUI('총')} ${properties.length}${translateUI('개의 매물이 등록되어 있습니다')}.`
               : `'${selectedCategory}' 카테고리에 ${filteredProperties.length}개의 매물이 있습니다.`
             }
           </p>
@@ -322,11 +327,11 @@ export default function Home() {
         ) : filteredProperties.length === 0 ? (
           <div className="text-center py-16">
             <HomeIcon className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-neutral-900 mb-2">등록된 매물이 없습니다</h3>
+            <h3 className="text-xl font-semibold text-neutral-900 mb-2">{translateUI('매물이 없습니다')}</h3>
             <p className="text-neutral-600 mb-6">첫 번째 매물을 등록해보세요!</p>
             <Button onClick={() => setShowCreateModal(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              매물 등록하기
+              {translateUI('매물 등록')}하기
             </Button>
           </div>
         ) : (
