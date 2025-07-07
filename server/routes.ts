@@ -7,10 +7,16 @@ import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all properties
   app.get("/api/properties", async (req, res) => {
+    console.log("🚀 /api/properties 요청 받음");
+    const startTime = Date.now();
+    
     try {
       const properties = await storage.getProperties();
+      const endTime = Date.now();
+      console.log(`📤 매물 ${properties.length}개 응답 전송 완료, 총 소요시간: ${endTime - startTime}ms`);
       res.json(properties);
     } catch (error) {
+      console.error("❌ 매물 조회 API 에러:", error);
       res.status(500).json({ message: "Failed to fetch properties" });
     }
   });

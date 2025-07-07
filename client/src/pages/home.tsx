@@ -38,24 +38,53 @@ export default function Home() {
   } = useTranslation();
   const { toast } = useToast();
 
-  const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
+  const { data: properties = [], isLoading, error, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
     queryFn: async () => {
-      const response = await fetch("/api/properties", {
-        cache: 'no-cache',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+      console.log("🔄 매물 데이터 호출 시작");
+      try {
+        const response = await fetch("/api/properties", {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        console.log("📡 Response status:", response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-      });
-      if (!response.ok) throw new Error("Failed to fetch properties");
-      const data = await response.json();
-      console.log("실제로 받은 매물 데이터:", data);
-      console.log("매물 개수:", data.length);
-      return data;
+        const text = await response.text();
+        console.log("📝 Raw response text:", text.substring(0, 200) + "...");
+        
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error("❌ JSON 파싱 에러:", parseError);
+          console.log("📄 Full response text:", text);
+          throw new Error("Failed to parse JSON response");
+        }
+        
+        console.log("🎯 실제로 받은 매물 데이터:", data);
+        console.log("📊 매물 개수:", Array.isArray(data) ? data.length : 'Not an array');
+        console.log("📋 데이터 타입:", typeof data);
+        
+        if (!Array.isArray(data)) {
+          console.warn("⚠️ 받은 데이터가 배열이 아닙니다:", data);
+          return [];
+        }
+        
+        return data;
+      } catch (fetchError) {
+        console.error("❌ API 호출 에러:", fetchError);
+        throw fetchError;
+      }
     },
-    staleTime: 0, // 즉시 stale로 만들어서 항상 새로 가져오기
-    gcTime: 0, // 캐시 시간을 0으로 설정 (React Query v5에서는 gcTime 사용)
+    staleTime: 0,
+    gcTime: 0,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   // Translation mutation for bulk translating all properties
@@ -165,9 +194,20 @@ export default function Home() {
     return property.category === selectedCategory;
   });
   
-  console.log("properties 배열:", properties);
-  console.log("filteredProperties 배열:", filteredProperties);
-  console.log("실제 렌더링될 매물 개수:", filteredProperties.length);
+  console.log("🏠 properties 배열:", properties);
+  console.log("📋 filteredProperties 배열:", filteredProperties);
+  console.log("🎯 실제 렌더링될 매물 개수:", filteredProperties.length);
+  console.log("🔍 선택된 카테고리:", selectedCategory);
+  console.log("⚠️ React Query error:", error);
+  console.log("⏳ Loading 상태:", isLoading);
+  
+  // 만약 properties가 비어있고 로딩이 끝났으면 강제로 다시 로드
+  if (!isLoading && properties.length === 0 && !error) {
+    console.log("🔄 백그라운드에서 실제 데이터 로딩 시도...");
+    setTimeout(() => {
+      refetch();
+    }, 1000);
+  }
 
   // 사용 가능한 카테고리 목록 생성 (매물에서 실제 사용된 카테고리들 + 커스텀 카테고리들)
   const propertyCategories = Array.from(new Set(properties.map(p => p.category || '기타').filter(Boolean)));

@@ -17,8 +17,18 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getProperties(): Promise<Property[]> {
-    const result = await db.select().from(properties).where(eq(properties.isDeleted, 0));
-    return result;
+    console.log("📊 데이터베이스에서 매물 조회 시작");
+    const startTime = Date.now();
+    
+    try {
+      const result = await db.select().from(properties).where(eq(properties.isDeleted, 0));
+      const endTime = Date.now();
+      console.log(`✅ 매물 조회 완료: ${result.length}개, 소요시간: ${endTime - startTime}ms`);
+      return result;
+    } catch (error) {
+      console.error("❌ 데이터베이스 조회 에러:", error);
+      throw error;
+    }
   }
 
   async getProperty(id: number): Promise<Property | undefined> {
