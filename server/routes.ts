@@ -16,6 +16,11 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint for deployment
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   // Upload image to Cloudinary
   app.post("/api/upload-image", upload.single('image'), async (req, res) => {
     try {
