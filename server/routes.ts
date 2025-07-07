@@ -46,6 +46,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check Cloudinary configuration
+  app.get("/api/cloudinary-status", async (req, res) => {
+    try {
+      const config = {
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? 
+          process.env.CLOUDINARY_CLOUD_NAME.substring(0, 3) + '***' : 'NOT_SET',
+        api_key: process.env.CLOUDINARY_API_KEY ? 
+          process.env.CLOUDINARY_API_KEY.substring(0, 3) + '***' : 'NOT_SET',
+        api_secret: process.env.CLOUDINARY_API_SECRET ? '***SET***' : 'NOT_SET'
+      };
+      res.json({ config, status: 'Configuration loaded' });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to check configuration" });
+    }
+  });
+
   // Migrate existing images to Cloudinary
   app.post("/api/migrate-images", async (req, res) => {
     try {
