@@ -18,6 +18,7 @@ export default function ImageUpload({
   const [images, setImages] = useState<string[]>(initialImages);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isPasteReady, setIsPasteReady] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -70,7 +71,7 @@ export default function ImageUpload({
     return () => document.removeEventListener('paste', handlePaste);
   }, [isPasteReady, images.length, maxImages]);
 
-  const processImageFile = (file: File) => {
+  const processImageFile = async (file: File) => {
     console.log('Processing image file:', {
       name: file.name,
       size: file.size,
@@ -109,51 +110,61 @@ export default function ImageUpload({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      console.log('FileReader onload triggered');
-      const result = e.target?.result as string;
-      if (result) {
-        const updatedImages = [...images, result];
-        console.log('Adding image to state, new count:', updatedImages.length);
-        setImages(updatedImages);
-        onImagesChange(updatedImages);
-        toast({
-          title: "이미지 업로드 완료",
-          description: `${file.name}이(가) 성공적으로 추가되었습니다.`,
-        });
-      } else {
-        console.error('FileReader result is empty');
-        toast({
-          title: "이미지 업로드 실패",
-          description: "이미지를 읽는 중 오류가 발생했습니다.",
-          variant: "destructive",
-        });
+    try {
+      setUploading(true);
+      
+      // FormData 생성
+      const formData = new FormData();
+      formData.append('image', file);
+
+      // Cloudinary에 업로드
+      const response = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('이미지 업로드에 실패했습니다.');
       }
-    };
-    reader.onerror = (e) => {
-      console.error('FileReader error:', e);
+
+      const result = await response.json();
+      
+      // Cloudinary URL을 이미지 배열에 추가
+      const updatedImages = [...images, result.imageUrl];
+      console.log('Adding Cloudinary image to state, new count:', updatedImages.length);
+      setImages(updatedImages);
+      onImagesChange(updatedImages);
+      
+      toast({
+        title: "이미지 업로드 완료",
+        description: `${file.name}이(가) Cloudinary에 성공적으로 업로드되었습니다.`,
+      });
+      
+    } catch (error) {
+      console.error('이미지 업로드 오류:', error);
       toast({
         title: "이미지 업로드 실패",
-        description: "이미지를 읽는 중 오류가 발생했습니다.",
+        description: "이미지 업로드에 실패했습니다. 다시 시도해주세요.",
         variant: "destructive",
       });
-    };
-    console.log('Starting FileReader.readAsDataURL');
-    reader.readAsDataURL(file);
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const handleFileSelect = (files: FileList) => {
+  const handleFileSelect = async (files: FileList) => {
     console.log('handleFileSelect called with', files.length, 'files');
     if (files.length === 0) {
       console.warn('No files selected');
       return;
     }
     
-    Array.from(files).forEach((file, index) => {
-      console.log(`Processing file ${index + 1}/${files.length}:`, file.name);
-      processImageFile(file);
-    });
+    // 순차적으로 파일 처리 (동시에 여러 파일 업로드 방지)
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      console.log(`Processing file ${i + 1}/${files.length}:`, file.name);
+      await processImageFile(file);
+    }
   };
 
   const removeImage = (index: number) => {
@@ -225,11 +236,11 @@ export default function ImageUpload({
             }
           </div>
           <div className="flex gap-2">
-            <Button type="button" variant="outline">
-              파일 선택
+            <Button type="button" variant="outline" disabled={uploading}>
+              {uploading ? "업로드 중..." : "파일 선택"}
             </Button>
             {isPasteReady && (
-              <Button type="button" variant="outline" className="bg-blue-50">
+              <Button type="button" variant="outline" className="bg-blue-50" disabled={uploading}>
                 <Clipboard className="h-4 w-4 mr-2" />
                 붙여넣기 준비됨
               </Button>

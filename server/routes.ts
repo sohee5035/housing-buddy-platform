@@ -3,8 +3,48 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPropertySchema } from "@shared/schema";
 import { z } from "zod";
+import multer from "multer";
+import { uploadImageToCloudinary, deleteImageFromCloudinary } from "./cloudinary";
+
+// Multer 설정 (메모리 저장소 사용)
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB 제한
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Upload image to Cloudinary
+  app.post("/api/upload-image", upload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+
+      // Cloudinary에 이미지 업로드
+      const result = await uploadImageToCloudinary(req.file.buffer, {
+        folder: 'real-estate',
+        quality: 'auto',
+        width: 1200,
+        height: 800,
+        crop: 'limit'
+      });
+
+      res.json({
+        imageUrl: result.secure_url,
+        publicId: result.public_id,
+        width: result.width,
+        height: result.height,
+        format: result.format,
+        bytes: result.bytes
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      res.status(500).json({ message: "Failed to upload image" });
+    }
+  });
+
   // Get all properties
   app.get("/api/properties", async (req, res) => {
     try {
