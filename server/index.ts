@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { warmupDatabase } from "./db";
+import { storage } from "./storage";
 
 const app = express();
 app.use(express.json({ limit: '50mb' })); // 이미지 업로드를 위한 크기 제한 증가
@@ -67,7 +69,24 @@ app.use((req, res, next) => {
     port,
     host: "0.0.0.0",
     reusePort: true,
-  }, () => {
+  }, async () => {
     log(`serving on port ${port}`);
+    
+    // 서버 시작 후 데이터베이스 웜업 및 캐시 프리로딩
+    try {
+      // 1. 데이터베이스 웜업
+      await warmupDatabase();
+      
+      // 2. 캐시 프리로딩 (자주 사용되는 데이터 미리 로드)
+      console.log('[STARTUP] Preloading cache...');
+      const startTime = Date.now();
+      await storage.getProperties(); // 매물 목록 미리 캐시에 저장
+      const duration = Date.now() - startTime;
+      console.log(`[STARTUP] Cache preloaded in ${duration}ms`);
+      
+      console.log('[STARTUP] Server initialization complete!');
+    } catch (error) {
+      console.error('[STARTUP] Initialization failed:', error);
+    }
   });
 })();
