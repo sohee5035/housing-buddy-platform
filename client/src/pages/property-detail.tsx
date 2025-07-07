@@ -185,8 +185,7 @@ export default function PropertyDetail() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Desktop Layout */}
-          <div className="hidden md:flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <button 
                 className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
@@ -226,60 +225,6 @@ export default function PropertyDetail() {
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 {translateUI('삭제')}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Layout - Two Rows */}
-          <div className="md:hidden py-3">
-            {/* First Row: Logo */}
-            <div className="flex items-center justify-center mb-3">
-              <button 
-                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setLocation("/");
-                }}
-              >
-                <HomeIcon className="h-7 w-7 text-primary mr-2" />
-                <h1 className="text-xl font-bold text-neutral-900">부동산 매물</h1>
-              </button>
-            </div>
-            
-            {/* Second Row: Action Buttons */}
-            <div className="flex items-center justify-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setLocation("/")}
-                className="flex-1 max-w-[80px]"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                <span className="text-xs">{translateUI('뒤로가기')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setAdminAction('edit');
-                  setShowAdminAuth(true);
-                }}
-                className="flex-1 max-w-[60px]"
-              >
-                <Edit className="h-4 w-4 mr-1" />
-                <span className="text-xs">{translateUI('편집')}</span>
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => {
-                  setAdminAction('delete');
-                  setShowAdminAuth(true);
-                }}
-                className="flex-1 max-w-[60px]"
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                <span className="text-xs">{translateUI('삭제')}</span>
               </Button>
             </div>
           </div>

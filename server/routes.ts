@@ -7,15 +7,10 @@ import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all properties
   app.get("/api/properties", async (req, res) => {
-    const startTime = Date.now();
     try {
-      console.log('[API] GET /api/properties - start');
       const properties = await storage.getProperties();
-      const duration = Date.now() - startTime;
-      console.log(`[API] GET /api/properties - completed in ${duration}ms`);
       res.json(properties);
     } catch (error) {
-      console.error('[API] GET /api/properties - error:', error);
       res.status(500).json({ message: "Failed to fetch properties" });
     }
   });
@@ -35,22 +30,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get single property by ID
   app.get("/api/properties/:id", async (req, res) => {
-    const startTime = Date.now();
     try {
       const id = parseInt(req.params.id);
-      console.log(`[API] GET /api/properties/${id} - start`);
       const property = await storage.getProperty(id);
       
       if (!property) {
-        console.log(`[API] GET /api/properties/${id} - not found`);
         return res.status(404).json({ message: "Property not found" });
       }
 
-      const duration = Date.now() - startTime;
-      console.log(`[API] GET /api/properties/${id} - completed in ${duration}ms`);
       res.json(property);
     } catch (error) {
-      console.error(`[API] GET /api/properties/${req.params.id} - error:`, error);
       res.status(500).json({ message: "Failed to fetch property" });
     }
   });
