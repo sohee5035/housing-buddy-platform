@@ -4,6 +4,7 @@ import { Property } from "@shared/schema";
 import PropertyForm from "@/components/property-form";
 import AdminAuth from "@/components/admin-auth";
 import CategoryManager from "@/components/category-manager";
+import AdminPanel from "@/components/admin-panel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,9 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showAdminAuth, setShowAdminAuth] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
-  const [adminAction, setAdminAction] = useState<'create' | 'trash' | 'category'>('create');
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
 
   const [customCategories, setCustomCategories] = useState<string[]>([]);
@@ -200,18 +199,7 @@ export default function Home() {
                 <HomeIcon className="h-8 w-8 text-primary mr-3" />
                 <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
               </button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  console.log("🔄 수동 새로고침 버튼 클릭");
-                  refetch();
-                }}
-                className="ml-2"
-              >
-                <RotateCcw className="h-4 w-4 mr-1" />
-                새로고침
-              </Button>
+
             </div>
           </div>
           
@@ -263,35 +251,21 @@ export default function Home() {
                     원본복원
                   </Button>
                 )}
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    console.log("🔄 수동 새로고침 버튼 클릭");
+                    refetch();
+                  }}
+                >
+                  <RotateCcw className="h-4 w-4 mr-1" />
+                  새로고침
+                </Button>
               </div>
 
-              <Button 
-                variant="outline"
-                onClick={() => {
-                  setAdminAction('category');
-                  setShowAdminAuth(true);
-                }}
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                카테고리 관리
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => {
-                  setAdminAction('trash');
-                  setShowAdminAuth(true);
-                }}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                {translateUI('휴지통')}
-              </Button>
-              <Button onClick={() => {
-                setAdminAction('create');
-                setShowAdminAuth(true);
-              }}>
-                <Plus className="h-4 w-4 mr-2" />
-                {translateUI('매물 등록')}
-              </Button>
+
             </div>
           </div>
         </div>
@@ -419,31 +393,7 @@ export default function Home() {
         )}
       </main>
 
-      {/* Admin Authentication */}
-      <AdminAuth
-        isOpen={showAdminAuth}
-        onClose={() => setShowAdminAuth(false)}
-        onSuccess={() => {
-          setShowAdminAuth(false);
-          if (adminAction === 'create') {
-            setShowCreateModal(true);
-          } else if (adminAction === 'trash') {
-            setLocation('/trash');
-          } else if (adminAction === 'category') {
-            setShowCategoryManager(true);
-          }
-        }}
-        title={
-          adminAction === 'create' ? "매물 등록 권한 확인" : 
-          adminAction === 'trash' ? "휴지통 접근 권한 확인" :
-          "카테고리 관리 권한 확인"
-        }
-        description={
-          adminAction === 'create' ? "매물을 등록하려면 관리자 비밀번호가 필요합니다." : 
-          adminAction === 'trash' ? "휴지통에 접근하려면 관리자 비밀번호가 필요합니다." :
-          "카테고리를 관리하려면 관리자 비밀번호가 필요합니다."
-        }
-      />
+
 
       {/* Create Property Modal */}
       <Dialog open={showCreateModal} onOpenChange={() => {}}>
@@ -469,14 +419,14 @@ export default function Home() {
         propertyCategories={propertyCategories}
       />
 
-      {/* Floating Action Button (Mobile) */}
-      <Button
-        className="fixed bottom-6 right-6 rounded-full h-14 w-14 md:hidden shadow-lg"
-        size="icon"
-        onClick={() => setShowAdminAuth(true)}
-      >
-        <Plus className="h-6 w-6" />
-      </Button>
+      {/* Admin Panel */}
+      <AdminPanel
+        onCreateListing={() => setShowCreateModal(true)}
+        onCategoryManager={() => setShowCategoryManager(true)}
+        onTrashView={() => setLocation('/trash')}
+      />
+
+
     </div>
   );
 }
