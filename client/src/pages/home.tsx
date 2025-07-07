@@ -38,24 +38,51 @@ export default function Home() {
   } = useTranslation();
   const { toast } = useToast();
 
-  const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
+  const { data: properties = [], isLoading, refetch, error } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
     queryFn: async () => {
-      const response = await fetch("/api/properties", {
-        cache: 'no-cache',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+      console.log("🔄 Fetching properties from API...");
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2분 timeout
+      
+      try {
+        const response = await fetch("/api/properties", {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          console.error("❌ API Response not OK:", response.status, response.statusText);
+          throw new Error(`Failed to fetch properties: ${response.status}`);
         }
-      });
-      if (!response.ok) throw new Error("Failed to fetch properties");
-      const data = await response.json();
-      console.log("실제로 받은 매물 데이터:", data);
-      console.log("매물 개수:", data.length);
-      return data;
+        
+        const data = await response.json();
+        console.log("✅ 실제로 받은 매물 데이터:", data);
+        console.log("📊 매물 개수:", data?.length || 0);
+        
+        // 데이터 유효성 검사
+        if (!Array.isArray(data)) {
+          console.error("❌ 받은 데이터가 배열이 아닙니다:", typeof data, data);
+          return [];
+        }
+        
+        return data;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.error("🚨 Fetch error:", error);
+        throw error;
+      }
     },
-    staleTime: 0, // 즉시 stale로 만들어서 항상 새로 가져오기
-    gcTime: 0, // 캐시 시간을 0으로 설정 (React Query v5에서는 gcTime 사용)
+    staleTime: 1000 * 60 * 5, // 5분 동안 fresh
+    gcTime: 1000 * 60 * 10, // 10분 동안 캐시 유지
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Translation mutation for bulk translating all properties
@@ -165,9 +192,12 @@ export default function Home() {
     return property.category === selectedCategory;
   });
   
-  console.log("properties 배열:", properties);
-  console.log("filteredProperties 배열:", filteredProperties);
-  console.log("실제 렌더링될 매물 개수:", filteredProperties.length);
+  console.log("🏠 properties 배열:", properties);
+  console.log("📋 filteredProperties 배열:", filteredProperties);
+  console.log("🎯 실제 렌더링될 매물 개수:", filteredProperties.length);
+  console.log("🔍 선택된 카테고리:", selectedCategory);
+  console.log("⚠️ React Query error:", error);
+  console.log("⏳ Loading 상태:", isLoading);
 
   // 사용 가능한 카테고리 목록 생성 (매물에서 실제 사용된 카테고리들 + 커스텀 카테고리들)
   const propertyCategories = Array.from(new Set(properties.map(p => p.category || '기타').filter(Boolean)));
@@ -315,7 +345,17 @@ export default function Home() {
           </p>
         </div>
 
-        {isLoading ? (
+        {error ? (
+          <div className="text-center py-16">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="text-lg font-semibold text-red-900 mb-2">데이터 로딩 실패</h3>
+              <p className="text-red-700 mb-4">매물 정보를 불러오는 중 오류가 발생했습니다.</p>
+              <Button onClick={() => refetch()} variant="outline">
+                다시 시도
+              </Button>
+            </div>
+          </div>
+        ) : isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="overflow-hidden">
