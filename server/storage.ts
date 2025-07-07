@@ -17,31 +17,26 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getProperties(): Promise<Property[]> {
-    const result = await db.select({
-      id: properties.id,
-      title: properties.title,
-      address: properties.address,
-      deposit: properties.deposit,
-      monthlyRent: properties.monthlyRent,
-      maintenanceFee: properties.maintenanceFee,
-      description: properties.description,
-      otherInfo: properties.otherInfo,
-      originalUrl: properties.originalUrl,
-      category: properties.category,
-      isActive: properties.isActive,
-      isDeleted: properties.isDeleted,
-      deletedAt: properties.deletedAt,
-      createdAt: properties.createdAt,
-      // photos 필드 제외 - 메인 화면에서는 이미지 로딩 안함
-    }).from(properties).where(eq(properties.isDeleted, 0));
+    const result = await db.select().from(properties).where(eq(properties.isDeleted, 0));
     
-    // photos 필드에 빈 배열 추가 (타입 호환성을 위해)
-    const propertiesWithEmptyPhotos = result.map(prop => ({
-      ...prop,
-      photos: [] as string[]
-    }));
+    // 메인 화면용으로 첫 번째 이미지만 포함 (Cloudinary URL)
+    const propertiesWithThumbnail = result.map(prop => {
+      let thumbnailPhoto: string[] = [];
+      
+      if (prop.photos && Array.isArray(prop.photos) && prop.photos.length > 0) {
+        const firstPhoto = prop.photos[0];
+        if (firstPhoto) {
+          thumbnailPhoto = [firstPhoto];
+        }
+      }
+      
+      return {
+        ...prop,
+        photos: thumbnailPhoto
+      };
+    });
     
-    return propertiesWithEmptyPhotos;
+    return propertiesWithThumbnail;
   }
 
   async getProperty(id: number): Promise<Property | undefined> {

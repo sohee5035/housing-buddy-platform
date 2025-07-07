@@ -46,13 +46,21 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
         <Card className="hover:shadow-md transition-shadow duration-300 cursor-pointer">
           <div className="flex">
             {/* 이미지 섹션 */}
-            <div className="relative w-64 h-48 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-l-lg overflow-hidden flex-shrink-0">
-              <div className="flex items-center justify-center h-full text-neutral-400">
-                <div className="text-center">
-                  <HomeIcon className="h-12 w-12 mx-auto mb-2" />
-                  <p className="text-sm">이미지 미리보기</p>
+            <div className="relative w-64 h-48 bg-neutral-200 rounded-l-lg overflow-hidden flex-shrink-0">
+              {property.photos && property.photos.length > 0 ? (
+                <img
+                  src={property.photos[0]}
+                  alt={displayTitle}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-neutral-400">
+                  <div className="text-center">
+                    <HomeIcon className="h-12 w-12 mx-auto mb-2" />
+                    <p className="text-sm">이미지 준비중</p>
+                  </div>
                 </div>
-              </div>
+              )}
               
               <div className="absolute top-3 left-3">
                 <Badge variant="secondary">임대</Badge>
@@ -170,13 +178,21 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
     <Link href={`/property/${property.id}`} className="block">
       <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
         <div className="relative">
-          <div className="relative h-64 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-t-lg overflow-hidden">
-            <div className="flex items-center justify-center h-full text-neutral-400">
-              <div className="text-center">
-                <HomeIcon className="h-16 w-16 mx-auto mb-2" />
-                <p className="text-sm">이미지 미리보기</p>
+          <div className="relative h-64 bg-neutral-200 rounded-t-lg overflow-hidden">
+            {property.photos && property.photos.length > 0 ? (
+              <img
+                src={property.photos[0]}
+                alt={displayTitle}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-neutral-400">
+                <div className="text-center">
+                  <HomeIcon className="h-16 w-16 mx-auto mb-2" />
+                  <p className="text-sm">이미지 준비중</p>
+                </div>
               </div>
-            </div>
+            )}
             
             <div className="absolute top-4 left-4">
               <Badge variant="secondary">임대</Badge>
