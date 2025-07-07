@@ -105,8 +105,8 @@ export default function TranslationModal({ isOpen, onClose, property }: Translat
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+    <Dialog open={isOpen} onOpenChange={() => {}}>
+      <DialogContent className="max-w-2xl" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <Languages className="h-5 w-5 mr-2" />
