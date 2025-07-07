@@ -185,48 +185,48 @@ export default function PropertyDetail() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          {/* 첫 번째 줄: 타이틀과 뒤로가기 */}
+          <div className="flex items-center h-16 border-b border-neutral-100">
+            <button 
+              className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
+              onClick={(e) => {
+                e.preventDefault();
+                setLocation("/");
+              }}
+            >
+              <ArrowLeft className="h-6 w-6 text-neutral-600 mr-2" />
+              <span className="text-sm text-neutral-600 mr-4">{translateUI('뒤로가기')}</span>
+            </button>
             <div className="flex items-center">
-              <button 
-                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setLocation("/");
-                }}
-              >
-                <HomeIcon className="h-8 w-8 text-primary mr-3" />
-                <h1 className="text-2xl font-bold text-neutral-900 whitespace-nowrap">부동산 매물</h1>
-              </button>
+              <HomeIcon className="h-8 w-8 text-primary mr-3" />
+              <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                onClick={() => setLocation("/")}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {translateUI('뒤로가기')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setAdminAction('edit');
-                  setShowAdminAuth(true);
-                }}
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                {translateUI('편집')}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  setAdminAction('delete');
-                  setShowAdminAuth(true);
-                }}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                {translateUI('삭제')}
-              </Button>
-            </div>
+          </div>
+          
+          {/* 두 번째 줄: 액션 버튼들 */}
+          <div className="flex justify-end items-center h-12 space-x-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setAdminAction('edit');
+                setShowAdminAuth(true);
+              }}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              {translateUI('편집')}
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                setAdminAction('delete');
+                setShowAdminAuth(true);
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              {translateUI('삭제')}
+            </Button>
           </div>
         </div>
       </header>
