@@ -237,12 +237,12 @@ export default function Home() {
                       {translateMutation.isPending ? (
                         <>
                           <Languages className="h-4 w-4 mr-1 animate-spin" />
-                          번역중
+                          Translating...
                         </>
                       ) : (
                         <>
                           <Globe className="h-4 w-4 mr-1" />
-                          전체번역
+                          Translate All
                         </>
                       )}
                     </Button>
@@ -254,7 +254,7 @@ export default function Home() {
                     size="sm"
                   >
                     <RotateCcw className="h-4 w-4 mr-1" />
-                    원본복원
+                    Restore Original
                   </Button>
                 )}
                 
@@ -267,7 +267,7 @@ export default function Home() {
                   }}
                 >
                   <RotateCcw className="h-4 w-4 mr-1" />
-                  새로고침
+                  Refresh
                 </Button>
               </div>
 
