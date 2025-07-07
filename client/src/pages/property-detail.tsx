@@ -261,8 +261,7 @@ export default function PropertyDetail() {
                   <button
                     key={index}
                     onClick={() => {
-                      setSelectedImageIndex(index);
-                      setShowImageGallery(true);
+                      setCurrentImageIndex(index);
                     }}
                     className={`h-16 bg-neutral-200 rounded overflow-hidden hover:ring-2 hover:ring-primary/50 transition-all ${
                       currentImageIndex === index ? 'ring-2 ring-primary' : ''
