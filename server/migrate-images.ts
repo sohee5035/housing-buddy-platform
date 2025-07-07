@@ -86,7 +86,7 @@ async function migrateImagesToCloudinary() {
 }
 
 // 직접 실행 (배포 환경에서 안전하게 처리)
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   migrateImagesToCloudinary().then((success) => {
     console.log('Migration script finished');
     if (success) {

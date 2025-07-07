@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import * as React from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import PropertyForm from "@/components/property-form";
 import AdminAuth from "@/components/admin-auth";
 import CategoryManager from "@/components/category-manager";
 import AdminPanel from "@/components/admin-panel";
+import SearchForm from "@/components/search-form";
 import SmartTextWithTooltips from "@/components/smart-text-with-tooltips";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -17,10 +19,25 @@ import { useTranslation } from "@/contexts/TranslationContext";
 import { translateText, supportedLanguages } from "@/lib/translate";
 import { useToast } from "@/hooks/use-toast";
 
+interface SearchFilters {
+  city?: string;
+  propertyType?: string;
+  priceRange?: string;
+  listingType?: string;
+  search?: string;
+  depositMin?: number;
+  depositMax?: number;
+  monthlyRentMin?: number;
+  monthlyRentMax?: number;
+  includeMaintenanceFee?: boolean;
+}
+
 export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
 
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [, setLocation] = useLocation();
@@ -62,6 +79,67 @@ export default function Home() {
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
+
+  // 검색 필터링 함수
+  const filterProperties = (props: Property[], filters: SearchFilters): Property[] => {
+    return props.filter(property => {
+      // 텍스트 검색
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const matchesSearch = 
+          property.title.toLowerCase().includes(searchLower) ||
+          property.description.toLowerCase().includes(searchLower) ||
+          property.address.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
+
+      // 지역 필터
+      if (filters.city && filters.city !== 'any') {
+        if (!property.address.includes(filters.city)) return false;
+      }
+
+      // 매물 유형 필터
+      if (filters.propertyType && filters.propertyType !== 'any') {
+        if (!property.title.includes(filters.propertyType) && 
+            !property.description.includes(filters.propertyType)) return false;
+      }
+
+      // 카테고리 필터
+      if (filters.priceRange && filters.priceRange !== 'any') {
+        if (property.category !== filters.priceRange) return false;
+      }
+
+      // 보증금 필터
+      if (filters.depositMin !== undefined && property.deposit < filters.depositMin) return false;
+      if (filters.depositMax !== undefined && property.deposit > filters.depositMax) return false;
+
+      // 월세 필터 (관리비 포함 옵션 고려)
+      let monthlyRent = property.monthlyRent;
+      if (filters.includeMaintenanceFee && property.maintenanceFee) {
+        monthlyRent += property.maintenanceFee;
+      }
+      
+      if (filters.monthlyRentMin !== undefined && monthlyRent < filters.monthlyRentMin) return false;
+      if (filters.monthlyRentMax !== undefined && monthlyRent > filters.monthlyRentMax) return false;
+
+      return true;
+    });
+  };
+
+  // 검색 핸들러
+  const handleSearch = (filters: SearchFilters) => {
+    setSearchFilters(filters);
+    const filtered = filterProperties(properties, filters);
+    setFilteredProperties(filtered);
+  };
+
+  // properties가 변경될 때마다 필터 재적용
+  React.useEffect(() => {
+    if (properties.length > 0) {
+      const filtered = filterProperties(properties, searchFilters);
+      setFilteredProperties(filtered);
+    }
+  }, [properties, searchFilters]);
 
   // Translation mutation for bulk translating all properties
   const translateMutation = useMutation({
@@ -169,11 +247,13 @@ export default function Home() {
     return `${translateUI('보증금')} ${depositStr}${translateUI('만원')} / ${translateUI('월세')} ${rentStr}${translateUI('만원')}`;
   };
 
-  // 카테고리별 매물 필터링
-  const filteredProperties = properties.filter(property => {
-    if (selectedCategory === '전체') return true;
-    return property.category === selectedCategory;
-  });
+  // 표시할 매물 목록 결정 (검색 필터가 있으면 필터된 결과, 없으면 카테고리 필터)
+  const displayProperties = filteredProperties.length > 0 || Object.keys(searchFilters).length > 0 
+    ? filteredProperties 
+    : properties.filter(property => {
+        if (selectedCategory === '전체') return true;
+        return property.category === selectedCategory;
+      });
   
 
 
@@ -277,6 +357,13 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Search Form */}
+      <div className="bg-neutral-50 border-b border-neutral-200 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SearchForm onSearch={handleSearch} />
+        </div>
+      </div>
+
       {/* Category Filter */}
       <div className="bg-white border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -290,7 +377,11 @@ export default function Home() {
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
                 size="sm"
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => {
+                  setSelectedCategory(category);
+                  setSearchFilters({}); // 카테고리 선택 시 검색 필터 초기화
+                  setFilteredProperties([]);
+                }}
                 className="text-sm"
               >
                 {translateUI(category)}
@@ -305,9 +396,11 @@ export default function Home() {
         <div className="mb-6">
           <h2 className="text-3xl font-bold text-neutral-900 mb-2">{translateUI('등록된 매물')}</h2>
           <p className="text-neutral-600">
-            {selectedCategory === '전체' 
-              ? `${translateUI('총')} ${properties.length}${translateUI('개의 매물이 등록되어 있습니다')}.`
-              : `'${selectedCategory}' 카테고리에 ${filteredProperties.length}개의 매물이 있습니다.`
+            {Object.keys(searchFilters).length > 0 
+              ? `검색 조건에 맞는 ${displayProperties.length}개의 매물이 있습니다.`
+              : selectedCategory === '전체' 
+                ? `${translateUI('총')} ${properties.length}${translateUI('개의 매물이 등록되어 있습니다')}.`
+                : `'${selectedCategory}' 카테고리에 ${displayProperties.length}개의 매물이 있습니다.`
             }
           </p>
         </div>
@@ -325,19 +418,31 @@ export default function Home() {
               </Card>
             ))}
           </div>
-        ) : filteredProperties.length === 0 ? (
+        ) : displayProperties.length === 0 ? (
           <div className="text-center py-16">
             <HomeIcon className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-neutral-900 mb-2">{translateUI('매물이 없습니다')}</h3>
-            <p className="text-neutral-600 mb-6">첫 번째 매물을 등록해보세요!</p>
-            <Button onClick={() => setShowCreateModal(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              {translateUI('매물 등록')}하기
-            </Button>
+            <h3 className="text-xl font-semibold text-neutral-900 mb-2">
+              {Object.keys(searchFilters).length > 0 
+                ? '검색 조건에 맞는 매물이 없습니다'
+                : translateUI('매물이 없습니다')
+              }
+            </h3>
+            <p className="text-neutral-600 mb-6">
+              {Object.keys(searchFilters).length > 0 
+                ? '다른 검색 조건을 시도해보세요.'
+                : '첫 번째 매물을 등록해보세요!'
+              }
+            </p>
+            {Object.keys(searchFilters).length === 0 && (
+              <Button onClick={() => setShowCreateModal(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                {translateUI('매물 등록')}하기
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProperties.map((property) => (
+            {displayProperties.map((property) => (
               <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <Link href={`/property/${property.id}`}>
                   <div className="relative h-48 bg-neutral-200">
