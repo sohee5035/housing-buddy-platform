@@ -40,9 +40,30 @@ export default function Home() {
 
   const { data: properties = [], isLoading, refetch, error } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
-    retry: false, // 재시도 비활성화로 빠른 진단
+    queryFn: async () => {
+      console.log("🔄 직접 API 호출 시작...");
+      const response = await fetch("/api/properties", {
+        headers: {
+          'Accept': 'application/json',
+        },
+        cache: 'no-cache'
+      });
+      
+      if (!response.ok) {
+        console.error("❌ API 응답 실패:", response.status, response.statusText);
+        throw new Error(`API 호출 실패: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("✅ API 응답 성공:", data);
+      console.log("📊 매물 개수:", data?.length || 0);
+      
+      return Array.isArray(data) ? data : [];
+    },
+    retry: 1,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
+    staleTime: 0, // 항상 fresh하게 가져오기
   });
 
   // Translation mutation for bulk translating all properties
