@@ -46,52 +46,13 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
         <Card className="hover:shadow-md transition-shadow duration-300 cursor-pointer">
           <div className="flex">
             {/* 이미지 섹션 */}
-            <div className="relative w-64 h-48 bg-neutral-200 rounded-l-lg overflow-hidden flex-shrink-0">
-              {property.photos && property.photos.length > 0 ? (
-                <>
-                  <img
-                    src={property.photos[currentImageIndex]}
-                    alt={displayTitle}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                  
-                  {property.photos.length > 1 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setCurrentImageIndex(prev => 
-                            prev === 0 ? property.photos!.length - 1 : prev - 1
-                          );
-                        }}
-                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-1 rounded-full hover:bg-black/70 transition-colors z-10"
-                      >
-                        <ChevronLeft className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setCurrentImageIndex(prev => 
-                            prev === property.photos!.length - 1 ? 0 : prev + 1
-                          );
-                        }}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-1 rounded-full hover:bg-black/70 transition-colors z-10"
-                      >
-                        <ChevronRight className="h-3 w-3" />
-                      </button>
-                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-2 py-1 rounded-full text-xs">
-                        {currentImageIndex + 1} / {property.photos.length}
-                      </div>
-                    </>
-                  )}
-                </>
-              ) : (
-                <div className="flex items-center justify-center h-full text-neutral-400">
-                  <HomeIcon className="h-12 w-12" />
+            <div className="relative w-64 h-48 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-l-lg overflow-hidden flex-shrink-0">
+              <div className="flex items-center justify-center h-full text-neutral-400">
+                <div className="text-center">
+                  <HomeIcon className="h-12 w-12 mx-auto mb-2" />
+                  <p className="text-sm">이미지 미리보기</p>
                 </div>
-              )}
+              </div>
               
               <div className="absolute top-3 left-3">
                 <Badge variant="secondary">임대</Badge>
@@ -209,52 +170,13 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
     <Link href={`/property/${property.id}`} className="block">
       <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
         <div className="relative">
-          <div className="relative h-64 bg-neutral-200 rounded-t-lg overflow-hidden">
-            {property.photos && property.photos.length > 0 ? (
-              <>
-                <img
-                  src={property.photos[currentImageIndex]}
-                  alt={displayTitle}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
-                
-                {property.photos.length > 1 && (
-                  <>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setCurrentImageIndex(prev => 
-                          prev === 0 ? property.photos!.length - 1 : prev - 1
-                        );
-                      }}
-                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setCurrentImageIndex(prev => 
-                          prev === property.photos!.length - 1 ? 0 : prev + 1
-                        );
-                      }}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                      {currentImageIndex + 1} / {property.photos.length}
-                    </div>
-                  </>
-                )}
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-full text-neutral-400">
-                <HomeIcon className="h-16 w-16" />
+          <div className="relative h-64 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-t-lg overflow-hidden">
+            <div className="flex items-center justify-center h-full text-neutral-400">
+              <div className="text-center">
+                <HomeIcon className="h-16 w-16 mx-auto mb-2" />
+                <p className="text-sm">이미지 미리보기</p>
               </div>
-            )}
+            </div>
             
             <div className="absolute top-4 left-4">
               <Badge variant="secondary">임대</Badge>
