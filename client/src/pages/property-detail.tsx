@@ -59,7 +59,14 @@ export default function PropertyDetail() {
       '뒤로가기': 'Back',
       '미정': 'TBD',
       '알 수 없음': 'Unknown',
-      '기타': 'Others'
+      '기타': 'Others',
+      '상세 설명': 'Property Details',
+      '추가 정보': 'Additional Information',
+      '위치': 'Location',
+      '원본 링크': 'Original Link',
+      '원본 페이지에서 보기': 'View Original Page',
+      'Google Maps에서 보기': 'View on Google Maps',
+      '등록일': 'Listed Date'
     };
     
     return uiTranslations[koreanText] || koreanText;
@@ -354,7 +361,7 @@ export default function PropertyDetail() {
                 <div className="mt-6">
                   <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
                     <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
-                    상세 설명
+                    {translateUI('상세 설명')}
                   </h3>
                   <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
                     <p className="text-neutral-700 whitespace-pre-wrap leading-relaxed">
@@ -371,7 +378,7 @@ export default function PropertyDetail() {
                   <div className="mt-6">
                     <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
                       <div className="w-1 h-6 bg-green-500 rounded-full mr-3"></div>
-                      추가 정보
+                      {translateUI('추가 정보')}
                     </h3>
                     <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                       <p className="text-neutral-700 whitespace-pre-wrap leading-relaxed">
@@ -389,7 +396,7 @@ export default function PropertyDetail() {
                 <div className="mt-6">
                   <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
                     <div className="w-1 h-6 bg-red-500 rounded-full mr-3"></div>
-                    위치
+                    {translateUI('위치')}
                   </h3>
                   <div className="bg-neutral-100 rounded-lg overflow-hidden shadow-sm">
                     <iframe
@@ -415,7 +422,7 @@ export default function PropertyDetail() {
                         rel="noopener noreferrer"
                         className="text-primary hover:text-primary/80 transition-colors font-medium"
                       >
-                        Google Maps에서 보기 →
+{translateUI('Google Maps에서 보기')} →
                       </a>
                     </div>
                   </div>
@@ -423,7 +430,7 @@ export default function PropertyDetail() {
 
                 {property.originalUrl && (
                   <div className="mt-6">
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">원본 링크</h3>
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">{translateUI('원본 링크')}</h3>
                     <a
                       href={property.originalUrl}
                       target="_blank"
@@ -431,14 +438,14 @@ export default function PropertyDetail() {
                       className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
-                      원본 페이지에서 보기
+                      {translateUI('원본 페이지에서 보기')}
                     </a>
                   </div>
                 )}
 
                 <div className="mt-6 pt-4 border-t border-neutral-200 flex items-center text-sm text-neutral-500">
                   <Calendar className="h-4 w-4 mr-2" />
-                  등록일: {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
+                  {translateUI('등록일')}: {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
                 </div>
               </CardContent>
             </Card>
