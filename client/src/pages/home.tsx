@@ -41,6 +41,7 @@ export default function Home() {
   const { data: properties = [], isLoading, error, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
     queryFn: async () => {
+      console.log("🔄 매물 데이터 호출 시작");
       const response = await fetch("/api/properties", {
         cache: 'no-cache',
         headers: {
@@ -48,16 +49,22 @@ export default function Home() {
           'Pragma': 'no-cache'
         }
       });
+      console.log("📡 Response status:", response.status);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
+      console.log("🎯 받은 데이터:", data);
+      console.log("📊 매물 개수:", Array.isArray(data) ? data.length : 'Not an array');
       return Array.isArray(data) ? data : [];
     },
-    staleTime: 0,
-    gcTime: 0,
-    retry: 3,
-    retryDelay: 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    retry: (failureCount, error) => {
+      console.log(`❌ 재시도 ${failureCount}번째:`, error);
+      return failureCount < 3;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Translation mutation for bulk translating all properties
@@ -166,6 +173,13 @@ export default function Home() {
     if (selectedCategory === '전체') return true;
     return property.category === selectedCategory;
   });
+  
+  console.log("🏠 properties 배열:", properties);
+  console.log("📋 filteredProperties 배열:", filteredProperties);
+  console.log("🎯 실제 렌더링될 매물 개수:", filteredProperties.length);
+  console.log("🔍 선택된 카테고리:", selectedCategory);
+  console.log("⚠️ React Query error:", error);
+  console.log("⏳ Loading 상태:", isLoading);
 
   // 사용 가능한 카테고리 목록 생성 (매물에서 실제 사용된 카테고리들 + 커스텀 카테고리들)
   const propertyCategories = Array.from(new Set(properties.map(p => p.category || '기타').filter(Boolean)));
@@ -184,16 +198,30 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Title Row */}
           <div className="flex items-center justify-center py-4 border-b border-neutral-100">
-            <button 
-              className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.href = "/";
-              }}
-            >
-              <HomeIcon className="h-8 w-8 text-primary mr-3" />
-              <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
-            </button>
+            <div className="flex items-center gap-3">
+              <button 
+                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "/";
+                }}
+              >
+                <HomeIcon className="h-8 w-8 text-primary mr-3" />
+                <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
+              </button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  console.log("🔄 수동 새로고침 버튼 클릭");
+                  refetch();
+                }}
+                className="ml-2"
+              >
+                <RotateCcw className="h-4 w-4 mr-1" />
+                새로고침
+              </Button>
+            </div>
           </div>
           
           {/* Controls Row */}
