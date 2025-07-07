@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import PropertyForm from "@/components/property-form";
@@ -38,72 +38,48 @@ export default function Home() {
   } = useTranslation();
   const { toast } = useToast();
 
-  const { data: properties = [], isLoading, refetch, error } = useQuery<Property[]>({
-    queryKey: ["/api/properties"],
-    queryFn: async () => {
-      console.log("🔄 API 호출 시작...");
+  // React Query 대신 useState와 useEffect 사용
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadProperties = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      console.log("🔄 매물 데이터 로딩 시작...");
       
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 timeout
-        
-        const response = await fetch("/api/properties", {
-          signal: controller.signal,
-          headers: {
-            'Accept': 'application/json',
-          },
-          cache: 'no-cache'
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          console.error("❌ API 응답 실패:", response.status, response.statusText);
-          throw new Error(`API 호출 실패: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log("✅ API 응답 성공:", data);
-        console.log("📊 매물 개수:", data?.length || 0);
-        
-        return Array.isArray(data) ? data : [];
-      } catch (error) {
-        console.error("🚨 API 호출 실패, 기본 매물 표시:", error);
-        
-        // API 실패시 기본 매물 표시
-        const fallbackProperties = [{
-          id: 1,
-          title: "상도동 원룸",
-          description: "교통이 편리한 상도동 원룸입니다.",
-          propertyType: "원룸",
-          listingType: "월세",
-          deposit: 1000,
-          monthlyRent: 50,
-          maintenanceFee: 5,
-          city: "서울시 동작구",
-          district: "상도동",
-          fullAddress: "서울시 동작구 상도동",
-          size: 20,
-          floor: "2층",
-          totalFloors: "5층",
-          images: [],
-          category: "원룸",
-          contactInfo: "010-1234-5678",
-          originalListingUrl: "",
-          mapUrl: "",
-          isDeleted: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }];
-        
-        return fallbackProperties;
+      const response = await fetch("/api/properties", {
+        headers: { 'Accept': 'application/json' },
+        cache: 'no-cache'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API 오류: ${response.status}`);
       }
-    },
-    retry: 0,
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    staleTime: 0,
-  });
+      
+      const data = await response.json();
+      console.log("✅ 매물 데이터 로딩 성공:", data);
+      
+      if (Array.isArray(data)) {
+        setProperties(data);
+      } else {
+        setProperties([]);
+      }
+    } catch (err) {
+      console.error("🚨 매물 로딩 실패:", err);
+      setError(err instanceof Error ? err.message : "알 수 없는 오류");
+      setProperties([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refetch = () => loadProperties();
+
+  useEffect(() => {
+    loadProperties();
+  }, []);
 
   // Translation mutation for bulk translating all properties
   const translateMutation = useMutation({
