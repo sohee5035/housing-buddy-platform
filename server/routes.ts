@@ -5,6 +5,7 @@ import { insertPropertySchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from "./cloudinary";
+import { migrateImagesToCloudinary } from "./migrate-images";
 
 // Multer 설정 (메모리 저장소 사용)
 const upload = multer({ 
@@ -42,6 +43,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error uploading image:", error);
       res.status(500).json({ message: "Failed to upload image" });
+    }
+  });
+
+  // Migrate existing images to Cloudinary
+  app.post("/api/migrate-images", async (req, res) => {
+    try {
+      console.log("Starting image migration to Cloudinary...");
+      await migrateImagesToCloudinary();
+      res.json({ message: "Image migration completed successfully" });
+    } catch (error) {
+      console.error("Error during image migration:", error);
+      res.status(500).json({ message: "Failed to migrate images" });
     }
   });
 
