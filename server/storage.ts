@@ -55,41 +55,14 @@ export class DatabaseStorage implements IStorage {
 
     const startTime = Date.now();
     try {
-      const result = await db.select().from(properties).where(eq(properties.isDeleted, 0)).limit(50);
+      const result = await db.select().from(properties).where(eq(properties.isDeleted, 0));
       const duration = Date.now() - startTime;
       console.log(`[DB] getProperties took ${duration}ms`);
       setCache(cacheKey, result);
       return result;
     } catch (error) {
       console.error('[DB] getProperties error:', error);
-      // 기본 매물 반환으로 항상 작동하도록 보장
-      const fallbackProperties: Property[] = [{
-        id: 8,
-        title: "Sangdo-dong Studio Room",
-        description: "교통이 편리한 상도동 원룸입니다.",
-        propertyType: "원룸",
-        listingType: "월세", 
-        deposit: 1000,
-        monthlyRent: 50,
-        maintenanceFee: 5,
-        city: "서울시 동작구",
-        district: "상도동",
-        fullAddress: "서울시 동작구 상도동",
-        size: 20,
-        floor: "2층",
-        totalFloors: "5층",
-        images: [],
-        category: "원룸",
-        contactInfo: "010-1234-5678",
-        originalListingUrl: "",
-        mapUrl: "",
-        isDeleted: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }];
-      
-      setCache(cacheKey, fallbackProperties);
-      return fallbackProperties;
+      throw error;
     }
   }
 

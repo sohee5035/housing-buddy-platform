@@ -38,22 +38,24 @@ export default function Home() {
   } = useTranslation();
   const { toast } = useToast();
 
-  const { data: properties = [], isLoading, refetch, error } = useQuery<Property[]>({
+  const { data: properties = [], isLoading, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
     queryFn: async () => {
-      console.log("🔄 매물 데이터 호출 시작");
-      const response = await fetch("/api/properties");
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
+      const response = await fetch("/api/properties", {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch properties");
       const data = await response.json();
-      console.log("✅ 매물 데이터 수신:", data?.length || 0, "개");
+      console.log("실제로 받은 매물 데이터:", data);
+      console.log("매물 개수:", data.length);
       return data;
     },
-    staleTime: 0,
-    gcTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
-    retry: 1,
+    staleTime: 0, // 즉시 stale로 만들어서 항상 새로 가져오기
+    gcTime: 0, // 캐시 시간을 0으로 설정 (React Query v5에서는 gcTime 사용)
   });
 
   // Translation mutation for bulk translating all properties
@@ -163,12 +165,9 @@ export default function Home() {
     return property.category === selectedCategory;
   });
   
-  console.log("🏠 properties 배열:", properties);
-  console.log("📋 filteredProperties 배열:", filteredProperties);
-  console.log("🎯 실제 렌더링될 매물 개수:", filteredProperties.length);
-  console.log("🔍 선택된 카테고리:", selectedCategory);
-  console.log("⚠️ React Query error:", error);
-  console.log("⏳ Loading 상태:", isLoading);
+  console.log("properties 배열:", properties);
+  console.log("filteredProperties 배열:", filteredProperties);
+  console.log("실제 렌더링될 매물 개수:", filteredProperties.length);
 
   // 사용 가능한 카테고리 목록 생성 (매물에서 실제 사용된 카테고리들 + 커스텀 카테고리들)
   const propertyCategories = Array.from(new Set(properties.map(p => p.category || '기타').filter(Boolean)));
@@ -316,17 +315,7 @@ export default function Home() {
           </p>
         </div>
 
-        {error ? (
-          <div className="text-center py-16">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-red-900 mb-2">데이터 로딩 실패</h3>
-              <p className="text-red-700 mb-4">매물 정보를 불러오는 중 오류가 발생했습니다.</p>
-              <Button onClick={() => refetch()} variant="outline">
-                다시 시도
-              </Button>
-            </div>
-          </div>
-        ) : isLoading ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="overflow-hidden">
