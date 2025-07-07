@@ -3,18 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import AdminAuth from "@/components/admin-auth";
-import { Settings, Plus, Trash2, FolderCog, Shield } from "lucide-react";
+import { Settings, Plus, Trash2, FolderCog, Shield, Edit, Delete } from "lucide-react";
 
 interface AdminPanelProps {
   onCreateListing: () => void;
   onCategoryManager: () => void;
   onTrashView: () => void;
+  onEditProperty?: () => void;
+  onDeleteProperty?: () => void;
+  currentPropertyId?: number;
 }
 
 export default function AdminPanel({ 
   onCreateListing, 
   onCategoryManager, 
-  onTrashView 
+  onTrashView,
+  onEditProperty,
+  onDeleteProperty,
+  currentPropertyId
 }: AdminPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
@@ -78,6 +84,32 @@ export default function AdminPanel({
                 </Button>
               </div>
             </div>
+            
+            {/* 현재 매물 편집/삭제 (매물 상세 페이지에서만 표시) */}
+            {currentPropertyId && onEditProperty && onDeleteProperty && (
+              <div className="rounded-lg border border-blue-200 p-4 bg-blue-50">
+                <h3 className="font-medium text-sm text-blue-700 mb-3">현재 매물 관리</h3>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => handleAdminAction(onEditProperty)}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    매물 편집
+                  </Button>
+                  
+                  <Button
+                    variant="destructive"
+                    className="w-full justify-start"
+                    onClick={() => handleAdminAction(onDeleteProperty)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    매물 삭제
+                  </Button>
+                </div>
+              </div>
+            )}
             
             <div className="rounded-lg border border-neutral-200 p-4 bg-neutral-50">
               <h3 className="font-medium text-sm text-neutral-700 mb-3">시스템 설정</h3>

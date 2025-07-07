@@ -5,6 +5,7 @@ import { useState } from "react";
 import PropertyForm from "@/components/property-form";
 import AdminAuth from "@/components/admin-auth";
 import ImageGalleryModal from "@/components/image-gallery-modal";
+import AdminPanel from "@/components/admin-panel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -139,7 +140,7 @@ export default function PropertyDetail() {
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
                 <HomeIcon className="h-8 w-8 text-primary mr-3" />
-                <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
+                <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
               </div>
             </div>
           </div>
@@ -199,34 +200,8 @@ export default function PropertyDetail() {
             </button>
             <div className="flex items-center">
               <HomeIcon className="h-8 w-8 text-primary mr-3" />
-              <h1 className="text-2xl font-bold text-neutral-900">부동산 매물</h1>
+              <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
             </div>
-          </div>
-          
-          {/* 두 번째 줄: 액션 버튼들 */}
-          <div className="flex justify-end items-center h-12 space-x-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setAdminAction('edit');
-                setShowAdminAuth(true);
-              }}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              {translateUI('편집')}
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => {
-                setAdminAction('delete');
-                setShowAdminAuth(true);
-              }}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              {translateUI('삭제')}
-            </Button>
           </div>
         </div>
       </header>
@@ -505,6 +480,20 @@ export default function PropertyDetail() {
           title={getTranslatedPropertyText('title') || property.title}
         />
       )}
+
+      {/* Admin Panel */}
+      <AdminPanel
+        onCreateListing={() => setLocation('/')}
+        onCategoryManager={() => setLocation('/')}
+        onTrashView={() => setLocation('/trash')}
+        onEditProperty={() => setShowEditModal(true)}
+        onDeleteProperty={() => {
+          if (confirm('정말로 이 매물을 삭제하시겠습니까?')) {
+            deleteMutation.mutate();
+          }
+        }}
+        currentPropertyId={property?.id}
+      />
     </div>
   );
 }
