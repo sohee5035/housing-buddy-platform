@@ -40,49 +40,9 @@ export default function Home() {
 
   const { data: properties = [], isLoading, refetch, error } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
-    queryFn: async () => {
-      console.log("🔄 Fetching properties from API...");
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2분 timeout
-      
-      try {
-        const response = await fetch("/api/properties", {
-          signal: controller.signal,
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          }
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          console.error("❌ API Response not OK:", response.status, response.statusText);
-          throw new Error(`Failed to fetch properties: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log("✅ 실제로 받은 매물 데이터:", data);
-        console.log("📊 매물 개수:", data?.length || 0);
-        
-        // 데이터 유효성 검사
-        if (!Array.isArray(data)) {
-          console.error("❌ 받은 데이터가 배열이 아닙니다:", typeof data, data);
-          return [];
-        }
-        
-        return data;
-      } catch (error) {
-        clearTimeout(timeoutId);
-        console.error("🚨 Fetch error:", error);
-        throw error;
-      }
-    },
-    staleTime: 1000 * 60 * 5, // 5분 동안 fresh
-    gcTime: 1000 * 60 * 10, // 10분 동안 캐시 유지
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retry: false, // 재시도 비활성화로 빠른 진단
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
 
   // Translation mutation for bulk translating all properties
