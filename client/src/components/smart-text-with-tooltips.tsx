@@ -20,7 +20,21 @@ export default function SmartTextWithTooltips({
   const allTerms = [...terms, ...originalTerms];
   
   if (allTerms.length === 0) {
-    return <span className={className}>{text}</span>;
+    // 용어가 없어도 줄바꿈 처리
+    const parts = text.split('\n');
+    if (parts.length === 1) {
+      return <span className={className}>{text}</span>;
+    }
+    return (
+      <span className={className}>
+        {parts.map((part, index) => (
+          <span key={index}>
+            {index > 0 && <br />}
+            {part}
+          </span>
+        ))}
+      </span>
+    );
   }
 
   // 텍스트를 부분으로 나누고 용어가 있는 부분에 툴팁 적용
@@ -72,7 +86,13 @@ export default function SmartTextWithTooltips({
     uniqueMatches.forEach((match, index) => {
       // 이전 용어와 현재 용어 사이의 텍스트 추가
       if (match.start > lastIndex) {
-        result.push(inputText.substring(lastIndex, match.start));
+        const textBetween = inputText.substring(lastIndex, match.start);
+        // 줄바꿈을 React 요소로 변환
+        const parts = textBetween.split('\n');
+        parts.forEach((part, partIndex) => {
+          if (partIndex > 0) result.push(<br key={`br-${lastIndex}-${partIndex}`} />);
+          if (part) result.push(part);
+        });
       }
       
       // 툴팁이 적용된 용어 추가
@@ -92,7 +112,13 @@ export default function SmartTextWithTooltips({
     
     // 마지막 용어 이후의 텍스트 추가
     if (lastIndex < inputText.length) {
-      result.push(inputText.substring(lastIndex));
+      const remainingText = inputText.substring(lastIndex);
+      // 줄바꿈을 React 요소로 변환
+      const parts = remainingText.split('\n');
+      parts.forEach((part, partIndex) => {
+        if (partIndex > 0) result.push(<br key={`br-final-${partIndex}`} />);
+        if (part) result.push(part);
+      });
     }
     
     return result;
