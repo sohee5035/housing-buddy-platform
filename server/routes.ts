@@ -9,6 +9,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/properties", async (req, res) => {
     try {
       const properties = await storage.getProperties();
+      res.setHeader('Content-Type', 'application/json');
       res.json(properties);
     } catch (error) {
       console.error("Error fetching properties:", error);

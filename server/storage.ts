@@ -17,15 +17,31 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getProperties(): Promise<Property[]> {
-    console.log("📊 데이터베이스에서 매물 조회 시작");
-    try {
-      const result = await db.select().from(properties).where(eq(properties.isDeleted, 0));
-      console.log(`✅ 매물 조회 완료: ${result.length}개`);
-      return result;
-    } catch (error) {
-      console.error("❌ 데이터베이스 조회 에러:", error);
-      throw error;
-    }
+    const result = await db.select({
+      id: properties.id,
+      title: properties.title,
+      address: properties.address,
+      deposit: properties.deposit,
+      monthlyRent: properties.monthlyRent,
+      maintenanceFee: properties.maintenanceFee,
+      description: properties.description,
+      otherInfo: properties.otherInfo,
+      originalUrl: properties.originalUrl,
+      category: properties.category,
+      isActive: properties.isActive,
+      isDeleted: properties.isDeleted,
+      deletedAt: properties.deletedAt,
+      createdAt: properties.createdAt,
+      // photos 필드 제외 - 별도 API로 제공
+    }).from(properties).where(eq(properties.isDeleted, 0));
+    
+    // photos 필드에 빈 배열 추가
+    const propertiesWithEmptyPhotos = result.map(prop => ({
+      ...prop,
+      photos: [] as string[]
+    }));
+    
+    return propertiesWithEmptyPhotos;
   }
 
   async getProperty(id: number): Promise<Property | undefined> {

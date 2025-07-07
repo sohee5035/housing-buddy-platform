@@ -41,7 +41,6 @@ export default function Home() {
   const { data: properties = [], isLoading, error, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
     queryFn: async () => {
-      console.log("🔄 매물 데이터 호출 시작");
       const response = await fetch("/api/properties", {
         cache: 'no-cache',
         headers: {
@@ -49,13 +48,10 @@ export default function Home() {
           'Pragma': 'no-cache'
         }
       });
-      console.log("📡 Response status:", response.status);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
-      console.log("🎯 받은 데이터:", data);
-      console.log("📊 매물 개수:", Array.isArray(data) ? data.length : 'Not an array');
       return Array.isArray(data) ? data : [];
     },
     refetchOnWindowFocus: false,
@@ -174,12 +170,7 @@ export default function Home() {
     return property.category === selectedCategory;
   });
   
-  console.log("🏠 properties 배열:", properties);
-  console.log("📋 filteredProperties 배열:", filteredProperties);
-  console.log("🎯 실제 렌더링될 매물 개수:", filteredProperties.length);
-  console.log("🔍 선택된 카테고리:", selectedCategory);
-  console.log("⚠️ React Query error:", error);
-  console.log("⏳ Loading 상태:", isLoading);
+
 
   // 사용 가능한 카테고리 목록 생성 (매물에서 실제 사용된 카테고리들 + 커스텀 카테고리들)
   const propertyCategories = Array.from(new Set(properties.map(p => p.category || '기타').filter(Boolean)));
