@@ -332,11 +332,13 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
         <CardContent className="p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-4">
+              {/* PC: 한 줄 레이아웃, 모바일: 2줄 레이아웃 */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <Input
                   placeholder={getTranslatedText("이름을 입력하세요")}
                   value={authorName}
                   onChange={(e) => setAuthorName(e.target.value)}
+                  className="md:col-span-1"
                 />
                 <Input
                   type="password"
@@ -344,13 +346,13 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                   value={authorPassword}
                   onChange={(e) => setAuthorPassword(e.target.value)}
                   maxLength={4}
+                  className="md:col-span-1"
                 />
-              </div>
-              <div>
                 <Input
                   placeholder={getTranslatedText("이메일 또는 한국 전화번호 (선택사항)")}
                   value={authorContact}
                   onChange={(e) => setAuthorContact(e.target.value)}
+                  className="md:col-span-1"
                 />
               </div>
             </div>
