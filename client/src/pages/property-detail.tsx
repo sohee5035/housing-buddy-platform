@@ -1,7 +1,7 @@
 import { useParams, useLocation, Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropertyForm from "@/components/property-form";
 import ImageGalleryModal from "@/components/image-gallery-modal";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,21 @@ export default function PropertyDetail() {
       return [];
     }
   });
+
+  // 로컬 스토리지 변경 감지
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const saved = localStorage.getItem('customCategories');
+        setCustomCategories(saved ? JSON.parse(saved) : []);
+      } catch {
+        setCustomCategories([]);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   

@@ -25,7 +25,14 @@ export default function Home() {
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  const [customCategories, setCustomCategories] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('customCategories');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [, setLocation] = useLocation();
   
   // Translation context
@@ -441,7 +448,10 @@ export default function Home() {
         isOpen={showCategoryManager}
         onClose={() => setShowCategoryManager(false)}
         customCategories={customCategories}
-        onUpdateCategories={setCustomCategories}
+        onUpdateCategories={(categories) => {
+          setCustomCategories(categories);
+          localStorage.setItem('customCategories', JSON.stringify(categories));
+        }}
         propertyCategories={propertyCategories}
       />
 
