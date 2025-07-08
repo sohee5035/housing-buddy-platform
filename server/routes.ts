@@ -16,7 +16,11 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check endpoint for deployment
+  // Health check endpoints for deployment
+  app.get("/", (req, res) => {
+    res.json({ status: "ok", message: "Housing Buddy API is running", timestamp: new Date().toISOString() });
+  });
+  
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
