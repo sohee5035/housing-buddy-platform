@@ -15,15 +15,35 @@ const upload = multer({
   }
 });
 
+// Server readiness flag
+let isServerReady = false;
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Root endpoint for Cloud Run health checks - this must respond to / with 200
+  app.get("/", (req, res) => {
+    if (!isServerReady) {
+      return res.status(503).json({ 
+        status: "starting", 
+        service: "Housing Buddy",
+        message: "Server is starting up"
+      });
+    }
+    res.status(200).json({ 
+      status: "ok", 
+      service: "Housing Buddy", 
+      version: "1.0.0",
+      timestamp: new Date().toISOString() 
+    });
+  });
+
   // Health check endpoint for deployment
   app.get("/api/health", (req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
+    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
   // Root endpoint for external health checks
   app.get("/health", (req, res) => {
-    res.json({ status: "ok", service: "Housing Buddy", timestamp: new Date().toISOString() });
+    res.status(200).json({ status: "ok", service: "Housing Buddy", timestamp: new Date().toISOString() });
   });
 
   // Upload image to Cloudinary
@@ -72,15 +92,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Migrate existing images to Cloudinary
+  // Migrate existing images to Cloudinary (admin only, separate from startup)
   app.post("/api/migrate-images", async (req, res) => {
     try {
       console.log("Starting image migration to Cloudinary...");
-      await migrateImagesToCloudinary();
-      res.json({ message: "Image migration completed successfully" });
+      // Run migration in background to avoid blocking
+      setImmediate(async () => {
+        try {
+          await migrateImagesToCloudinary();
+          console.log("Image migration completed successfully in background");
+        } catch (error) {
+          console.error("Background image migration failed:", error);
+        }
+      });
+      res.json({ message: "Image migration started in background" });
     } catch (error) {
-      console.error("Error during image migration:", error);
-      res.status(500).json({ message: "Failed to migrate images" });
+      console.error("Error starting image migration:", error);
+      res.status(500).json({ message: "Failed to start migration" });
     }
   });
 
@@ -465,4 +493,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// Export function to mark server as ready
+export function markServerReady() {
+  isServerReady = true;
+  console.log("Server marked as ready for health checks");
 }

@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
+import { registerRoutes, markServerReady } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
@@ -41,9 +41,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
@@ -66,28 +67,64 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
-  });
-
-  // Graceful shutdown handlers
-  process.on('SIGTERM', () => {
-    log('SIGTERM received, shutting down gracefully');
-    server.close(() => {
-      log('Process terminated');
-      process.exit(0);
+    // ALWAYS serve the app on port 5000
+    // this serves both the API and the client.
+    // It is the only port that is not firewalled.
+    const port = process.env.PORT || 5000;
+    const host = process.env.HOST || "0.0.0.0";
+    
+    server.listen(port, host, () => {
+      log(`serving on ${host}:${port}`);
+      log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      log(`Server ready for connections`);
+      
+      // Mark server as ready for health checks
+      markServerReady();
     });
-  });
 
-  process.on('SIGINT', () => {
-    log('SIGINT received, shutting down gracefully');
-    server.close(() => {
-      log('Process terminated');
-      process.exit(0);
+    // Handle server errors
+    server.on('error', (error: any) => {
+      if (error.code === 'EADDRINUSE') {
+        log(`Port ${port} is already in use`);
+        process.exit(1);
+      } else {
+        log(`Server error: ${error.message}`);
+        process.exit(1);
+      }
     });
-  });
+
+    // Graceful shutdown handlers
+    process.on('SIGTERM', () => {
+      log('SIGTERM received, shutting down gracefully');
+      server.close(() => {
+        log('Process terminated');
+        process.exit(0);
+      });
+    });
+
+    process.on('SIGINT', () => {
+      log('SIGINT received, shutting down gracefully');
+      server.close(() => {
+        log('Process terminated');
+        process.exit(0);
+      });
+    });
+
+    // Handle uncaught exceptions
+    process.on('uncaughtException', (error) => {
+      log(`Uncaught Exception: ${error.message}`);
+      console.error(error.stack);
+      process.exit(1);
+    });
+
+    process.on('unhandledRejection', (reason, promise) => {
+      log(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
+      process.exit(1);
+    });
+
+  } catch (error) {
+    log(`Failed to start server: ${error}`);
+    console.error(error);
+    process.exit(1);
+  }
 })();
