@@ -82,7 +82,10 @@ export default function AdminPanel({
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => handleAdminAction(onCreateListing)}
+                  onClick={() => {
+                    onCreateListing();
+                    setIsOpen(false);
+                  }}
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   새 매물 등록
@@ -91,7 +94,10 @@ export default function AdminPanel({
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => handleAdminAction(onTrashView)}
+                  onClick={() => {
+                    onTrashView();
+                    setIsOpen(false);
+                  }}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   휴지통
@@ -100,7 +106,10 @@ export default function AdminPanel({
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => handleAdminAction(onCommentsView)}
+                  onClick={() => {
+                    onCommentsView();
+                    setIsOpen(false);
+                  }}
                 >
                   <MessageCircle className="h-4 w-4 mr-2" />
                   문의 관리
@@ -116,7 +125,10 @@ export default function AdminPanel({
                   <Button
                     variant="outline"
                     className="w-full justify-start"
-                    onClick={() => handleAdminAction(onEditProperty)}
+                    onClick={() => {
+                      onEditProperty();
+                      setIsOpen(false);
+                    }}
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     매물 편집
@@ -125,7 +137,10 @@ export default function AdminPanel({
                   <Button
                     variant="destructive"
                     className="w-full justify-start"
-                    onClick={() => handleAdminAction(onDeleteProperty)}
+                    onClick={() => {
+                      onDeleteProperty();
+                      setIsOpen(false);
+                    }}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     매물 삭제
@@ -140,7 +155,10 @@ export default function AdminPanel({
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => handleAdminAction(onCategoryManager)}
+                  onClick={() => {
+                    onCategoryManager();
+                    setIsOpen(false);
+                  }}
                 >
                   <FolderCog className="h-4 w-4 mr-2" />
                   카테고리 관리
