@@ -416,41 +416,7 @@ export default function PropertyDetail() {
                   </div>
                 )}
 
-                {/* 관리자 전용 편집/삭제 버튼 */}
-                {isAdmin && (
-                  <div className="mt-6 pt-4 border-t border-blue-200 bg-blue-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <ShieldCheck className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-800">관리자 도구</span>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setShowEditModal(true)}
-                          className="border-blue-300 text-blue-700 hover:bg-blue-100"
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          편집
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => {
-                            if (confirm("정말로 이 매물을 삭제하시겠습니까?")) {
-                              deleteMutation.mutate();
-                            }
-                          }}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          {deleteMutation.isPending ? "삭제 중..." : "삭제"}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+
 
                 <div className="mt-6 pt-4 border-t border-neutral-200 flex items-center text-sm text-neutral-500">
                   <Calendar className="h-4 w-4 mr-2" />
@@ -498,6 +464,35 @@ export default function PropertyDetail() {
         />
       )}
 
+      {/* Floating Admin Buttons - Property Detail Page */}
+      {isAdmin && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <div className="flex flex-col space-y-2">
+            <Button
+              size="sm"
+              onClick={() => setShowEditModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
+              title="매물 편집"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => {
+                if (confirm("정말로 이 매물을 삭제하시겠습니까?")) {
+                  deleteMutation.mutate();
+                }
+              }}
+              disabled={deleteMutation.isPending}
+              className="shadow-lg rounded-full w-12 h-12 p-0"
+              title="매물 삭제"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

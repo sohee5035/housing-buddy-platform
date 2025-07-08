@@ -283,69 +283,55 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Admin Panel Header */}
-      {(isAdmin || !isAdmin) && (
+      {/* Admin Panel Header - Only visible when logged in */}
+      {isAdmin && (
         <div className="bg-neutral-50 border-b border-neutral-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex justify-center items-center space-x-2">
-              {isAdmin ? (
-                <>
-                  <div className="flex items-center space-x-2 bg-blue-100 px-3 py-1 rounded-full">
-                    <ShieldCheck className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-800">관리자 모드</span>
-                  </div>
-                  
-                  <Button
-                    type="button"
-                    onClick={() => setShowCreateModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    {translateUI('매물 등록')}
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowCategoryManager(true)}
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    카테고리 관리
-                  </Button>
+              <div className="flex items-center space-x-2 bg-blue-100 px-3 py-1 rounded-full">
+                <ShieldCheck className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-800">관리자 모드</span>
+              </div>
+              
+              <Button
+                type="button"
+                onClick={() => setShowCreateModal(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {translateUI('매물 등록')}
+              </Button>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCategoryManager(true)}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                카테고리 관리
+              </Button>
 
-                  <Link href="/trash">
-                    <Button variant="outline" type="button">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      휴지통
-                    </Button>
-                  </Link>
-                  
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      logout();
-                      toast({
-                        title: "로그아웃",
-                        description: "관리자 모드에서 로그아웃되었습니다.",
-                      });
-                    }}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    로그아웃
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowAdminLogin(true)}
-                  className="text-neutral-600 hover:text-blue-600"
-                >
-                  <ShieldCheck className="h-4 w-4 mr-2" />
-                  관리자 로그인
+              <Link href="/trash">
+                <Button variant="outline" type="button">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  휴지통
                 </Button>
-              )}
+              </Link>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  logout();
+                  toast({
+                    title: "로그아웃",
+                    description: "관리자 모드에서 로그아웃되었습니다.",
+                  });
+                }}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                로그아웃
+              </Button>
             </div>
           </div>
         </div>
@@ -517,6 +503,19 @@ export default function Home() {
         onClose={() => setShowAdminLogin(false)}
       />
 
+      {/* Floating Admin Login Button - Bottom Right */}
+      {!isAdmin && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            type="button"
+            onClick={() => setShowAdminLogin(true)}
+            className="bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
+            title="관리자 로그인"
+          >
+            <ShieldCheck className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
 
     </div>
   );
