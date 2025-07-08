@@ -13,15 +13,15 @@
   --card-foreground: 215 25% 15%; /* #0F172A */
   --border: 220 13% 91%; /* #E2E8F0 */
   --input: 220 13% 91%; /* #E2E8F0 */
-  --primary: 217 91% 60%; /* #2563EB */
+  --primary: 270 45% 60%; /* #8B5CF6 - 부드러운 보라색 */
   --primary-foreground: 210 40% 98%; /* #F8FAFC */
-  --secondary: 210 40% 93%; /* #F1F5F9 */
+  --secondary: 270 20% 93%; /* #F3F0FF - 연한 보라색 */
   --secondary-foreground: 222 84% 5%; /* #0F172A */
-  --accent: 210 40% 93%; /* #F1F5F9 */
+  --accent: 270 20% 93%; /* #F3F0FF - 연한 보라색 */
   --accent-foreground: 222 84% 5%; /* #0F172A */
   --destructive: 0 84% 60%; /* #EF4444 */
   --destructive-foreground: 0 0% 98%; /* #FEFEFE */
-  --ring: 217 91% 60%; /* #2563EB */
+  --ring: 270 45% 60%; /* #8B5CF6 - 부드러운 보라색 */
   --radius: 0.5rem;
   --chart-1: 12 76% 61%; /* #E88C30 */
   --chart-2: 173 58% 39%; /* #2D9A6B */
@@ -30,12 +30,12 @@
   --chart-5: 27 87% 67%; /* #F97316 */
   --sidebar-background: 0 0% 98%; /* #FAFAFA */
   --sidebar-foreground: 240 5.3% 26.1%; /* #374151 */
-  --sidebar-primary: 217 91% 60%; /* #2563EB */
+  --sidebar-primary: 270 45% 60%; /* #8B5CF6 - 부드러운 보라색 */
   --sidebar-primary-foreground: 210 40% 98%; /* #F8FAFC */
-  --sidebar-accent: 210 40% 93%; /* #F1F5F9 */
+  --sidebar-accent: 270 20% 93%; /* #F3F0FF - 연한 보라색 */
   --sidebar-accent-foreground: 222 84% 5%; /* #0F172A */
   --sidebar-border: 220 13% 91%; /* #E2E8F0 */
-  --sidebar-ring: 217 91% 60%; /* #2563EB */
+  --sidebar-ring: 270 45% 60%; /* #8B5CF6 - 부드러운 보라색 */
 }
 
 .dark {
@@ -49,15 +49,15 @@
   --card-foreground: 210 40% 98%; /* #F8FAFC */
   --border: 217 32% 17%; /* #334155 */
   --input: 217 32% 17%; /* #334155 */
-  --primary: 217 91% 60%; /* #2563EB */
+  --primary: 270 45% 60%; /* #8B5CF6 - 부드러운 보라색 */
   --primary-foreground: 222 84% 5%; /* #0F172A */
-  --secondary: 217 32% 17%; /* #334155 */
+  --secondary: 270 15% 17%; /* #2D2449 - 어두운 보라색 */
   --secondary-foreground: 210 40% 98%; /* #F8FAFC */
-  --accent: 217 32% 17%; /* #334155 */
+  --accent: 270 15% 17%; /* #2D2449 - 어두운 보라색 */
   --accent-foreground: 210 40% 98%; /* #F8FAFC */
   --destructive: 0 62% 30%; /* #991B1B */
   --destructive-foreground: 210 40% 98%; /* #F8FAFC */
-  --ring: 217 91% 60%; /* #2563EB */
+  --ring: 270 45% 60%; /* #8B5CF6 - 부드러운 보라색 */
   --chart-1: 220 70% 50%; /* #3B82F6 */
   --chart-2: 160 60% 45%; /* #10B981 */
   --chart-3: 30 80% 55%; /* #F59E0B */
@@ -65,12 +65,12 @@
   --chart-5: 340 75% 55%; /* #EF4444 */
   --sidebar-background: 222 84% 5%; /* #0F172A */
   --sidebar-foreground: 210 40% 98%; /* #F8FAFC */
-  --sidebar-primary: 217 91% 60%; /* #2563EB */
+  --sidebar-primary: 270 45% 60%; /* #8B5CF6 - 부드러운 보라색 */
   --sidebar-primary-foreground: 222 84% 5%; /* #0F172A */
-  --sidebar-accent: 217 32% 17%; /* #334155 */
+  --sidebar-accent: 270 15% 17%; /* #2D2449 - 어두운 보라색 */
   --sidebar-accent-foreground: 210 40% 98%; /* #F8FAFC */
   --sidebar-border: 217 32% 17%; /* #334155 */
-  --sidebar-ring: 217 91% 60%; /* #2563EB */
+  --sidebar-ring: 270 45% 60%; /* #8B5CF6 - 부드러운 보라색 */
 }
 
 @layer base {
