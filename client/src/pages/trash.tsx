@@ -6,18 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAdmin } from "@/contexts/AdminContext";
 import { 
   ArrowLeft, 
   RotateCcw, 
   Trash2, 
   Home as HomeIcon,
   MapPin,
-  Calendar
+  Calendar,
+  ShieldCheck
 } from "lucide-react";
 
 export default function Trash() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAdmin } = useAdmin();
 
   const { data: deletedProperties = [], isLoading } = useQuery<Property[]>({
     queryKey: ["/api/trash"],
@@ -111,28 +114,30 @@ export default function Trash() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Simple Header */}
+      {/* Header */}
       <header className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex items-center justify-between h-16 border-b border-neutral-100">
             <div className="flex items-center">
-              <button 
-                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = "/";
-                }}
-              >
+              <Link href="/">
+                <button className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0 mr-4">
+                  <ArrowLeft className="h-6 w-6 text-neutral-600 mr-2" />
+                  <span className="text-sm text-neutral-600">뒤로가기</span>
+                </button>
+              </Link>
+              <div className="flex items-center">
                 <HomeIcon className="h-8 w-8 text-primary mr-3" />
-                <h1 className="text-2xl font-bold text-neutral-900">휴지통</h1>
-              </button>
+                <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy - 휴지통</h1>
+              </div>
             </div>
-            <Link href="/">
-              <Button variant="outline">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                목록으로 돌아가기
-              </Button>
-            </Link>
+            
+            {/* Admin Status Indicator */}
+            {isAdmin && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full">
+                <ShieldCheck className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-700">관리자</span>
+              </div>
+            )}
           </div>
         </div>
       </header>

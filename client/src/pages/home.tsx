@@ -207,7 +207,7 @@ export default function Home() {
       <header className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Title Row */}
-          <div className="flex items-center justify-center py-4 border-b border-neutral-100">
+          <div className="flex items-center justify-between py-4 border-b border-neutral-100">
             <div className="flex items-center gap-3">
               <button 
                 className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
@@ -219,8 +219,15 @@ export default function Home() {
                 <HomeIcon className="h-8 w-8 text-primary mr-3" />
                 <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
               </button>
-
             </div>
+            
+            {/* Admin Status Indicator */}
+            {isAdmin && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full">
+                <ShieldCheck className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-700">관리자</span>
+              </div>
+            )}
           </div>
           
           {/* Controls Row */}

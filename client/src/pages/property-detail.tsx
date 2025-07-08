@@ -212,21 +212,31 @@ export default function PropertyDetail() {
       <header className="bg-white shadow-sm border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* 첫 번째 줄: 타이틀과 뒤로가기 */}
-          <div className="flex items-center h-16 border-b border-neutral-100">
-            <button 
-              className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
-              onClick={(e) => {
-                e.preventDefault();
-                setLocation("/");
-              }}
-            >
-              <ArrowLeft className="h-6 w-6 text-neutral-600 mr-2" />
-              <span className="text-sm text-neutral-600 mr-4">{translateUI('뒤로가기')}</span>
-            </button>
+          <div className="flex items-center justify-between h-16 border-b border-neutral-100">
             <div className="flex items-center">
-              <HomeIcon className="h-8 w-8 text-primary mr-3" />
-              <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
+              <button 
+                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setLocation("/");
+                }}
+              >
+                <ArrowLeft className="h-6 w-6 text-neutral-600 mr-2" />
+                <span className="text-sm text-neutral-600 mr-4">{translateUI('뒤로가기')}</span>
+              </button>
+              <div className="flex items-center">
+                <HomeIcon className="h-8 w-8 text-primary mr-3" />
+                <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
+              </div>
             </div>
+            
+            {/* Admin Status Indicator */}
+            {isAdmin && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full">
+                <ShieldCheck className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-700">관리자</span>
+              </div>
+            )}
           </div>
         </div>
       </header>

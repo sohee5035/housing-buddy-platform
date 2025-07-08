@@ -1,13 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageCircle, User, Calendar, MapPin, Phone } from "lucide-react";
+import { MessageCircle, User, Calendar, MapPin, Phone, ArrowLeft, Home as HomeIcon, ShieldCheck } from "lucide-react";
 import { Comment, Property } from "@shared/schema";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { useAdmin } from "@/contexts/AdminContext";
 import { format } from "date-fns";
+import { Link } from "wouter";
 
 export default function AdminComments() {
   const { getTranslatedText } = useTranslation();
+  const { isAdmin } = useAdmin();
 
   // 관리자용 전체 댓글 조회
   const { data: comments = [], isLoading } = useQuery<Comment[]>({
@@ -36,15 +39,44 @@ export default function AdminComments() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">
-          {getTranslatedText("전체 문의 관리", "admin-comments-title")}
-        </h1>
-        <p className="text-gray-600">
-          {getTranslatedText("모든 매물의 문의 및 예약 현황을 관리할 수 있습니다.", "admin-comments-desc")}
-        </p>
-      </div>
+    <div className="min-h-screen bg-neutral-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-neutral-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 border-b border-neutral-100">
+            <div className="flex items-center">
+              <Link href="/">
+                <button className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0">
+                  <ArrowLeft className="h-6 w-6 text-neutral-600 mr-2" />
+                  <span className="text-sm text-neutral-600 mr-4">뒤로가기</span>
+                </button>
+              </Link>
+              <div className="flex items-center">
+                <HomeIcon className="h-8 w-8 text-primary mr-3" />
+                <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
+              </div>
+            </div>
+            
+            {/* Admin Status Indicator */}
+            {isAdmin && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full">
+                <ShieldCheck className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-700">관리자</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+      
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-2">
+            {getTranslatedText("전체 문의 관리", "admin-comments-title")}
+          </h1>
+          <p className="text-gray-600">
+            {getTranslatedText("모든 매물의 문의 및 예약 현황을 관리할 수 있습니다.", "admin-comments-desc")}
+          </p>
+        </div>
 
       <div className="grid grid-cols-1 gap-4">
         {comments.length === 0 ? (
@@ -110,6 +142,7 @@ export default function AdminComments() {
             </Card>
           ))
         )}
+      </div>
       </div>
     </div>
   );
