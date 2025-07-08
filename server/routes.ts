@@ -21,6 +21,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
+  // Root endpoint for external health checks
+  app.get("/health", (req, res) => {
+    res.json({ status: "ok", service: "Housing Buddy", timestamp: new Date().toISOString() });
+  });
+
   // Upload image to Cloudinary
   app.post("/api/upload-image", upload.single('image'), async (req, res) => {
     try {

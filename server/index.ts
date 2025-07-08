@@ -3,6 +3,10 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Trust proxy for external domains
+app.set('trust proxy', true);
+
 app.use(express.json({ limit: '50mb' })); // 이미지 업로드를 위한 크기 제한 증가
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
@@ -43,10 +47,13 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    console.error(`Error ${status}: ${message}`, err);
+    console.error(`Error ${status}: ${message}`, err.stack || err);
     
     if (!res.headersSent) {
-      res.status(status).json({ message });
+      res.status(status).json({ 
+        message: process.env.NODE_ENV === 'production' ? "Internal Server Error" : message,
+        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+      });
     }
   });
 
@@ -63,11 +70,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
+  server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
   });
 
