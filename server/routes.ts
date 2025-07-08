@@ -17,21 +17,28 @@ const upload = multer({
 
 // Server readiness flag
 let isServerReady = false;
+let serverStartTime = Date.now();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Root endpoint for Cloud Run health checks - this must respond to / with 200
   app.get("/", (req, res) => {
+    const uptime = Date.now() - serverStartTime;
+    
     if (!isServerReady) {
       return res.status(503).json({ 
         status: "starting", 
         service: "Housing Buddy",
-        message: "Server is starting up"
+        message: "Server is starting up",
+        uptime: `${Math.round(uptime / 1000)}s`,
+        timestamp: new Date().toISOString()
       });
     }
+    
     res.status(200).json({ 
       status: "ok", 
       service: "Housing Buddy", 
       version: "1.0.0",
+      uptime: `${Math.round(uptime / 1000)}s`,
       timestamp: new Date().toISOString() 
     });
   });
@@ -497,6 +504,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 // Export function to mark server as ready
 export function markServerReady() {
+  if (isServerReady) {
+    console.log("Server already marked as ready");
+    return;
+  }
+  
   isServerReady = true;
-  console.log("Server marked as ready for health checks");
+  const uptime = Date.now() - serverStartTime;
+  console.log(`Server marked as ready for health checks after ${Math.round(uptime / 1000)}s`);
+  console.log("Health check endpoint (/) will now return 200 status");
 }

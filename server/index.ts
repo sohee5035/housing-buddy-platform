@@ -78,8 +78,12 @@ app.use((req, res, next) => {
       log(`Environment: ${process.env.NODE_ENV || 'development'}`);
       log(`Server ready for connections`);
       
-      // Mark server as ready for health checks
-      markServerReady();
+      // Add a small delay to ensure all initialization is complete
+      // before marking server as ready for health checks
+      setTimeout(() => {
+        markServerReady();
+        log(`Health checks now accepting requests`);
+      }, 1000); // 1 second delay
     });
 
     // Handle server errors
