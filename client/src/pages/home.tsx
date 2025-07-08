@@ -188,8 +188,8 @@ export default function Home() {
   const allCategories = Array.from(new Set([...propertyCategories, ...customCategories]));
   const availableCategories = ['전체', ...allCategories];
   
-  // 매물 등록 폼에 전달할 전체 카테고리 목록
-  const formCategories = Array.from(new Set([...allCategories, ...customCategories]));
+  // 매물 등록 폼에 전달할 전체 카테고리 목록 (기본 카테고리 포함)
+  const formCategories = Array.from(new Set(['기타', ...allCategories]));
 
 
 

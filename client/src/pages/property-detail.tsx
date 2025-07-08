@@ -34,6 +34,16 @@ export default function PropertyDetail() {
   const { isAdmin } = useAdmin();
   const [showImageGallery, setShowImageGallery] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  
+  // 로컬 스토리지에서 커스텀 카테고리 가져오기
+  const [customCategories, setCustomCategories] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('customCategories');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -438,7 +448,11 @@ export default function PropertyDetail() {
           </DialogHeader>
           <PropertyForm
             initialData={property}
-            availableCategories={Array.from(new Set(allProperties.map(p => p.category).filter((cat): cat is string => Boolean(cat))))}
+            availableCategories={Array.from(new Set([
+              '기타',
+              ...allProperties.map(p => p.category).filter((cat): cat is string => Boolean(cat)),
+              ...customCategories
+            ]))}
             onSuccess={() => {
               setShowEditModal(false);
               queryClient.invalidateQueries({ queryKey: [`/api/properties/${id}`] });
