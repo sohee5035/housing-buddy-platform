@@ -1,4 +1,4 @@
-import { properties, comments, type Property, type InsertProperty, type Comment, type InsertComment } from "@shared/schema";
+import { properties, comments, type Property, type InsertProperty, type Comment, type InsertComment, type UpdateComment } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 
@@ -17,7 +17,9 @@ export interface IStorage {
   // Comment methods
   getComments(propertyId: number): Promise<Comment[]>;
   createComment(comment: InsertComment): Promise<Comment>;
+  updateComment(id: number, updateData: UpdateComment): Promise<Comment | undefined>;
   deleteComment(id: number): Promise<boolean>;
+  verifyCommentPassword(id: number, password: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -109,11 +111,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Comment methods
-  async getComments(propertyId: number): Promise<Comment[]> {
+  async getComments(propertyId: number, isAdmin: boolean = false): Promise<Comment[]> {
+    let whereConditions = [
+      eq(comments.propertyId, propertyId),
+      eq(comments.isDeleted, 0)
+    ];
+    
+    // 관리자가 아니면 관리자 전용 댓글 제외
+    if (!isAdmin) {
+      whereConditions.push(eq(comments.isAdminOnly, 0));
+    }
+    
     const result = await db
       .select()
       .from(comments)
-      .where(and(eq(comments.propertyId, propertyId), eq(comments.isDeleted, 0)))
+      .where(and(...whereConditions))
       .orderBy(desc(comments.createdAt));
     return result;
   }
@@ -126,6 +138,25 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  async updateComment(id: number, updateData: UpdateComment): Promise<Comment | undefined> {
+    // 비밀번호 확인
+    const isValid = await this.verifyCommentPassword(id, updateData.password);
+    if (!isValid) {
+      throw new Error("잘못된 비밀번호입니다.");
+    }
+
+    const [result] = await db
+      .update(comments)
+      .set({
+        content: updateData.content,
+        isAdminOnly: updateData.isAdminOnly,
+        updatedAt: new Date(),
+      })
+      .where(eq(comments.id, id))
+      .returning();
+    return result;
+  }
+
   async deleteComment(id: number): Promise<boolean> {
     const [result] = await db
       .update(comments)
@@ -133,6 +164,15 @@ export class DatabaseStorage implements IStorage {
       .where(eq(comments.id, id))
       .returning();
     return !!result;
+  }
+
+  async verifyCommentPassword(id: number, password: string): Promise<boolean> {
+    const [comment] = await db
+      .select({ authorPassword: comments.authorPassword })
+      .from(comments)
+      .where(eq(comments.id, id));
+    
+    return comment?.authorPassword === password;
   }
 }
 

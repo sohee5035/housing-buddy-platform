@@ -46,17 +46,30 @@ export type User = typeof users.$inferSelect;
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   propertyId: integer("property_id").notNull().references(() => properties.id),
+  parentId: integer("parent_id").references(() => comments.id), // 대댓글을 위한 부모 댓글 ID
   authorName: text("author_name").notNull(),
+  authorPassword: text("author_password").notNull().default("0000"), // 4자리 숫자 비밀번호
   content: text("content").notNull(),
+  isAdminOnly: integer("is_admin_only").default(0), // 1 = 관리자만 볼 수 있음
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
   isDeleted: integer("is_deleted").default(0), // 0 = active, 1 = deleted
 });
 
 export const insertCommentSchema = createInsertSchema(comments).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
   isDeleted: true,
 });
 
+export const updateCommentSchema = createInsertSchema(comments).pick({
+  content: true,
+  isAdminOnly: true,
+}).extend({
+  password: z.string().length(4, "비밀번호는 4자리 숫자여야 합니다."),
+});
+
 export type InsertComment = z.infer<typeof insertCommentSchema>;
+export type UpdateComment = z.infer<typeof updateCommentSchema>;
 export type Comment = typeof comments.$inferSelect;

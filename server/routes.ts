@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertCommentSchema } from "@shared/schema";
+import { insertPropertySchema, insertCommentSchema, updateCommentSchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from "./cloudinary";
@@ -287,7 +287,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid property ID" });
       }
       
-      const comments = await storage.getComments(propertyId);
+      // 관리자 여부 확인 (간단히 헤더로 체크, 실제로는 세션 등을 사용)
+      const isAdmin = req.headers['x-admin'] === 'true';
+      const comments = await storage.getComments(propertyId, isAdmin);
       res.json(comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -316,6 +318,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error creating comment:", error);
       res.status(500).json({ message: "Failed to create comment" });
+    }
+  });
+
+  // Update a comment
+  app.put("/api/comments/:id", async (req: Request, res: Response) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      if (isNaN(commentId)) {
+        return res.status(400).json({ message: "Invalid comment ID" });
+      }
+
+      const validatedData = updateCommentSchema.parse(req.body);
+      const comment = await storage.updateComment(commentId, validatedData);
+      
+      if (!comment) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      res.json(comment);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Invalid comment data", errors: error.errors });
+      }
+      if (error.message === "잘못된 비밀번호입니다.") {
+        return res.status(401).json({ message: error.message });
+      }
+      console.error("Error updating comment:", error);
+      res.status(500).json({ message: "Failed to update comment" });
     }
   });
 
