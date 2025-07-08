@@ -429,8 +429,8 @@ export default function Home() {
 
 
       {/* Create Property Modal */}
-      <Dialog open={showCreateModal} onOpenChange={() => {}}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()}>
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <PropertyForm 
             onSuccess={() => {
               setShowCreateModal(false);

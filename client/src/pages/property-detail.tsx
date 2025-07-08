@@ -456,8 +456,8 @@ export default function PropertyDetail() {
 
 
       {/* Edit Modal */}
-      <Dialog open={showEditModal} onOpenChange={() => {}}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()}>
+      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>매물 편집</DialogTitle>
           </DialogHeader>
