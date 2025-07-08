@@ -2,9 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import PropertyForm from "@/components/property-form";
-import AdminAuth from "@/components/admin-auth";
 import CategoryManager from "@/components/category-manager";
-import AdminPanel from "@/components/admin-panel";
 
 import SmartTextWithTooltips from "@/components/smart-text-with-tooltips";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -12,9 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X, Settings, Languages, Globe, RotateCcw } from "lucide-react";
+import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X, Settings, Languages, Globe, RotateCcw, ShieldCheck, LogOut } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { useAdmin } from "@/contexts/AdminContext";
+import AdminLogin from "@/components/admin-login";
 import { translateText, supportedLanguages } from "@/lib/translate";
 import { useToast } from "@/hooks/use-toast";
 
@@ -24,8 +24,7 @@ export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
-
-
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [, setLocation] = useLocation();
   
@@ -41,6 +40,7 @@ export default function Home() {
     getTranslatedText 
   } = useTranslation();
   const { toast } = useToast();
+  const { isAdmin, logout } = useAdmin();
 
   const { data: properties = [], isLoading, error, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -283,7 +283,73 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Admin Panel Header */}
+      {(isAdmin || !isAdmin) && (
+        <div className="bg-neutral-50 border-b border-neutral-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex justify-center items-center space-x-2">
+              {isAdmin ? (
+                <>
+                  <div className="flex items-center space-x-2 bg-blue-100 px-3 py-1 rounded-full">
+                    <ShieldCheck className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800">관리자 모드</span>
+                  </div>
+                  
+                  <Button
+                    type="button"
+                    onClick={() => setShowCreateModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    {translateUI('매물 등록')}
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowCategoryManager(true)}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    카테고리 관리
+                  </Button>
 
+                  <Link href="/trash">
+                    <Button variant="outline" type="button">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      휴지통
+                    </Button>
+                  </Link>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      logout();
+                      toast({
+                        title: "로그아웃",
+                        description: "관리자 모드에서 로그아웃되었습니다.",
+                      });
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    로그아웃
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAdminLogin(true)}
+                  className="text-neutral-600 hover:text-blue-600"
+                >
+                  <ShieldCheck className="h-4 w-4 mr-2" />
+                  관리자 로그인
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Category Filter */}
       <div className="bg-white border-b border-neutral-200">
@@ -445,11 +511,10 @@ export default function Home() {
         propertyCategories={propertyCategories}
       />
 
-      {/* Admin Panel */}
-      <AdminPanel
-        onCreateListing={() => setShowCreateModal(true)}
-        onCategoryManager={() => setShowCategoryManager(true)}
-        onTrashView={() => setLocation('/trash')}
+      {/* Admin Login Modal */}
+      <AdminLogin
+        isOpen={showAdminLogin}
+        onClose={() => setShowAdminLogin(false)}
       />
 
 

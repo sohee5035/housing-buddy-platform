@@ -3,9 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import { useState } from "react";
 import PropertyForm from "@/components/property-form";
-import AdminAuth from "@/components/admin-auth";
 import ImageGalleryModal from "@/components/image-gallery-modal";
-import AdminPanel from "@/components/admin-panel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import SmartTextWithTooltips from "@/components/smart-text-with-tooltips";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { useAdmin } from "@/contexts/AdminContext";
 import { 
   ArrowLeft, 
   Edit, 
@@ -23,7 +22,8 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck
 } from "lucide-react";
 
 export default function PropertyDetail() {
@@ -31,8 +31,7 @@ export default function PropertyDetail() {
   const [, setLocation] = useLocation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showAdminAuth, setShowAdminAuth] = useState(false);
-  const [adminAction, setAdminAction] = useState<'edit' | 'delete'>('edit');
+  const { isAdmin } = useAdmin();
   const [showImageGallery, setShowImageGallery] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { toast } = useToast();
@@ -417,6 +416,42 @@ export default function PropertyDetail() {
                   </div>
                 )}
 
+                {/* 관리자 전용 편집/삭제 버튼 */}
+                {isAdmin && (
+                  <div className="mt-6 pt-4 border-t border-blue-200 bg-blue-50 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <ShieldCheck className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-800">관리자 도구</span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setShowEditModal(true)}
+                          className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          편집
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => {
+                            if (confirm("정말로 이 매물을 삭제하시겠습니까?")) {
+                              deleteMutation.mutate();
+                            }
+                          }}
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          {deleteMutation.isPending ? "삭제 중..." : "삭제"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-6 pt-4 border-t border-neutral-200 flex items-center text-sm text-neutral-500">
                   <Calendar className="h-4 w-4 mr-2" />
                   {translateUI('등록일')}: {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
@@ -427,24 +462,7 @@ export default function PropertyDetail() {
         </div>
       </main>
 
-      {/* Admin Authentication */}
-      <AdminAuth
-        isOpen={showAdminAuth}
-        onClose={() => setShowAdminAuth(false)}
-        onSuccess={() => {
-          setShowAdminAuth(false);
-          if (adminAction === 'edit') {
-            setShowEditModal(true);
-          } else if (adminAction === 'delete') {
-            handleDelete();
-          }
-        }}
-        title={adminAction === 'edit' ? '매물 편집' : '매물 삭제'}
-        description={adminAction === 'edit' 
-          ? '매물 정보를 편집하려면 관리자 인증이 필요합니다.' 
-          : '매물을 삭제하려면 관리자 인증이 필요합니다.'
-        }
-      />
+
 
       {/* Edit Modal */}
       <Dialog open={showEditModal} onOpenChange={() => {}}>
@@ -480,19 +498,7 @@ export default function PropertyDetail() {
         />
       )}
 
-      {/* Admin Panel */}
-      <AdminPanel
-        onCreateListing={() => setLocation('/')}
-        onCategoryManager={() => setLocation('/')}
-        onTrashView={() => setLocation('/trash')}
-        onEditProperty={() => setShowEditModal(true)}
-        onDeleteProperty={() => {
-          if (confirm('정말로 이 매물을 삭제하시겠습니까?')) {
-            deleteMutation.mutate();
-          }
-        }}
-        currentPropertyId={property?.id}
-      />
+
     </div>
   );
 }
