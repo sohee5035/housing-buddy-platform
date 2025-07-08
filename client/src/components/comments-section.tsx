@@ -331,24 +331,28 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
       <Card>
         <CardContent className="p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <Input
-                placeholder={getTranslatedText("이름을 입력하세요")}
-                value={authorName}
-                onChange={(e) => setAuthorName(e.target.value)}
-              />
-              <Input
-                type="password"
-                placeholder={getTranslatedText("4자리 숫자 비밀번호")}
-                value={authorPassword}
-                onChange={(e) => setAuthorPassword(e.target.value)}
-                maxLength={4}
-              />
-              <Input
-                placeholder={getTranslatedText("연락처 (선택사항)")}
-                value={authorContact}
-                onChange={(e) => setAuthorContact(e.target.value)}
-              />
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  placeholder={getTranslatedText("이름을 입력하세요")}
+                  value={authorName}
+                  onChange={(e) => setAuthorName(e.target.value)}
+                />
+                <Input
+                  type="password"
+                  placeholder={getTranslatedText("4자리 숫자 비밀번호")}
+                  value={authorPassword}
+                  onChange={(e) => setAuthorPassword(e.target.value)}
+                  maxLength={4}
+                />
+              </div>
+              <div>
+                <Input
+                  placeholder={getTranslatedText("연락처 (선택사항)")}
+                  value={authorContact}
+                  onChange={(e) => setAuthorContact(e.target.value)}
+                />
+              </div>
             </div>
             <div>
               <Textarea
