@@ -242,7 +242,7 @@ export default function PropertyDetail() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Image Gallery */}
           <div className="space-y-4">
@@ -317,7 +317,7 @@ export default function PropertyDetail() {
 
             {/* PC: 좌우 분할 */}
             <div className="hidden lg:block">
-              <div className="grid grid-cols-3 gap-4 h-96">
+              <div className="grid grid-cols-3 gap-4 h-80">
                 {/* 좌측 메인 이미지 */}
                 <div className="col-span-2 relative bg-neutral-200 rounded-lg overflow-hidden">
                   {property.photos && property.photos.length > 0 ? (
