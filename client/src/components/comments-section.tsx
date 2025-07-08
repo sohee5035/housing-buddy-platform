@@ -4,6 +4,8 @@ import { Comment, InsertComment, UpdateComment, DeleteComment } from "@shared/sc
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
+import { useTranslation } from "@/contexts/TranslationContext";
+import { systemMessages } from "@/lib/property-terms";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -32,6 +34,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAdmin } = useAdmin();
+  const { getTranslatedText } = useTranslation();
 
   // 댓글 목록 가져오기
   const { data: comments = [], isLoading } = useQuery<Comment[]>({
@@ -262,9 +265,16 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-2">
-        <MessageCircle className="h-5 w-5 text-blue-600" />
-        <h3 className="text-lg font-semibold">댓글 ({comments.length})</h3>
+      <div className="space-y-3">
+        <div className="flex items-center space-x-2">
+          <MessageCircle className="h-5 w-5 text-blue-600" />
+          <h3 className="text-lg font-semibold">{getTranslatedText("문의 및 예약")} ({comments.length})</h3>
+        </div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-blue-800 text-sm leading-relaxed whitespace-pre-line">
+            {getTranslatedText(systemMessages.commentGuidance, "comment-guidance")}
+          </p>
+        </div>
       </div>
 
       {/* 댓글 작성 폼 */}
@@ -287,7 +297,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
             </div>
             <div>
               <Textarea
-                placeholder="댓글을 입력하세요..."
+                placeholder={getTranslatedText("궁금한 점이나 예약 관련 문의를 입력해주세요...", "comment-placeholder")}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={3}
@@ -317,7 +327,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                 size="sm"
               >
                 <Send className="h-4 w-4 mr-2" />
-                {createCommentMutation.isPending ? "등록 중..." : "댓글 등록"}
+                {createCommentMutation.isPending ? getTranslatedText("등록 중...") : getTranslatedText("문의 등록")}
               </Button>
             </div>
           </form>
@@ -332,7 +342,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
           </div>
         ) : comments.length === 0 ? (
           <div className="text-center py-8 text-neutral-500">
-            아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
+            {getTranslatedText("아직 문의가 없습니다. 첫 번째 문의를 남겨보세요!", "no-comments")}
           </div>
         ) : (
           comments.map((comment, index) => (

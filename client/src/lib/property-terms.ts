@@ -6,6 +6,11 @@ export interface PropertyTerm {
   category: 'room_type' | 'location' | 'facility' | 'price' | 'general';
 }
 
+// 시스템 메시지
+export const systemMessages = {
+  commentGuidance: "궁금한 점이나 예약 희망하시면 여기에 남겨주세요.\n최대한 빠르게 답변드릴게요 :)"
+};
+
 export const propertyTerms: PropertyTerm[] = [
   // 방 종류
   {
