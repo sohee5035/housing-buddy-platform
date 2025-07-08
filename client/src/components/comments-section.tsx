@@ -24,9 +24,11 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
   const [authorName, setAuthorName] = useState("");
   const [authorPassword, setAuthorPassword] = useState("");
   const [content, setContent] = useState("");
+  const [authorContact, setAuthorContact] = useState("");
   const [isAdminOnly, setIsAdminOnly] = useState(false);
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
   const [editContent, setEditContent] = useState("");
+  const [editContact, setEditContact] = useState("");
   const [editPassword, setEditPassword] = useState("");
   const [editIsAdminOnly, setEditIsAdminOnly] = useState(false);
   const [deletingComment, setDeletingComment] = useState<Comment | null>(null);
@@ -61,6 +63,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
       setAuthorName("");
       setAuthorPassword("");
       setContent("");
+      setAuthorContact("");
       setIsAdminOnly(false);
       toast({
         title: "댓글 등록 완료",
@@ -131,6 +134,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
       queryClient.invalidateQueries({ queryKey: [`/api/properties/${propertyId}/comments`] });
       setEditingComment(null);
       setEditContent("");
+      setEditContact("");
       setEditPassword("");
       setEditIsAdminOnly(false);
       toast({
@@ -144,6 +148,33 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
         description: error.message || "댓글 수정 중 오류가 발생했습니다.",
         variant: "destructive",
       });
+    },
+  });
+
+  // 편집용 댓글 불러오기 mutation
+  const getCommentForEditMutation = useMutation({
+    mutationFn: async ({ commentId, password }: { commentId: number; password: string }) => {
+      const response = await apiRequest("POST", `/api/comments/${commentId}/edit`, { password });
+      return response.json();
+    },
+    onSuccess: (comment: Comment) => {
+      setEditContent(comment.content);
+      setEditContact(comment.authorContact || "");
+      setEditIsAdminOnly(comment.isAdminOnly === 1);
+      toast({
+        title: "댓글을 불러왔습니다.",
+        description: "이제 수정하실 수 있습니다.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "댓글 불러오기에 실패했습니다.",
+        description: error.message,
+        variant: "destructive",
+      });
+      setEditingComment(null);
+      setEditPassword("");
     },
   });
 
@@ -170,6 +201,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
     createCommentMutation.mutate({
       authorName: authorName.trim(),
       authorPassword: authorPassword.trim(),
+      authorContact: authorContact.trim() || undefined,
       content: content.trim(),
       isAdminOnly: isAdminOnly ? 1 : 0,
     });
@@ -186,11 +218,29 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
     setDeletePassword("");
   };
 
-  const handleEditComment = (comment: Comment) => {
+  const handleEditComment = async (comment: Comment) => {
     setEditingComment(comment);
-    setEditContent(comment.content);
-    setEditIsAdminOnly(comment.isAdminOnly === 1);
+    setEditContent("");
+    setEditContact("");
+    setEditIsAdminOnly(false);
     setEditPassword("");
+  };
+
+  // 비밀번호 입력 후 댓글 내용 불러오기
+  const handleLoadCommentForEdit = () => {
+    if (!editingComment || !editPassword || editPassword.length !== 4) {
+      toast({
+        title: "비밀번호를 입력해주세요",
+        description: "4자리 숫자 비밀번호를 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    getCommentForEditMutation.mutate({
+      commentId: editingComment.id,
+      password: editPassword,
+    });
   };
 
   const handleUpdateComment = (e: React.FormEvent) => {
@@ -281,18 +331,23 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
       <Card>
         <CardContent className="p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <Input
-                placeholder="이름을 입력하세요"
+                placeholder={getTranslatedText("이름을 입력하세요")}
                 value={authorName}
                 onChange={(e) => setAuthorName(e.target.value)}
               />
               <Input
                 type="password"
-                placeholder="4자리 숫자 비밀번호"
+                placeholder={getTranslatedText("4자리 숫자 비밀번호")}
                 value={authorPassword}
                 onChange={(e) => setAuthorPassword(e.target.value)}
                 maxLength={4}
+              />
+              <Input
+                placeholder={getTranslatedText("연락처 (선택사항)")}
+                value={authorContact}
+                onChange={(e) => setAuthorContact(e.target.value)}
               />
             </div>
             <div>
@@ -356,14 +411,14 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                       {comment.isAdminOnly === 1 && (
                         <Badge variant="secondary" className="text-blue-600 bg-blue-100">
                           <ShieldCheck className="h-3 w-3 mr-1" />
-                          관리자 전용
+                          {getTranslatedText("관리자 전용")}
                         </Badge>
                       )}
                       <span className="text-sm text-neutral-500">
                         {comment.createdAt && new Date(comment.createdAt).toLocaleString('ko-KR')}
                       </span>
                       {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
-                        <span className="text-xs text-neutral-400">(수정됨)</span>
+                        <span className="text-xs text-neutral-400">({getTranslatedText("수정됨")})</span>
                       )}
                     </div>
                     <div className="flex space-x-1">
@@ -397,9 +452,36 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                       )}
                     </div>
                   </div>
-                  <p className="text-neutral-700 whitespace-pre-wrap leading-relaxed">
-                    {comment.content}
-                  </p>
+                  <div className="mt-2">
+                    {comment.isAdminOnly === 1 && !isAdmin ? (
+                      <div className="text-blue-600 italic">
+                        {getTranslatedText("관리자 전용 문의입니다.", "admin-only-message")}
+                      </div>
+                    ) : (
+                      <div className="bg-gray-50 p-3 rounded-md border">
+                        <p className="text-gray-600 text-sm mb-2">
+                          {getTranslatedText("개인정보 보호를 위해 내용이 숨겨집니다. 수정하려면 비밀번호를 입력하세요.", "privacy-message")}
+                        </p>
+                        <div className="text-gray-400 text-xs">
+                          {getTranslatedText("문의 내용 및 연락처는 관리자에게만 전달됩니다.", "admin-only-content")}
+                        </div>
+                      </div>
+                    )}
+                    {/* 관리자만 연락처 표시 */}
+                    {isAdmin && comment.authorContact && (
+                      <div className="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded">
+                        <strong>연락처:</strong> {comment.authorContact}
+                      </div>
+                    )}
+                    {/* 관리자만 실제 내용 표시 */}
+                    {isAdmin && (
+                      <div className="mt-2 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
+                        <p className="text-blue-900 whitespace-pre-wrap leading-relaxed">
+                          {comment.content}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
               {index < comments.length - 1 && <Separator className="my-2" />}
@@ -412,59 +494,96 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
       <Dialog open={!!editingComment} onOpenChange={() => setEditingComment(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>댓글 수정</DialogTitle>
+            <DialogTitle>{getTranslatedText("댓글 수정")}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleUpdateComment} className="space-y-4">
-            <div>
-              <Input
-                type="password"
-                placeholder="4자리 숫자 비밀번호"
-                value={editPassword}
-                onChange={(e) => setEditPassword(e.target.value)}
-                maxLength={4}
-              />
-            </div>
-            <div>
-              <Textarea
-                placeholder="댓글을 입력하세요..."
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-                rows={3}
-                className="w-full resize-none"
-              />
-            </div>
-            {isAdmin && (
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="editAdminOnly"
-                  checked={editIsAdminOnly}
-                  onCheckedChange={setEditIsAdminOnly}
+          {!editContent ? (
+            // 비밀번호 입력 단계
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                {getTranslatedText("댓글을 수정하시려면 비밀번호를 입력해주세요.")}
+              </p>
+              <div>
+                <Input
+                  type="password"
+                  placeholder={getTranslatedText("4자리 숫자 비밀번호")}
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
+                  maxLength={4}
                 />
-                <label 
-                  htmlFor="editAdminOnly" 
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
-                >
-                  <ShieldCheck className="h-4 w-4 mr-1 text-blue-600" />
-                  관리자만 볼 수 있음
-                </label>
               </div>
-            )}
-            <div className="flex justify-end space-x-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setEditingComment(null)}
-              >
-                취소
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={updateCommentMutation.isPending}
-              >
-                {updateCommentMutation.isPending ? "수정 중..." : "수정"}
-              </Button>
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setEditingComment(null)}
+                >
+                  {getTranslatedText("취소")}
+                </Button>
+                <Button 
+                  onClick={handleLoadCommentForEdit}
+                  disabled={getCommentForEditMutation.isPending}
+                >
+                  {getCommentForEditMutation.isPending ? getTranslatedText("불러오는 중...") : getTranslatedText("댓글 불러오기")}
+                </Button>
+              </div>
             </div>
-          </form>
+          ) : (
+            // 댓글 수정 단계
+            <form onSubmit={handleUpdateComment} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {getTranslatedText("댓글 내용")}
+                </label>
+                <Textarea
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  rows={3}
+                  className="w-full resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {getTranslatedText("연락처 (선택사항)")}
+                </label>
+                <Input
+                  value={editContact}
+                  onChange={(e) => setEditContact(e.target.value)}
+                  placeholder={getTranslatedText("연락처 (선택사항)")}
+                />
+              </div>
+              {isAdmin && (
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="editAdminOnly"
+                    checked={editIsAdminOnly}
+                    onCheckedChange={setEditIsAdminOnly}
+                  />
+                  <label 
+                    htmlFor="editAdminOnly" 
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
+                  >
+                    <ShieldCheck className="h-4 w-4 mr-1 text-blue-600" />
+                    {getTranslatedText("관리자만 볼 수 있음")}
+                  </label>
+                </div>
+              )}
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setEditingComment(null)}
+                >
+                  {getTranslatedText("취소")}
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={updateCommentMutation.isPending}
+                >
+                  {updateCommentMutation.isPending ? getTranslatedText("수정 중...") : getTranslatedText("수정")}
+                </Button>
+              </div>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
 

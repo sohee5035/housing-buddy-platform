@@ -49,6 +49,7 @@ export const comments = pgTable("comments", {
   parentId: integer("parent_id").references(() => comments.id), // 대댓글을 위한 부모 댓글 ID
   authorName: text("author_name").notNull(),
   authorPassword: text("author_password").notNull().default("0000"), // 4자리 숫자 비밀번호
+  authorContact: text("author_contact"), // 연락처 (관리자만 볼 수 있음)
   content: text("content").notNull(),
   isAdminOnly: integer("is_admin_only").default(0), // 1 = 관리자만 볼 수 있음
   createdAt: timestamp("created_at").defaultNow(),
@@ -65,6 +66,7 @@ export const insertCommentSchema = createInsertSchema(comments).omit({
 
 export const updateCommentSchema = createInsertSchema(comments).pick({
   content: true,
+  authorContact: true,
   isAdminOnly: true,
 }).extend({
   password: z.string().length(4, "비밀번호는 4자리 숫자여야 합니다."),

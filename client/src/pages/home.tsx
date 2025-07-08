@@ -15,6 +15,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import AdminLogin from "@/components/admin-login";
+import AdminPanel from "@/components/admin-panel";
 import { translateText, supportedLanguages } from "@/lib/translate";
 import { useToast } from "@/hooks/use-toast";
 
@@ -473,50 +474,12 @@ export default function Home() {
             <ShieldCheck className="h-5 w-5" />
           </Button>
         ) : (
-          <div className="flex flex-col space-y-2">
-            <Button
-              type="button"
-              onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
-              title="매물 등록"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-            
-            <Button
-              type="button"
-              onClick={() => setShowCategoryManager(true)}
-              className="bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
-              title="카테고리 관리"
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
-
-            <Link href="/trash">
-              <Button
-                type="button"
-                className="bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
-                title="휴지통"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </Link>
-            
-            <Button
-              type="button"
-              onClick={() => {
-                logout();
-                toast({
-                  title: "로그아웃",
-                  description: "관리자 모드에서 로그아웃되었습니다.",
-                });
-              }}
-              className="bg-red-600 hover:bg-red-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
-              title="로그아웃"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
+          <AdminPanel
+            onCreateListing={() => setShowCreateModal(true)}
+            onCategoryManager={() => setShowCategoryManager(true)}
+            onTrashView={() => window.location.href = "/trash"}
+            onCommentsView={() => window.location.href = "/admin/comments"}
+          />
         )}
       </div>
 

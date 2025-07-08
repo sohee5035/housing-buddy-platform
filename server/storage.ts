@@ -21,6 +21,8 @@ export interface IStorage {
   deleteComment(id: number): Promise<boolean>; // Admin only
   deleteCommentWithPassword(id: number, deleteData: DeleteComment): Promise<boolean>; // User with password
   verifyCommentPassword(id: number, password: string): Promise<boolean>;
+  getCommentForEdit(id: number, password: string): Promise<Comment | undefined>; // 수정용 댓글 조회
+  getAllCommentsForAdmin(): Promise<Comment[]>; // 관리자용 전체 문의 조회
 }
 
 export class DatabaseStorage implements IStorage {
@@ -150,6 +152,7 @@ export class DatabaseStorage implements IStorage {
       .update(comments)
       .set({
         content: updateData.content,
+        authorContact: updateData.authorContact,
         isAdminOnly: updateData.isAdminOnly,
         updatedAt: new Date(),
       })
@@ -189,6 +192,30 @@ export class DatabaseStorage implements IStorage {
       .where(eq(comments.id, id));
     
     return comment?.authorPassword === password;
+  }
+
+  async getCommentForEdit(id: number, password: string): Promise<Comment | undefined> {
+    // 비밀번호 확인
+    const isValid = await this.verifyCommentPassword(id, password);
+    if (!isValid) {
+      throw new Error("잘못된 비밀번호입니다.");
+    }
+
+    const [comment] = await db
+      .select()
+      .from(comments)
+      .where(and(eq(comments.id, id), eq(comments.isDeleted, 0)));
+    
+    return comment;
+  }
+
+  async getAllCommentsForAdmin(): Promise<Comment[]> {
+    const result = await db
+      .select()
+      .from(comments)
+      .where(eq(comments.isDeleted, 0))
+      .orderBy(desc(comments.createdAt));
+    return result;
   }
 }
 

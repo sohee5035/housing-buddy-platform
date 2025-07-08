@@ -397,6 +397,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get comment for editing (with password verification)
+  app.post("/api/comments/:id/edit", async (req: Request, res: Response) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      if (isNaN(commentId)) {
+        return res.status(400).json({ message: "Invalid comment ID" });
+      }
+
+      const { password } = req.body;
+      if (!password || password.length !== 4) {
+        return res.status(400).json({ message: "Invalid password" });
+      }
+
+      const comment = await storage.getCommentForEdit(commentId, password);
+      if (!comment) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      res.json(comment);
+    } catch (error: any) {
+      if (error.message === "잘못된 비밀번호입니다.") {
+        return res.status(401).json({ message: error.message });
+      }
+      console.error("Error getting comment for edit:", error);
+      res.status(500).json({ message: "Failed to get comment" });
+    }
+  });
+
+  // Get all comments for admin
+  app.get("/api/admin/comments", async (req: Request, res: Response) => {
+    try {
+      const comments = await storage.getAllCommentsForAdmin();
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching admin comments:", error);
+      res.status(500).json({ message: "Failed to fetch comments" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

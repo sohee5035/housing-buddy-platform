@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import AdminAuth from "@/components/admin-auth";
-import { Settings, Plus, Trash2, FolderCog, Shield, Edit, Delete } from "lucide-react";
+import { Settings, Plus, Trash2, FolderCog, Shield, Edit, Delete, MessageCircle } from "lucide-react";
 
 interface AdminPanelProps {
   onCreateListing: () => void;
   onCategoryManager: () => void;
   onTrashView: () => void;
+  onCommentsView: () => void;
   onEditProperty?: () => void;
   onDeleteProperty?: () => void;
   currentPropertyId?: number;
@@ -18,6 +19,7 @@ export default function AdminPanel({
   onCreateListing, 
   onCategoryManager, 
   onTrashView,
+  onCommentsView,
   onEditProperty,
   onDeleteProperty,
   currentPropertyId
@@ -81,6 +83,15 @@ export default function AdminPanel({
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   휴지통
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => handleAdminAction(onCommentsView)}
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  문의 관리
                 </Button>
               </div>
             </div>
