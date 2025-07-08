@@ -55,43 +55,14 @@ export default function AdminPanel({
         <SheetTrigger asChild>
           {trigger || (
             <div className={`fixed bottom-6 right-6 z-50 ${className}`}>
-              <div className="flex flex-col space-y-2">
-                <Button
-                  type="button"
-                  onClick={() => onCreateListing()}
-                  className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
-                  title="매물 등록"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-                
-                <Button
-                  type="button"
-                  onClick={() => onCategoryManager()}
-                  className="bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
-                  title="카테고리 관리"
-                >
-                  <Settings className="h-4 w-4" />
-                </Button>
-
-                <Button
-                  type="button"
-                  onClick={() => onTrashView()}
-                  className="bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
-                  title="휴지통"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-
-                <Button
-                  type="button"
-                  onClick={() => onCommentsView()}
-                  className="bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
-                  title="문의 관리"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button
+                type="button"
+                onClick={() => onCreateListing()}
+                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
+                title="매물 등록"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
           )}
         </SheetTrigger>
