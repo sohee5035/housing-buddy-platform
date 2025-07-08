@@ -9,6 +9,7 @@ import Home from "@/pages/home";
 import PropertyDetail from "@/pages/property-detail";
 import Trash from "@/pages/trash";
 import NotFound from "@/pages/not-found";
+import AdminIconPreview from "@/components/admin-icon-preview";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/trash" component={Trash} />
+      <Route path="/admin-icons" component={AdminIconPreview} />
       <Route component={NotFound} />
     </Switch>
   );
