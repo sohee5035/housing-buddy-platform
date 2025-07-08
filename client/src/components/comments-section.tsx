@@ -348,7 +348,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
               </div>
               <div>
                 <Input
-                  placeholder={getTranslatedText("연락처 (선택사항)")}
+                  placeholder={getTranslatedText("이메일 또는 한국 전화번호 (선택사항)")}
                   value={authorContact}
                   onChange={(e) => setAuthorContact(e.target.value)}
                 />
