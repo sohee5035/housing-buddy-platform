@@ -246,71 +246,148 @@ export default function PropertyDetail() {
         <div className="space-y-8">
           {/* Image Gallery */}
           <div className="space-y-4">
-            <div className="relative h-80 bg-neutral-200 rounded-lg overflow-hidden">
-              {property.photos && property.photos.length > 0 ? (
-                <>
-                  <img
-                    src={property.photos[currentImageIndex]}
-                    alt={getTranslatedPropertyText('title') || property.title}
-                    className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                    onClick={() => {
-                      setSelectedImageIndex(currentImageIndex);
-                      setShowImageGallery(true);
-                    }}
-                  />
-                  {property.photos.length > 1 && (
-                    <>
-                      <button
-                        onClick={() => setCurrentImageIndex(prev => 
-                          prev === 0 ? property.photos!.length - 1 : prev - 1
-                        )}
-                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setCurrentImageIndex(prev => 
-                          prev === property.photos!.length - 1 ? 0 : prev + 1
-                        )}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                        {currentImageIndex + 1} / {property.photos.length}
-                      </div>
-                    </>
-                  )}
-                </>
-              ) : (
-                <div className="flex items-center justify-center h-full text-neutral-500">
-                  <HomeIcon className="h-16 w-16" />
+            {/* Mobile: 세로 배치 */}
+            <div className="block lg:hidden">
+              <div className="relative h-80 bg-neutral-200 rounded-lg overflow-hidden">
+                {property.photos && property.photos.length > 0 ? (
+                  <>
+                    <img
+                      src={property.photos[currentImageIndex]}
+                      alt={getTranslatedPropertyText('title') || property.title}
+                      className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                      onClick={() => {
+                        setSelectedImageIndex(currentImageIndex);
+                        setShowImageGallery(true);
+                      }}
+                    />
+                    {property.photos.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setCurrentImageIndex(prev => 
+                            prev === 0 ? property.photos!.length - 1 : prev - 1
+                          )}
+                          className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => setCurrentImageIndex(prev => 
+                            prev === property.photos!.length - 1 ? 0 : prev + 1
+                          )}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                          {currentImageIndex + 1} / {property.photos.length}
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-neutral-500">
+                    <HomeIcon className="h-16 w-16" />
+                  </div>
+                )}
+              </div>
+              
+              {/* Mobile Thumbnail Gallery */}
+              {property.photos && property.photos.length > 1 && (
+                <div className="grid grid-cols-5 gap-2 mt-4">
+                  {property.photos.map((photo, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setCurrentImageIndex(index);
+                      }}
+                      className={`h-16 bg-neutral-200 rounded overflow-hidden hover:ring-2 hover:ring-primary/50 transition-all ${
+                        currentImageIndex === index ? 'ring-2 ring-primary' : ''
+                      }`}
+                    >
+                      <img
+                        src={photo}
+                        alt={`${getTranslatedPropertyText('title') || property.title} ${index + 1}`}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
+                      />
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
-            
-            {/* Thumbnail Gallery */}
-            {property.photos && property.photos.length > 1 && (
-              <div className="grid grid-cols-5 gap-2">
-                {property.photos.map((photo, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setCurrentImageIndex(index);
-                    }}
-                    className={`h-16 bg-neutral-200 rounded overflow-hidden hover:ring-2 hover:ring-primary/50 transition-all ${
-                      currentImageIndex === index ? 'ring-2 ring-primary' : ''
-                    }`}
-                  >
-                    <img
-                      src={photo}
-                      alt={`${getTranslatedPropertyText('title') || property.title} ${index + 1}`}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
-                    />
-                  </button>
-                ))}
+
+            {/* PC: 좌우 분할 */}
+            <div className="hidden lg:block">
+              <div className="grid grid-cols-3 gap-4 h-96">
+                {/* 좌측 메인 이미지 */}
+                <div className="col-span-2 relative bg-neutral-200 rounded-lg overflow-hidden">
+                  {property.photos && property.photos.length > 0 ? (
+                    <>
+                      <img
+                        src={property.photos[currentImageIndex]}
+                        alt={getTranslatedPropertyText('title') || property.title}
+                        className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                        onClick={() => {
+                          setSelectedImageIndex(currentImageIndex);
+                          setShowImageGallery(true);
+                        }}
+                      />
+                      {property.photos.length > 1 && (
+                        <>
+                          <button
+                            onClick={() => setCurrentImageIndex(prev => 
+                              prev === 0 ? property.photos!.length - 1 : prev - 1
+                            )}
+                            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => setCurrentImageIndex(prev => 
+                              prev === property.photos!.length - 1 ? 0 : prev + 1
+                            )}
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </button>
+                          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                            {currentImageIndex + 1} / {property.photos.length}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-neutral-500">
+                      <HomeIcon className="h-16 w-16" />
+                    </div>
+                  )}
+                </div>
+
+                {/* 우측 썸네일 그리드 */}
+                <div className="col-span-1">
+                  {property.photos && property.photos.length > 1 && (
+                    <div className="grid grid-cols-2 gap-2 h-full overflow-y-auto">
+                      {property.photos.map((photo, index) => (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            setCurrentImageIndex(index);
+                          }}
+                          className={`aspect-square bg-neutral-200 rounded overflow-hidden hover:ring-2 hover:ring-primary/50 transition-all ${
+                            currentImageIndex === index ? 'ring-2 ring-primary' : ''
+                          }`}
+                        >
+                          <img
+                            src={photo}
+                            alt={`${getTranslatedPropertyText('title') || property.title} ${index + 1}`}
+                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Property Details */}
