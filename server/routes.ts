@@ -280,6 +280,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Translation service not configured" });
       }
 
+      // 한국어로 번역할 때는 소스 언어를 자동 감지하고, 다른 언어로 번역할 때는 한국어에서 번역
+      const requestBody: any = {
+        q: text,
+        target: targetLang,
+      };
+
+      // 같은 언어로 번역하는 경우 원본 텍스트 그대로 반환
+      if (targetLang === 'ko') {
+        return res.json({ translatedText: text });
+      }
+
+      // 한국어가 아닌 다른 언어로 번역할 때만 소스 언어 지정
+      requestBody.source = 'ko';
+
       console.log("Making API request to Google Translate...");
       const response = await fetch(
         `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
@@ -288,11 +302,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            q: text,
-            target: targetLang,
-            source: 'ko',
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
 
