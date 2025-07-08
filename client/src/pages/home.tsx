@@ -16,7 +16,6 @@ import { useTranslation } from "@/contexts/TranslationContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import AdminLogin from "@/components/admin-login";
 import AdminPanel from "@/components/admin-panel";
-import ColorPaletteSelector from "@/components/color-palette-selector";
 import { translateText, supportedLanguages } from "@/lib/translate";
 import { useToast } from "@/hooks/use-toast";
 
@@ -512,25 +511,6 @@ export default function Home() {
           />
         )}
       </div>
-
-      {/* Color Palette Selector */}
-      <ColorPaletteSelector
-        onColorSelect={(color) => {
-          const root = document.documentElement;
-          root.style.setProperty('--primary', color.primary);
-          root.style.setProperty('--secondary', color.secondary);
-          root.style.setProperty('--accent', color.accent);
-          root.style.setProperty('--ring', color.ring);
-          root.style.setProperty('--sidebar-primary', color.primary);
-          root.style.setProperty('--sidebar-accent', color.secondary);
-          root.style.setProperty('--sidebar-ring', color.ring);
-          
-          toast({
-            title: "색상 변경 완료",
-            description: `${color.name}으로 변경되었습니다.`,
-          });
-        }}
-      />
 
     </div>
   );
