@@ -58,7 +58,7 @@ export default function AdminPanel({
               <Button
                 type="button"
                 onClick={() => onCreateListing()}
-                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg rounded-full w-12 h-12 p-0"
                 title="매물 등록"
               >
                 <Plus className="h-4 w-4" />
