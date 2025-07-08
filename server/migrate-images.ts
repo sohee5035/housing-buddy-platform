@@ -85,20 +85,7 @@ async function migrateImagesToCloudinary() {
   }
 }
 
-// 직접 실행 (배포 환경에서 안전하게 처리)
-if (import.meta.url === `file://${process.argv[1]}`) {
-  migrateImagesToCloudinary().then((success) => {
-    console.log('Migration script finished');
-    if (success) {
-      console.log('Migration completed successfully');
-    } else {
-      console.log('Migration completed with errors');
-    }
-    process.exit(0);
-  }).catch((error) => {
-    console.error('Migration script failed:', error);
-    process.exit(0); // 배포 실패를 방지하기 위해 0으로 종료
-  });
-}
+// Migration script can only be executed through API endpoint or manual import
+// Removed direct execution to prevent server startup issues during deployment
 
 export { migrateImagesToCloudinary };
