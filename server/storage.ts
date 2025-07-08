@@ -1,6 +1,6 @@
-import { properties, type Property, type InsertProperty } from "@shared/schema";
+import { properties, comments, type Property, type InsertProperty, type Comment, type InsertComment } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
   // Property methods
@@ -13,6 +13,11 @@ export interface IStorage {
   getDeletedProperties(): Promise<Property[]>;
   restoreProperty(id: number): Promise<Property | undefined>;
   permanentDeleteProperty(id: number): Promise<boolean>;
+  
+  // Comment methods
+  getComments(propertyId: number): Promise<Comment[]>;
+  createComment(comment: InsertComment): Promise<Comment>;
+  deleteComment(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -101,6 +106,33 @@ export class DatabaseStorage implements IStorage {
   async permanentDeleteProperty(id: number): Promise<boolean> {
     const result = await db.delete(properties).where(eq(properties.id, id));
     return (result.rowCount || 0) > 0;
+  }
+
+  // Comment methods
+  async getComments(propertyId: number): Promise<Comment[]> {
+    const result = await db
+      .select()
+      .from(comments)
+      .where(and(eq(comments.propertyId, propertyId), eq(comments.isDeleted, 0)))
+      .orderBy(desc(comments.createdAt));
+    return result;
+  }
+
+  async createComment(comment: InsertComment): Promise<Comment> {
+    const [result] = await db
+      .insert(comments)
+      .values(comment)
+      .returning();
+    return result;
+  }
+
+  async deleteComment(id: number): Promise<boolean> {
+    const [result] = await db
+      .update(comments)
+      .set({ isDeleted: 1 })
+      .where(eq(comments.id, id))
+      .returning();
+    return !!result;
   }
 }
 

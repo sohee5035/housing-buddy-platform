@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema } from "@shared/schema";
+import { insertPropertySchema, insertCommentSchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from "./cloudinary";
@@ -275,6 +275,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error translating text:", error);
       res.status(500).json({ message: "Translation failed" });
+    }
+  });
+
+  // Comment routes
+  // Get comments for a property
+  app.get("/api/properties/:id/comments", async (req: Request, res: Response) => {
+    try {
+      const propertyId = parseInt(req.params.id);
+      if (isNaN(propertyId)) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+      
+      const comments = await storage.getComments(propertyId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      res.status(500).json({ message: "Failed to fetch comments" });
+    }
+  });
+
+  // Create a comment
+  app.post("/api/properties/:id/comments", async (req: Request, res: Response) => {
+    try {
+      const propertyId = parseInt(req.params.id);
+      if (isNaN(propertyId)) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+
+      const validatedData = insertCommentSchema.parse({
+        ...req.body,
+        propertyId
+      });
+
+      const comment = await storage.createComment(validatedData);
+      res.status(201).json(comment);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Invalid comment data", errors: error.errors });
+      }
+      console.error("Error creating comment:", error);
+      res.status(500).json({ message: "Failed to create comment" });
+    }
+  });
+
+  // Delete a comment (admin only)
+  app.delete("/api/comments/:id", async (req: Request, res: Response) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      if (isNaN(commentId)) {
+        return res.status(400).json({ message: "Invalid comment ID" });
+      }
+
+      const success = await storage.deleteComment(commentId);
+      if (!success) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      res.json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ message: "Failed to delete comment" });
     }
   });
 

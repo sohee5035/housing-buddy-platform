@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import SmartTextWithTooltips from "@/components/smart-text-with-tooltips";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useAdmin } from "@/contexts/AdminContext";
+import CommentsSection from "@/components/comments-section";
 import { 
   ArrowLeft, 
   Edit, 
@@ -447,6 +448,13 @@ export default function PropertyDetail() {
                   <Calendar className="h-4 w-4 mr-2" />
                   {translateUI('등록일')}: {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* 댓글 섹션 */}
+            <Card className="mt-6">
+              <CardContent className="p-6">
+                <CommentsSection propertyId={property.id} />
               </CardContent>
             </Card>
           </div>
