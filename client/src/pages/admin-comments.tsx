@@ -40,33 +40,44 @@ export default function AdminComments() {
   // 관리자 메모 업데이트 뮤테이션
   const updateMemoMutation = useMutation({
     mutationFn: async ({ commentId, memo }: { commentId: number; memo: string }) => {
-      const response = await fetch(`/api/admin/comments/${commentId}/memo`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ memo }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('메모 업데이트에 실패했습니다.');
+      try {
+        const response = await fetch(`/api/admin/comments/${commentId}/memo`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ memo }),
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || `HTTP ${response.status}: 메모 업데이트에 실패했습니다.`);
+        }
+        
+        return response.json();
+      } catch (error) {
+        console.error('메모 업데이트 오류:', error);
+        throw error;
       }
-      
-      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('메모 저장 성공:', data);
       queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
       toast({
-        title: "메모 저장됨",
+        title: "✓ 메모 저장 완료",
         description: "관리자 메모가 성공적으로 저장되었습니다.",
+        duration: 3000,
       });
       setEditingMemo(null);
+      setMemoTexts({});
     },
-    onError: (error) => {
+    onError: (error: Error) => {
+      console.error('메모 저장 실패:', error);
       toast({
-        title: "오류",
-        description: "메모 저장에 실패했습니다.",
+        title: "❌ 메모 저장 실패",
+        description: error.message || "메모 저장에 실패했습니다.",
         variant: "destructive",
+        duration: 4000,
       });
     },
   });
