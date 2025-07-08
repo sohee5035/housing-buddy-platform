@@ -20,8 +20,8 @@ let isServerReady = false;
 let serverStartTime = Date.now();
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Root endpoint for Cloud Run health checks - this must respond to / with 200
-  app.get("/", (req, res) => {
+  // Health check endpoint specifically for deployment health checks
+  app.get("/health", (req, res) => {
     const uptime = Date.now() - serverStartTime;
     
     if (!isServerReady) {
@@ -43,14 +43,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Health check endpoint for deployment
+  // Additional health check endpoint for API
   app.get("/api/health", (req, res) => {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
-  });
-
-  // Root endpoint for external health checks
-  app.get("/health", (req, res) => {
-    res.status(200).json({ status: "ok", service: "Housing Buddy", timestamp: new Date().toISOString() });
   });
 
   // Upload image to Cloudinary
