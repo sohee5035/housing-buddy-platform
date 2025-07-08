@@ -436,6 +436,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update admin memo
+  app.put("/api/admin/comments/:id/memo", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { memo } = req.body;
+      
+      const updatedComment = await storage.updateAdminMemo(parseInt(id), memo || "");
+      
+      if (!updatedComment) {
+        return res.status(404).json({ message: "댓글을 찾을 수 없습니다." });
+      }
+      
+      res.json(updatedComment);
+    } catch (error) {
+      console.error("Error updating admin memo:", error);
+      res.status(500).json({ message: "관리자 메모 업데이트에 실패했습니다." });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -23,6 +23,7 @@ export interface IStorage {
   verifyCommentPassword(id: number, password: string): Promise<boolean>;
   getCommentForEdit(id: number, password: string): Promise<Comment | undefined>; // 수정용 댓글 조회
   getAllCommentsForAdmin(): Promise<Comment[]>; // 관리자용 전체 문의 조회
+  updateAdminMemo(id: number, memo: string): Promise<Comment | undefined>; // 관리자 메모 업데이트
 }
 
 export class DatabaseStorage implements IStorage {
@@ -216,6 +217,19 @@ export class DatabaseStorage implements IStorage {
       .where(eq(comments.isDeleted, 0))
       .orderBy(desc(comments.createdAt));
     return result;
+  }
+
+  async updateAdminMemo(id: number, memo: string): Promise<Comment | undefined> {
+    const [updatedComment] = await db
+      .update(comments)
+      .set({ 
+        adminMemo: memo,
+        updatedAt: new Date()
+      })
+      .where(eq(comments.id, id))
+      .returning();
+    
+    return updatedComment;
   }
 }
 

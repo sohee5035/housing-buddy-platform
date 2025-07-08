@@ -1,16 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageCircle, User, Calendar, MapPin, Phone, ArrowLeft, Home as HomeIcon, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { MessageCircle, User, Calendar, MapPin, Phone, ArrowLeft, Home as HomeIcon, ShieldCheck, StickyNote, Save, Edit2 } from "lucide-react";
 import { Comment, Property } from "@shared/schema";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useAdmin } from "@/contexts/AdminContext";
+import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Link } from "wouter";
 
 export default function AdminComments() {
   const { getTranslatedText } = useTranslation();
   const { isAdmin } = useAdmin();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [editingMemo, setEditingMemo] = useState<number | null>(null);
+  const [memoTexts, setMemoTexts] = useState<Record<number, string>>({});
 
   // 관리자용 전체 댓글 조회
   const { data: comments = [], isLoading } = useQuery<Comment[]>({
@@ -26,6 +35,58 @@ export default function AdminComments() {
   const getPropertyTitle = (propertyId: number) => {
     const property = properties.find(p => p.id === propertyId);
     return property?.title || `매물 #${propertyId}`;
+  };
+
+  // 관리자 메모 업데이트 뮤테이션
+  const updateMemoMutation = useMutation({
+    mutationFn: async ({ commentId, memo }: { commentId: number; memo: string }) => {
+      const response = await fetch(`/api/admin/comments/${commentId}/memo`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ memo }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('메모 업데이트에 실패했습니다.');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
+      toast({
+        title: "메모 저장됨",
+        description: "관리자 메모가 성공적으로 저장되었습니다.",
+      });
+      setEditingMemo(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "오류",
+        description: "메모 저장에 실패했습니다.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleMemoEdit = (commentId: number, currentMemo: string | null) => {
+    setEditingMemo(commentId);
+    setMemoTexts(prev => ({
+      ...prev,
+      [commentId]: currentMemo || ""
+    }));
+  };
+
+  const handleMemoSave = (commentId: number) => {
+    const memo = memoTexts[commentId] || "";
+    updateMemoMutation.mutate({ commentId, memo });
+  };
+
+  const handleMemoCancel = () => {
+    setEditingMemo(null);
+    setMemoTexts({});
   };
 
   if (isLoading) {
@@ -137,6 +198,60 @@ export default function AdminComments() {
                   <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
                     {comment.content}
                   </p>
+                </div>
+
+                {/* 관리자 메모 섹션 */}
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <StickyNote className="h-4 w-4 text-yellow-600" />
+                      <span className="text-sm font-medium text-yellow-800">관리자 메모</span>
+                    </div>
+                    
+                    {editingMemo === comment.id ? (
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleMemoSave(comment.id)}
+                          disabled={updateMemoMutation.isPending}
+                        >
+                          <Save className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleMemoCancel}
+                        >
+                          취소
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleMemoEdit(comment.id, comment.adminMemo)}
+                      >
+                        <Edit2 className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {editingMemo === comment.id ? (
+                    <Textarea
+                      value={memoTexts[comment.id] || ""}
+                      onChange={(e) => setMemoTexts(prev => ({
+                        ...prev,
+                        [comment.id]: e.target.value
+                      }))}
+                      placeholder="관리자 전용 메모를 입력하세요..."
+                      className="min-h-[80px] text-sm"
+                    />
+                  ) : (
+                    <div className="text-sm text-yellow-700">
+                      {comment.adminMemo || "메모가 없습니다. 편집 버튼을 클릭하여 메모를 추가하세요."}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
