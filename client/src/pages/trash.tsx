@@ -133,7 +133,7 @@ export default function Trash() {
             
             {/* Admin Status Indicator */}
             {isAdmin && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full">
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">
                 <ShieldCheck className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium text-blue-700">관리자</span>
               </div>

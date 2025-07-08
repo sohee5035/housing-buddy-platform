@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import AdminAuth from "@/components/admin-auth";
-import { Settings, Plus, Trash2, FolderCog, Shield, Edit, Delete, MessageCircle } from "lucide-react";
+import { Settings, Plus, Trash2, FolderCog, Shield, Edit, Delete, MessageCircle, LogOut } from "lucide-react";
 
 interface AdminPanelProps {
   onCreateListing: () => void;
@@ -13,6 +13,9 @@ interface AdminPanelProps {
   onEditProperty?: () => void;
   onDeleteProperty?: () => void;
   currentPropertyId?: number;
+  onLogout?: () => void;
+  trigger?: React.ReactNode;
+  className?: string;
 }
 
 export default function AdminPanel({ 
@@ -22,7 +25,10 @@ export default function AdminPanel({
   onCommentsView,
   onEditProperty,
   onDeleteProperty,
-  currentPropertyId
+  currentPropertyId,
+  onLogout,
+  trigger,
+  className = ""
 }: AdminPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
@@ -44,15 +50,50 @@ export default function AdminPanel({
 
   return (
     <>
-      {/* 숨겨진 관리자 접근 */}
+      {/* 관리자 패널 */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <div
-            className="fixed bottom-0 right-0 w-8 h-8 cursor-pointer opacity-0 hover:opacity-20 transition-opacity z-50"
-            title="관리자 모드"
-          >
-            <Shield className="h-4 w-4" />
-          </div>
+          {trigger || (
+            <div className={`fixed bottom-6 right-6 z-50 ${className}`}>
+              <div className="flex flex-col space-y-2">
+                <Button
+                  type="button"
+                  onClick={() => onCreateListing()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
+                  title="매물 등록"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  type="button"
+                  onClick={() => onCategoryManager()}
+                  className="bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
+                  title="카테고리 관리"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => onTrashView()}
+                  className="bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
+                  title="휴지통"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => onCommentsView()}
+                  className="bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg rounded-full w-12 h-12 p-0"
+                  title="문의 관리"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </SheetTrigger>
         
         <SheetContent side="right" className="w-80">
@@ -135,6 +176,23 @@ export default function AdminPanel({
                 </Button>
               </div>
             </div>
+            
+            {/* 로그아웃 버튼 */}
+            {onLogout && (
+              <div className="rounded-lg border border-red-200 p-4 bg-red-50">
+                <Button
+                  variant="destructive"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    onLogout();
+                    setIsOpen(false);
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  관리자 로그아웃
+                </Button>
+              </div>
+            )}
             
             <div className="rounded-lg border border-amber-200 p-4 bg-amber-50">
               <div className="flex items-center gap-2 mb-2">

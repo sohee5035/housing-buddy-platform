@@ -223,10 +223,25 @@ export default function Home() {
             
             {/* Admin Status Indicator */}
             {isAdmin && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full">
-                <ShieldCheck className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700">관리자</span>
-              </div>
+              <AdminPanel
+                trigger={
+                  <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">
+                    <ShieldCheck className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-700">관리자</span>
+                  </div>
+                }
+                onCreateListing={() => setShowCreateModal(true)}
+                onCategoryManager={() => setShowCategoryManager(true)}
+                onTrashView={() => window.location.href = "/trash"}
+                onCommentsView={() => window.location.href = "/admin/comments"}
+                onLogout={() => {
+                  logout();
+                  toast({
+                    title: "로그아웃",
+                    description: "관리자 모드에서 로그아웃되었습니다.",
+                  });
+                }}
+              />
             )}
           </div>
           
@@ -486,6 +501,13 @@ export default function Home() {
             onCategoryManager={() => setShowCategoryManager(true)}
             onTrashView={() => window.location.href = "/trash"}
             onCommentsView={() => window.location.href = "/admin/comments"}
+            onLogout={() => {
+              logout();
+              toast({
+                title: "로그아웃",
+                description: "관리자 모드에서 로그아웃되었습니다.",
+              });
+            }}
           />
         )}
       </div>
