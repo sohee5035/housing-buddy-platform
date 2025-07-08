@@ -242,11 +242,11 @@ export default function PropertyDetail() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-8">
           {/* Image Gallery */}
           <div className="space-y-4">
-            <div className="relative h-96 bg-neutral-200 rounded-lg overflow-hidden">
+            <div className="relative h-80 bg-neutral-200 rounded-lg overflow-hidden">
               {property.photos && property.photos.length > 0 ? (
                 <>
                   <img
@@ -337,9 +337,9 @@ export default function PropertyDetail() {
                 </div>
 
                 <div className="space-y-4">
-                  {/* 가격 정보 - 더 예쁘게 표시 */}
+                  {/* 가격 정보 - PC에서 한 줄로 표시 */}
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="text-center">
                         <div className="text-sm text-neutral-600 mb-1">{translateUI('보증금')}</div>
                         <div className="text-xl font-bold text-blue-600">
@@ -352,17 +352,15 @@ export default function PropertyDetail() {
                           {(property.monthlyRent / 10000).toLocaleString()}<span className="text-sm text-neutral-500">만원</span>
                         </div>
                       </div>
-                    </div>
-                    {property.maintenanceFee !== null && property.maintenanceFee > 0 && (
-                      <div className="mt-3 pt-3 border-t border-blue-200">
+                      {property.maintenanceFee !== null && property.maintenanceFee > 0 && (
                         <div className="text-center">
                           <div className="text-sm text-neutral-600 mb-1">{translateUI('관리비')}</div>
-                          <div className="text-lg font-semibold text-green-600">
+                          <div className="text-xl font-bold text-green-600">
                             {(property.maintenanceFee / 10000).toLocaleString()}<span className="text-sm text-neutral-500">만원</span>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
 
