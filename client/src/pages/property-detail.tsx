@@ -243,7 +243,7 @@ export default function PropertyDetail() {
 
       {/* Main Content */}
       <main className="max-w-6xl lg:max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
+        <div className="space-y-12">
           {/* Image Gallery */}
           <div className="space-y-4">
             {/* Mobile: 세로 배치 */}
