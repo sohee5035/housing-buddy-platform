@@ -100,6 +100,23 @@ export default function AdminComments() {
     setMemoTexts({});
   };
 
+  // 관리자가 아니면 홈으로 리다이렉트
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-neutral-900 mb-4">접근 권한이 없습니다</h2>
+          <p className="text-neutral-600 mb-6">관리자만 접근할 수 있는 페이지입니다.</p>
+          <Link href="/">
+            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+              홈으로 돌아가기
+            </button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto p-6">
