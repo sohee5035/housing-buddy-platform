@@ -215,14 +215,13 @@ export default function PropertyDetail() {
           <div className="flex items-center justify-between h-16 border-b border-neutral-100">
             <div className="flex items-center">
               <button 
-                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
+                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0 mr-4"
                 onClick={(e) => {
                   e.preventDefault();
                   setLocation("/");
                 }}
               >
-                <ArrowLeft className="h-6 w-6 text-neutral-600 mr-2" />
-                <span className="text-sm text-neutral-600 mr-4">{translateUI('뒤로가기')}</span>
+                <ArrowLeft className="h-6 w-6 text-neutral-600" />
               </button>
               <div className="flex items-center">
                 <HomeIcon className="h-8 w-8 text-primary mr-3" />
