@@ -16,6 +16,7 @@ export async function translateText(text: string, targetLang: string): Promise<T
 }
 
 export const supportedLanguages = [
+  { code: "ko", name: "한국어 (Korean)", flag: "🇰🇷" },
   { code: "en", name: "English (영어)", flag: "🇺🇸" },
   { code: "ja", name: "日本語 (일본어)", flag: "🇯🇵" },
   { code: "zh", name: "中文 (중국어)", flag: "🇨🇳" },
