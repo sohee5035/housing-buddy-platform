@@ -1,4 +1,4 @@
-import { properties, comments, type Property, type InsertProperty, type Comment, type InsertComment, type UpdateComment } from "@shared/schema";
+import { properties, comments, type Property, type InsertProperty, type Comment, type InsertComment, type UpdateComment, type DeleteComment } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 
@@ -18,7 +18,8 @@ export interface IStorage {
   getComments(propertyId: number): Promise<Comment[]>;
   createComment(comment: InsertComment): Promise<Comment>;
   updateComment(id: number, updateData: UpdateComment): Promise<Comment | undefined>;
-  deleteComment(id: number): Promise<boolean>;
+  deleteComment(id: number): Promise<boolean>; // Admin only
+  deleteCommentWithPassword(id: number, deleteData: DeleteComment): Promise<boolean>; // User with password
   verifyCommentPassword(id: number, password: string): Promise<boolean>;
 }
 
@@ -158,6 +159,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteComment(id: number): Promise<boolean> {
+    const [result] = await db
+      .update(comments)
+      .set({ isDeleted: 1 })
+      .where(eq(comments.id, id))
+      .returning();
+    return !!result;
+  }
+
+  async deleteCommentWithPassword(id: number, deleteData: DeleteComment): Promise<boolean> {
+    // 비밀번호 확인
+    const isValid = await this.verifyCommentPassword(id, deleteData.password);
+    if (!isValid) {
+      throw new Error("잘못된 비밀번호입니다.");
+    }
+
     const [result] = await db
       .update(comments)
       .set({ isDeleted: 1 })

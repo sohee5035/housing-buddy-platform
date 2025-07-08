@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertCommentSchema, updateCommentSchema } from "@shared/schema";
+import { insertPropertySchema, insertCommentSchema, updateCommentSchema, deleteCommentSchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from "./cloudinary";
@@ -346,6 +346,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error updating comment:", error);
       res.status(500).json({ message: "Failed to update comment" });
+    }
+  });
+
+  // Delete a comment with password (user)
+  app.post("/api/comments/:id/delete", async (req: Request, res: Response) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      if (isNaN(commentId)) {
+        return res.status(400).json({ message: "Invalid comment ID" });
+      }
+
+      const validatedData = deleteCommentSchema.parse(req.body);
+      const success = await storage.deleteCommentWithPassword(commentId, validatedData);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      res.json({ message: "Comment deleted successfully" });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Invalid password data", errors: error.errors });
+      }
+      if (error.message === "잘못된 비밀번호입니다.") {
+        return res.status(401).json({ message: error.message });
+      }
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ message: "Failed to delete comment" });
     }
   });
 

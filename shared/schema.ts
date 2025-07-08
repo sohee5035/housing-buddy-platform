@@ -70,6 +70,11 @@ export const updateCommentSchema = createInsertSchema(comments).pick({
   password: z.string().length(4, "비밀번호는 4자리 숫자여야 합니다."),
 });
 
+export const deleteCommentSchema = z.object({
+  password: z.string().length(4, "비밀번호는 4자리 숫자여야 합니다."),
+});
+
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type UpdateComment = z.infer<typeof updateCommentSchema>;
+export type DeleteComment = z.infer<typeof deleteCommentSchema>;
 export type Comment = typeof comments.$inferSelect;

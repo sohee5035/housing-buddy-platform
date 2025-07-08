@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Comment, InsertComment, UpdateComment } from "@shared/schema";
+import { Comment, InsertComment, UpdateComment, DeleteComment } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -27,6 +27,8 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
   const [editContent, setEditContent] = useState("");
   const [editPassword, setEditPassword] = useState("");
   const [editIsAdminOnly, setEditIsAdminOnly] = useState(false);
+  const [deletingComment, setDeletingComment] = useState<Comment | null>(null);
+  const [deletePassword, setDeletePassword] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAdmin } = useAdmin();
@@ -82,6 +84,29 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
       toast({
         title: "댓글 삭제 완료",
         description: "댓글이 삭제되었습니다.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "댓글 삭제 실패",
+        description: error.message || "댓글 삭제 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // 댓글 삭제 mutation (비밀번호 인증)
+  const deleteCommentWithPasswordMutation = useMutation({
+    mutationFn: async ({ commentId, deleteData }: { commentId: number; deleteData: DeleteComment }) => {
+      await apiRequest("POST", `/api/comments/${commentId}/delete`, deleteData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/properties/${propertyId}/comments`] });
+      setDeletingComment(null);
+      setDeletePassword("");
+      toast({
+        title: "댓글 삭제 완료",
+        description: "댓글이 성공적으로 삭제되었습니다.",
       });
     },
     onError: (error: any) => {
@@ -153,6 +178,11 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
     }
   };
 
+  const handleDeleteCommentUser = (comment: Comment) => {
+    setDeletingComment(comment);
+    setDeletePassword("");
+  };
+
   const handleEditComment = (comment: Comment) => {
     setEditingComment(comment);
     setEditContent(comment.content);
@@ -191,6 +221,44 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
       });
     }
   };
+
+  const handleConfirmDeleteComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!deletePassword.trim()) {
+      toast({
+        title: "입력 오류",
+        description: "비밀번호를 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (deletePassword.length !== 4 || !/^\d{4}$/.test(deletePassword)) {
+      toast({
+        title: "비밀번호 오류",
+        description: "비밀번호는 4자리 숫자여야 합니다.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (deletingComment) {
+      deleteCommentWithPasswordMutation.mutate({
+        commentId: deletingComment.id,
+        deleteData: {
+          password: deletePassword.trim(),
+        },
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -297,15 +365,24 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteCommentUser(comment)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                       {isAdmin && (
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteComment(comment.id)}
                           disabled={deleteCommentMutation.isPending}
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                          title="관리자 삭제"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <ShieldCheck className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
@@ -375,6 +452,45 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                 disabled={updateCommentMutation.isPending}
               >
                 {updateCommentMutation.isPending ? "수정 중..." : "수정"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* 댓글 삭제 모달 */}
+      <Dialog open={!!deletingComment} onOpenChange={() => setDeletingComment(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>댓글 삭제</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleConfirmDeleteComment} className="space-y-4">
+            <p className="text-sm text-neutral-600">
+              댓글을 삭제하려면 작성 시 설정한 4자리 비밀번호를 입력해주세요.
+            </p>
+            <div>
+              <Input
+                type="password"
+                placeholder="4자리 숫자 비밀번호"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                maxLength={4}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setDeletingComment(null)}
+              >
+                취소
+              </Button>
+              <Button 
+                type="submit" 
+                variant="destructive"
+                disabled={deleteCommentWithPasswordMutation.isPending}
+              >
+                {deleteCommentWithPasswordMutation.isPending ? "삭제 중..." : "삭제"}
               </Button>
             </div>
           </form>
