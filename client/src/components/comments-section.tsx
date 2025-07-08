@@ -359,22 +359,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                 className="w-full resize-none"
               />
             </div>
-            {isAdmin && (
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="adminOnly"
-                  checked={isAdminOnly}
-                  onCheckedChange={setIsAdminOnly}
-                />
-                <label 
-                  htmlFor="adminOnly" 
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
-                >
-                  <ShieldCheck className="h-4 w-4 mr-1 text-blue-600" />
-                  관리자만 볼 수 있음
-                </label>
-              </div>
-            )}
+
             <div className="flex justify-end">
               <Button 
                 type="submit" 
