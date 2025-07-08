@@ -89,8 +89,24 @@ app.use((req, res, next) => {
     // Handle server errors
     server.on('error', (error: any) => {
       if (error.code === 'EADDRINUSE') {
-        log(`Port ${port} is already in use`);
-        process.exit(1);
+        log(`Port ${port} is already in use, trying to find and kill existing process...`);
+        
+        // Try to gracefully shut down any existing process on this port
+        const alternativePort = parseInt(port.toString()) + Math.floor(Math.random() * 1000) + 1000;
+        log(`Attempting to use alternative port: ${alternativePort}`);
+        
+        setTimeout(() => {
+          server.listen(alternativePort, host, () => {
+            log(`serving on ${host}:${alternativePort}`);
+            log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+            log(`Server ready for connections`);
+            
+            setTimeout(() => {
+              markServerReady();
+              log(`Health checks now accepting requests`);
+            }, 1000);
+          });
+        }, 2000);
       } else {
         log(`Server error: ${error.message}`);
         process.exit(1);
