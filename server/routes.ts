@@ -1,11 +1,15 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertCommentSchema, updateCommentSchema, deleteCommentSchema } from "@shared/schema";
+import { insertPropertySchema, insertCommentSchema, updateCommentSchema, deleteCommentSchema, insertUserSchema, loginUserSchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from "./cloudinary";
 import { migrateImagesToCloudinary } from "./migrate-images";
+import { sendEmailVerification, sendWelcomeEmail } from "./email";
+import session from "express-session";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
 
 // Multer 설정 (메모리 저장소 사용)
 const upload = multer({ 
@@ -20,6 +24,68 @@ let isServerReady = false;
 let serverStartTime = Date.now();
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Session configuration
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'housing-buddy-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // HTTPS에서는 true로 설정
+      maxAge: 24 * 60 * 60 * 1000 // 24시간
+    }
+  }));
+
+  // Passport initialization
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  // Passport Local Strategy
+  passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+  }, async (email, password, done) => {
+    try {
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return done(null, false, { message: '등록되지 않은 이메일입니다.' });
+      }
+
+      if (!user.isEmailVerified) {
+        return done(null, false, { message: '이메일 인증이 필요합니다.' });
+      }
+
+      const isValidPassword = await storage.verifyPassword(password, user.password);
+      if (!isValidPassword) {
+        return done(null, false, { message: '비밀번호가 올바르지 않습니다.' });
+      }
+
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
+  }));
+
+  // Passport serialization
+  passport.serializeUser((user: any, done) => {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser(async (id: number, done) => {
+    try {
+      const user = await storage.getUserById(id);
+      done(null, user);
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  // Middleware to check if user is authenticated
+  const requireAuth = (req: Request, res: Response, next: any) => {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.status(401).json({ message: '로그인이 필요합니다.' });
+  };
   // Health check endpoint specifically for deployment health checks
   app.get("/health", (req, res) => {
     const uptime = Date.now() - serverStartTime;
@@ -46,6 +112,196 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Additional health check endpoint for API
   app.get("/api/health", (req, res) => {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  // User Authentication Routes
+  
+  // User registration
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "이미 등록된 이메일입니다." });
+      }
+
+      // Create user
+      const user = await storage.createUser(userData);
+      
+      // Generate verification link
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? `https://${req.get('host')}` 
+        : `http://${req.get('host')}`;
+      const verificationLink = `${baseUrl}/verify-email?token=${user.emailVerificationToken}&userId=${user.id}`;
+      
+      // Send verification email
+      const emailSent = await sendEmailVerification({
+        to: user.email,
+        verificationCode: user.emailVerificationToken!.substring(0, 6).toUpperCase(),
+        verificationLink
+      });
+
+      if (!emailSent) {
+        console.warn("Failed to send verification email to:", user.email);
+      }
+
+      res.status(201).json({ 
+        message: "회원가입이 완료되었습니다. 이메일을 확인하여 인증을 완료해주세요.",
+        userId: user.id,
+        email: user.email,
+        emailSent 
+      });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          message: "입력 정보가 올바르지 않습니다.",
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ message: "회원가입 중 오류가 발생했습니다." });
+    }
+  });
+
+  // Email verification
+  app.get("/api/auth/verify-email", async (req: Request, res: Response) => {
+    try {
+      const { token, userId } = req.query;
+      
+      if (!token || !userId) {
+        return res.status(400).json({ message: "유효하지 않은 인증 링크입니다." });
+      }
+
+      const isValidToken = await storage.verifyEmailToken(Number(userId), String(token));
+      if (!isValidToken) {
+        return res.status(400).json({ message: "만료되거나 유효하지 않은 인증 토큰입니다." });
+      }
+
+      // Update user verification status
+      const updatedUser = await storage.updateUserVerification(Number(userId), true);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+      }
+
+      // Send welcome email
+      await sendWelcomeEmail({
+        to: updatedUser.email,
+        userName: updatedUser.name
+      });
+
+      res.json({ 
+        message: "이메일 인증이 완료되었습니다. 이제 로그인할 수 있습니다.",
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          name: updatedUser.name,
+          isEmailVerified: updatedUser.isEmailVerified
+        }
+      });
+    } catch (error) {
+      console.error("Email verification error:", error);
+      res.status(500).json({ message: "이메일 인증 중 오류가 발생했습니다." });
+    }
+  });
+
+  // User login
+  app.post("/api/auth/login", (req: Request, res: Response, next) => {
+    passport.authenticate('local', (err: any, user: any, info: any) => {
+      if (err) {
+        return res.status(500).json({ message: "로그인 중 오류가 발생했습니다." });
+      }
+      if (!user) {
+        return res.status(401).json({ message: info.message || "로그인에 실패했습니다." });
+      }
+      
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.status(500).json({ message: "로그인 중 오류가 발생했습니다." });
+        }
+        return res.json({
+          message: "로그인 성공",
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            isEmailVerified: user.isEmailVerified
+          }
+        });
+      });
+    })(req, res, next);
+  });
+
+  // User logout
+  app.post("/api/auth/logout", (req: Request, res: Response) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: "로그아웃 중 오류가 발생했습니다." });
+      }
+      res.json({ message: "로그아웃 되었습니다." });
+    });
+  });
+
+  // Get current user
+  app.get("/api/auth/me", (req: Request, res: Response) => {
+    if (req.isAuthenticated()) {
+      const user = req.user as any;
+      res.json({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        isEmailVerified: user.isEmailVerified
+      });
+    } else {
+      res.status(401).json({ message: "로그인이 필요합니다." });
+    }
+  });
+
+  // Resend verification email
+  app.post("/api/auth/resend-verification", async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "이메일이 필요합니다." });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "등록되지 않은 이메일입니다." });
+      }
+
+      if (user.isEmailVerified) {
+        return res.status(400).json({ message: "이미 인증된 계정입니다." });
+      }
+
+      // Generate new verification token
+      const newToken = storage.generateEmailVerificationToken();
+      
+      // Update user with new token (this would need a new storage method)
+      // For now, we'll use the existing token
+      
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? `https://${req.get('host')}` 
+        : `http://${req.get('host')}`;
+      const verificationLink = `${baseUrl}/verify-email?token=${user.emailVerificationToken}&userId=${user.id}`;
+      
+      const emailSent = await sendEmailVerification({
+        to: user.email,
+        verificationCode: user.emailVerificationToken!.substring(0, 6).toUpperCase(),
+        verificationLink
+      });
+
+      if (!emailSent) {
+        return res.status(500).json({ message: "이메일 발송에 실패했습니다." });
+      }
+
+      res.json({ message: "인증 이메일을 다시 발송했습니다." });
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      res.status(500).json({ message: "인증 이메일 재발송 중 오류가 발생했습니다." });
+    }
   });
 
   // Upload image to Cloudinary
