@@ -107,6 +107,23 @@ export default function Home() {
         }
       }
       
+      // UI 텍스트 번역 추가 (인사말 포함)
+      if (targetLang !== 'ko') {
+        const uiTexts = [
+          { key: 'greeting-suffix', text: '님 안녕하세요!' },
+        ];
+        
+        for (const uiText of uiTexts) {
+          try {
+            const result = await translateText(uiText.text, targetLang);
+            translations[uiText.key] = result.translatedText;
+          } catch (error) {
+            console.error(`Failed to translate ${uiText.key}:`, error);
+            translations[uiText.key] = uiText.text;
+          }
+        }
+      }
+      
       return translations;
     },
     onSuccess: (translations) => {
@@ -172,7 +189,8 @@ export default function Home() {
       '개의 매물이 등록되어 있습니다': 'properties are listed',
       '총': 'Total',
       '매물이 없습니다': 'No properties available',
-      '검색 결과가 없습니다': 'No search results found'
+      '검색 결과가 없습니다': 'No search results found',
+      '님 안녕하세요!': ', Hello!'
     };
     
     return uiTranslations[koreanText] || koreanText;

@@ -6,6 +6,7 @@ import { Home, Plus, Menu, User, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 import AdminLogin from "./admin-login";
 import AdminPanel from "./admin-panel";
@@ -31,6 +32,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const { user, isAuthenticated, logout } = useAuth();
   const { toast } = useToast();
   const { isAdmin } = useAdmin();
+  const { getTranslatedText, isTranslated } = useTranslation();
 
   const navItems = [
     { href: "/", label: "매물 보기", active: location === "/", id: "home" },
@@ -159,11 +161,13 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
               </Button>
             )}
             
-            {/* 모바일에서 사용자 아이콘 표시 */}
+            {/* 모바일에서 사용자 인사말 또는 로그인 아이콘 표시 */}
             {isAuthenticated ? (
-              <Button variant="ghost" size="icon" onClick={handleLogout}>
-                <User className="h-5 w-5" />
-              </Button>
+              <div className="flex items-center text-sm text-neutral-700 bg-neutral-50 px-3 py-1 rounded-full">
+                <span className="font-medium">
+                  {user?.name}{getTranslatedText("님 안녕하세요!", "greeting-suffix")}
+                </span>
+              </div>
             ) : (
               <Button variant="ghost" size="icon" onClick={handleLogin}>
                 <User className="h-5 w-5" />
