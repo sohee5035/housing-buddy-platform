@@ -6,7 +6,7 @@ import { Home, Plus, Menu, User, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
-import ImprovedAuthModal from "./improved-auth-modal";
+import SimpleAuthModal from "./simple-auth-modal";
 import AdminLogin from "./admin-login";
 import AdminPanel from "./admin-panel";
 import {
@@ -263,8 +263,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         </div>
       </div>
       
-      {/* Improved Auth Modal */}
-      <ImprovedAuthModal 
+      {/* Simple Auth Modal */}
+      <SimpleAuthModal 
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)}
       />

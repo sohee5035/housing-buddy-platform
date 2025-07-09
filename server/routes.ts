@@ -304,6 +304,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send verification code for one-page registration
+  app.post("/api/auth/send-verification", async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email || !z.string().email().safeParse(email).success) {
+        return res.status(400).json({ message: "유효한 이메일을 입력해주세요." });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "이미 등록된 이메일입니다." });
+      }
+
+      // Generate verification code
+      const verificationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      // Store verification code temporarily (in production, use Redis or database)
+      // For now, we'll use a simple in-memory storage
+      global.tempVerificationCodes = global.tempVerificationCodes || {};
+      global.tempVerificationCodes[email] = {
+        code: verificationCode,
+        expires: Date.now() + 10 * 60 * 1000 // 10 minutes
+      };
+
+      // Send verification email
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? `https://${req.get('host')}` 
+        : `http://${req.get('host')}`;
+      const verificationLink = `${baseUrl}/verify-email?code=${verificationCode}&email=${encodeURIComponent(email)}`;
+      
+      const emailSent = await sendEmailVerification({
+        to: email,
+        verificationCode,
+        verificationLink
+      });
+
+      if (!emailSent) {
+        return res.status(500).json({ message: "이메일 발송에 실패했습니다." });
+      }
+
+      res.json({ 
+        message: "인증번호를 발송했습니다. 이메일을 확인해주세요.",
+        email 
+      });
+    } catch (error) {
+      console.error("Send verification error:", error);
+      res.status(500).json({ message: "인증번호 발송 중 오류가 발생했습니다." });
+    }
+  });
+
+  // Verify code and register user
+  app.post("/api/auth/verify-and-register", async (req: Request, res: Response) => {
+    try {
+      const { email, password, name, phone, verificationCode } = req.body;
+      
+      // Validate input
+      if (!email || !password || !name || !verificationCode) {
+        return res.status(400).json({ message: "필수 정보가 누락되었습니다." });
+      }
+
+      // Check verification code
+      global.tempVerificationCodes = global.tempVerificationCodes || {};
+      const storedCode = global.tempVerificationCodes[email];
+      
+      if (!storedCode || storedCode.expires < Date.now()) {
+        return res.status(400).json({ message: "인증번호가 만료되었습니다. 다시 요청해주세요." });
+      }
+      
+      if (storedCode.code !== verificationCode.toUpperCase()) {
+        return res.status(400).json({ message: "인증번호가 올바르지 않습니다." });
+      }
+
+      // Check if user already exists (double check)
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "이미 등록된 이메일입니다." });
+      }
+
+      // Create user with email already verified
+      const userData = {
+        email,
+        password,
+        name,
+        phone: phone || undefined,
+        isEmailVerified: true // Since we verified via code
+      };
+
+      const user = await storage.createUser(userData);
+      
+      // Clean up verification code
+      delete global.tempVerificationCodes[email];
+      
+      // Send welcome email
+      await sendWelcomeEmail({
+        to: user.email,
+        userName: user.name
+      });
+
+      res.status(201).json({ 
+        message: "회원가입이 완료되었습니다. 환영합니다!",
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          isEmailVerified: user.isEmailVerified
+        }
+      });
+    } catch (error) {
+      console.error("Verify and register error:", error);
+      res.status(500).json({ message: "회원가입 중 오류가 발생했습니다." });
+    }
+  });
+
   // Upload image to Cloudinary
   app.post("/api/upload-image", upload.single('image'), async (req, res) => {
     try {
