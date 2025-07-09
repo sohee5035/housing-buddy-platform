@@ -6,7 +6,7 @@ import { Home, Plus, Menu, User, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
-import AuthModal from "./auth-modal";
+import ImprovedAuthModal from "./improved-auth-modal";
 import AdminLogin from "./admin-login";
 import AdminPanel from "./admin-panel";
 import {
@@ -25,7 +25,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authModalTab, setAuthModalTab] = useState<"login" | "register">("login");
+
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   
   const { user, isAuthenticated, logout } = useAuth();
@@ -40,12 +40,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   ];
 
   const handleLogin = () => {
-    setAuthModalTab("login");
-    setShowAuthModal(true);
-  };
-
-  const handleRegister = () => {
-    setAuthModalTab("register");
     setShowAuthModal(true);
   };
 
@@ -143,26 +137,9 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" onClick={handleLogin}>
-                  로그인
-                </Button>
-                <Button onClick={handleRegister}>
-                  회원가입
-                </Button>
-              </div>
-            )}
-
-            {/* 디버깅: 항상 보이는 로그인/회원가입 버튼 */}
-            {!isAuthenticated && (
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" onClick={handleLogin}>
-                  로그인
-                </Button>
-                <Button onClick={handleRegister}>
-                  회원가입
-                </Button>
-              </div>
+              <Button variant="ghost" size="icon" onClick={handleLogin}>
+                <User className="h-5 w-5" />
+              </Button>
             )}
           </div>
 
@@ -266,25 +243,14 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                       <>
                         <Button 
                           variant="outline" 
-                          className="w-full mb-2"
+                          className="w-full"
                           onClick={() => {
                             handleLogin();
                             setIsMobileMenuOpen(false);
                           }}
                         >
                           <User className="h-4 w-4 mr-2" />
-                          로그인
-                        </Button>
-                        
-                        <Button 
-                          className="w-full"
-                          onClick={() => {
-                            handleRegister();
-                            setIsMobileMenuOpen(false);
-                          }}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          회원가입
+                          로그인 / 회원가입
                         </Button>
                       </>
                     )}
@@ -296,11 +262,10 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         </div>
       </div>
       
-      {/* Auth Modal */}
-      <AuthModal 
+      {/* Improved Auth Modal */}
+      <ImprovedAuthModal 
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)}
-        defaultTab={authModalTab}
       />
       
       {/* Admin Login Modal */}
