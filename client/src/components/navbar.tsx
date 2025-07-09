@@ -146,7 +146,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
           </div>
 
           {/* Mobile Menu */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="md:hidden flex items-center space-x-0.5">
             {/* 관리자인 경우에만 모바일 매물 등록 버튼 표시 */}
             {isAuthenticated && isAdmin && (
               <Button
@@ -156,6 +156,17 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 className="border-primary text-primary"
               >
                 <Plus className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {/* 모바일에서 사용자 아이콘 표시 */}
+            {isAuthenticated ? (
+              <Button variant="ghost" size="icon" onClick={handleLogout}>
+                <User className="h-5 w-5" />
+              </Button>
+            ) : (
+              <Button variant="ghost" size="icon" onClick={handleLogin}>
+                <User className="h-5 w-5" />
               </Button>
             )}
             
