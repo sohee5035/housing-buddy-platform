@@ -1,3 +1,4 @@
+import * as React from "react"
 import { useToast } from "@/hooks/use-toast"
 import {
   Toast,
@@ -12,15 +13,24 @@ export function Toaster() {
   const { toasts } = useToast()
 
   return (
-    <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+    <ToastProvider duration={2000}>
+      {toasts.map(function ({ id, title, description, action, duration = 2000, ...props }) {
         return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
+          <Toast key={id} duration={duration} {...props}>
+            <div className="grid gap-1 w-full">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
               )}
+              {/* 진행 바 */}
+              <div className="w-full bg-gray-200/30 rounded-full h-1 mt-2 overflow-hidden">
+                <div 
+                  className="h-full bg-current rounded-full toast-progress-bar"
+                  style={{
+                    animationDuration: `${duration}ms`
+                  }}
+                />
+              </div>
             </div>
             {action}
             <ToastClose />

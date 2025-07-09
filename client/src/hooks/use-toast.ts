@@ -5,8 +5,8 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_LIMIT = 3
+const TOAST_REMOVE_DELAY = 300 // 300ms 애니메이션 후 제거
 
 type ToasterToast = ToastProps & {
   id: string
@@ -155,7 +155,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      duration: props.duration ?? 2000, // 기본 2초로 설정 (기존은 5초)
+      duration: props.duration ?? 2000, // 기본 2초로 설정
       onOpenChange: (open) => {
         if (!open) dismiss()
       },
