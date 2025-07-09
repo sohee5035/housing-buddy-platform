@@ -10,6 +10,7 @@ import { sendEmailVerification, sendWelcomeEmail } from "./email";
 import session from "express-session";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import connectPgSimple from "connect-pg-simple";
 
 // Multer 설정 (메모리 저장소 사용)
 const upload = multer({ 
@@ -24,8 +25,14 @@ let isServerReady = false;
 let serverStartTime = Date.now();
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session configuration
+  // Session configuration with PostgreSQL store
+  const PgSession = connectPgSimple(session);
   app.use(session({
+    store: new PgSession({
+      conString: process.env.DATABASE_URL,
+      tableName: 'sessions',
+      createTableIfMissing: true
+    }),
     secret: process.env.SESSION_SECRET || 'housing-buddy-secret-key',
     resave: false,
     saveUninitialized: false,
