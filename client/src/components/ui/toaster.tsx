@@ -23,9 +23,9 @@ export function Toaster() {
                 <ToastDescription>{description}</ToastDescription>
               )}
               {/* 진행 바 */}
-              <div className="w-full bg-gray-200/30 rounded-full h-1 mt-2 overflow-hidden">
+              <div className="w-full bg-gray-100/50 rounded-full h-1.5 mt-2 overflow-hidden">
                 <div 
-                  className="h-full bg-current rounded-full toast-progress-bar"
+                  className="h-full rounded-full toast-progress-bar"
                   style={{
                     animationDuration: `${duration}ms`
                   }}
