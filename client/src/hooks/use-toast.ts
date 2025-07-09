@@ -155,7 +155,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      duration: props.duration ?? 2000, // 기본 2초로 설정
+      duration: props.duration ?? 5000, // 기본 5초로 설정
       onOpenChange: (open) => {
         if (!open) dismiss()
       },
