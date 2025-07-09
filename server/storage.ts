@@ -1,6 +1,8 @@
-import { properties, comments, type Property, type InsertProperty, type Comment, type InsertComment, type UpdateComment, type DeleteComment } from "@shared/schema";
+import { properties, comments, users, type Property, type InsertProperty, type Comment, type InsertComment, type UpdateComment, type DeleteComment, type User, type InsertUser, type LoginUser } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 export interface IStorage {
   // Property methods
@@ -24,6 +26,15 @@ export interface IStorage {
   getCommentForEdit(id: number, password: string): Promise<Comment | undefined>; // 수정용 댓글 조회
   getAllCommentsForAdmin(): Promise<Comment[]>; // 관리자용 전체 문의 조회
   updateAdminMemo(id: number, memo: string): Promise<Comment | undefined>; // 관리자 메모 업데이트
+  
+  // User authentication methods
+  createUser(userData: InsertUser): Promise<User>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserById(id: number): Promise<User | undefined>;
+  verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean>;
+  generateEmailVerificationToken(): string;
+  verifyEmailToken(userId: number, token: string): Promise<boolean>;
+  updateUserVerification(userId: number, isVerified: boolean): Promise<User | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -143,10 +154,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateComment(id: number, updateData: UpdateComment): Promise<Comment | undefined> {
-    // 비밀번호 확인
-    const isValid = await this.verifyCommentPassword(id, updateData.password);
-    if (!isValid) {
-      throw new Error("잘못된 비밀번호입니다.");
+    // 비밀번호가 제공된 경우에만 확인 (로그인 사용자는 비밀번호 불필요)
+    if (updateData.password) {
+      const isValid = await this.verifyCommentPassword(id, updateData.password);
+      if (!isValid) {
+        throw new Error("잘못된 비밀번호입니다.");
+      }
     }
 
     const [result] = await db
@@ -172,10 +185,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCommentWithPassword(id: number, deleteData: DeleteComment): Promise<boolean> {
-    // 비밀번호 확인
-    const isValid = await this.verifyCommentPassword(id, deleteData.password);
-    if (!isValid) {
-      throw new Error("잘못된 비밀번호입니다.");
+    // 비밀번호가 제공된 경우에만 확인 (로그인 사용자는 비밀번호 불필요)
+    if (deleteData.password) {
+      const isValid = await this.verifyCommentPassword(id, deleteData.password);
+      if (!isValid) {
+        throw new Error("잘못된 비밀번호입니다.");
+      }
     }
 
     const [result] = await db
@@ -230,6 +245,77 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return updatedComment;
+  }
+
+  // User authentication methods
+  async createUser(userData: InsertUser): Promise<User> {
+    // 비밀번호 해시화
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+    
+    // 이메일 인증 토큰 생성
+    const emailVerificationToken = this.generateEmailVerificationToken();
+    
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...userData,
+        password: hashedPassword,
+        emailVerificationToken,
+        isEmailVerified: 0,
+      })
+      .returning();
+    
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email));
+    
+    return user || undefined;
+  }
+
+  async getUserById(id: number): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id));
+    
+    return user || undefined;
+  }
+
+  async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+    return await bcrypt.compare(plainPassword, hashedPassword);
+  }
+
+  generateEmailVerificationToken(): string {
+    return crypto.randomBytes(32).toString('hex');
+  }
+
+  async verifyEmailToken(userId: number, token: string): Promise<boolean> {
+    const [user] = await db
+      .select({ emailVerificationToken: users.emailVerificationToken })
+      .from(users)
+      .where(eq(users.id, userId));
+    
+    return user?.emailVerificationToken === token;
+  }
+
+  async updateUserVerification(userId: number, isVerified: boolean): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ 
+        isEmailVerified: isVerified ? 1 : 0,
+        emailVerificationToken: null,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return updatedUser;
   }
 }
 

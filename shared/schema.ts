@@ -29,7 +29,7 @@ export const insertPropertySchema = createInsertSchema(properties).omit({
 export type InsertProperty = z.infer<typeof insertPropertySchema>;
 export type Property = typeof properties.$inferSelect;
 
-// Session storage table for Replit Auth
+// Session storage table
 export const sessions = pgTable(
   "sessions",
   {
@@ -40,18 +40,40 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table for Replit Auth
+// User storage table for email authentication
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(), // Replit user ID (string)
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  password: text("password").notNull(), // hashed password
+  firstName: varchar("first_name", { length: 100 }),
+  lastName: varchar("last_name", { length: 100 }),
+  isEmailVerified: integer("is_email_verified").default(0), // 0 = not verified, 1 = verified
+  emailVerificationToken: varchar("email_verification_token", { length: 255 }),
+  resetPasswordToken: varchar("reset_password_token", { length: 255 }),
+  resetPasswordExpires: timestamp("reset_password_expires"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export type UpsertUser = typeof users.$inferInsert;
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  emailVerificationToken: true,
+  resetPasswordToken: true,
+  resetPasswordExpires: true,
+}).extend({
+  email: z.string().email("올바른 이메일을 입력해주세요"),
+  password: z.string().min(6, "비밀번호는 최소 6자리 이상이어야 합니다"),
+});
+
+export const loginUserSchema = z.object({
+  email: z.string().email("올바른 이메일을 입력해주세요"),
+  password: z.string().min(1, "비밀번호를 입력해주세요"),
+});
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type LoginUser = z.infer<typeof loginUserSchema>;
 export type User = typeof users.$inferSelect;
 
 // Comments table
@@ -59,7 +81,7 @@ export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   propertyId: integer("property_id").notNull().references(() => properties.id),
   parentId: integer("parent_id"), // 대댓글을 위한 부모 댓글 ID - self reference 제거
-  userId: varchar("user_id").references(() => users.id), // 로그인한 사용자 ID (nullable for anonymous)
+  userId: integer("user_id").references(() => users.id), // 로그인한 사용자 ID (nullable for anonymous)
   authorName: text("author_name").notNull(),
   authorPassword: text("author_password").default("0000"), // 4자리 숫자 비밀번호 (익명 댓글용)
   authorContact: text("author_contact"), // 연락처 (관리자만 볼 수 있음)
