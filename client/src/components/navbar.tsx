@@ -101,10 +101,15 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
               </Button>
             )}
             
+            {/* 항상 보이는 사용자 아이콘 (디버깅용) */}
+            <Button variant="ghost" size="icon" onClick={handleLogin}>
+              <User className="h-5 w-5" />
+            </Button>
+            
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2">
+                  <Button variant="outline" className="flex items-center space-x-2">
                     <User className="h-5 w-5" />
                     <span className="hidden lg:inline">{user?.name}</span>
                   </Button>
@@ -136,11 +141,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <Button variant="ghost" size="icon" onClick={handleLogin}>
-                <User className="h-5 w-5" />
-              </Button>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile Menu */}
