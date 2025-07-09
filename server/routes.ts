@@ -50,9 +50,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return done(null, false, { message: '등록되지 않은 이메일입니다.' });
       }
 
-      if (!user.isEmailVerified) {
-        return done(null, false, { message: '이메일 인증이 필요합니다.' });
-      }
+      // 이메일 인증 체크 제거 (도메인 구매 전까지 비활성화)
+      // if (!user.isEmailVerified) {
+      //   return done(null, false, { message: '이메일 인증이 필요합니다.' });
+      // }
 
       const isValidPassword = await storage.verifyPassword(password, user.password);
       if (!isValidPassword) {
