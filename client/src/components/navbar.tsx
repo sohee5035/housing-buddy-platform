@@ -152,6 +152,18 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 </Button>
               </div>
             )}
+
+            {/* 디버깅: 항상 보이는 로그인/회원가입 버튼 */}
+            {!isAuthenticated && (
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" onClick={handleLogin}>
+                  로그인
+                </Button>
+                <Button onClick={handleRegister}>
+                  회원가입
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu */}
