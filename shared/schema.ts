@@ -72,14 +72,13 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginUser = z.infer<typeof loginUserSchema>;
 export type User = typeof users.$inferSelect;
 
-// Comments table
+// Comments table (members only)
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   propertyId: integer("property_id").notNull().references(() => properties.id),
   parentId: integer("parent_id"), // 대댓글을 위한 부모 댓글 ID - self reference 제거
-  userId: integer("user_id").references(() => users.id), // 로그인한 사용자 ID (nullable for anonymous)
+  userId: integer("user_id").notNull().references(() => users.id), // 로그인한 사용자 ID (required for members)
   authorName: text("author_name").notNull(),
-  authorPassword: text("author_password").default("0000"), // 4자리 숫자 비밀번호 (익명 댓글용)
   authorContact: text("author_contact"), // 연락처 (관리자만 볼 수 있음)
   content: text("content").notNull(),
   isAdminOnly: integer("is_admin_only").default(0), // 1 = 관리자만 볼 수 있음
@@ -110,21 +109,17 @@ export const insertCommentSchema = createInsertSchema(comments).omit({
   createdAt: true,
   updatedAt: true,
   isDeleted: true,
-}).extend({
-  // authorPassword는 로그인한 사용자의 경우 선택사항으로 만듦
-  authorPassword: z.string().optional(),
+  userId: true, // 서버에서 자동으로 할당
 });
 
 export const updateCommentSchema = createInsertSchema(comments).pick({
   content: true,
   authorContact: true,
   isAdminOnly: true,
-}).extend({
-  password: z.string().optional(), // 로그인한 사용자는 비밀번호 불필요
 });
 
 export const deleteCommentSchema = z.object({
-  password: z.string().optional(), // 로그인한 사용자는 비밀번호 불필요
+  // 회원 전용에서는 비밀번호 필요 없음
 });
 
 export type InsertComment = z.infer<typeof insertCommentSchema>;

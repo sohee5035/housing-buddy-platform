@@ -729,20 +729,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create a comment
-  app.post("/api/properties/:id/comments", async (req: Request, res: Response) => {
+  // Create a comment (members only)
+  app.post("/api/properties/:id/comments", requireAuth, async (req: Request, res: Response) => {
     try {
       const propertyId = parseInt(req.params.id);
       if (isNaN(propertyId)) {
         return res.status(400).json({ message: "Invalid property ID" });
       }
 
+      const user = req.user as any;
       const validatedData = insertCommentSchema.parse({
         ...req.body,
-        propertyId
+        propertyId,
+        authorName: user.name, // 로그인한 사용자 이름 사용
       });
 
-      const comment = await storage.createComment(validatedData);
+      const comment = await storage.createComment({
+        ...validatedData,
+        userId: user.id
+      });
       res.status(201).json(comment);
     } catch (error: any) {
       if (error.name === "ZodError") {
@@ -753,8 +758,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update a comment
-  app.put("/api/comments/:id", async (req: Request, res: Response) => {
+  // Update a comment (members only)
+  app.put("/api/comments/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const commentId = parseInt(req.params.id);
       if (isNaN(commentId)) {
@@ -773,44 +778,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error.name === "ZodError") {
         return res.status(400).json({ message: "Invalid comment data", errors: error.errors });
       }
-      if (error.message === "잘못된 비밀번호입니다.") {
-        return res.status(401).json({ message: error.message });
-      }
       console.error("Error updating comment:", error);
       res.status(500).json({ message: "Failed to update comment" });
     }
   });
 
-  // Delete a comment with password (user)
-  app.post("/api/comments/:id/delete", async (req: Request, res: Response) => {
-    try {
-      const commentId = parseInt(req.params.id);
-      if (isNaN(commentId)) {
-        return res.status(400).json({ message: "Invalid comment ID" });
-      }
 
-      const validatedData = deleteCommentSchema.parse(req.body);
-      const success = await storage.deleteCommentWithPassword(commentId, validatedData);
-      
-      if (!success) {
-        return res.status(404).json({ message: "Comment not found" });
-      }
-      
-      res.json({ message: "Comment deleted successfully" });
-    } catch (error: any) {
-      if (error.name === "ZodError") {
-        return res.status(400).json({ message: "Invalid password data", errors: error.errors });
-      }
-      if (error.message === "잘못된 비밀번호입니다.") {
-        return res.status(401).json({ message: error.message });
-      }
-      console.error("Error deleting comment:", error);
-      res.status(500).json({ message: "Failed to delete comment" });
-    }
-  });
 
-  // Delete a comment (admin only)
-  app.delete("/api/comments/:id", async (req: Request, res: Response) => {
+  // Delete a comment (members only for own comments, admin for all)
+  app.delete("/api/comments/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const commentId = parseInt(req.params.id);
       if (isNaN(commentId)) {
@@ -829,33 +805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get comment for editing (with password verification)
-  app.post("/api/comments/:id/edit", async (req: Request, res: Response) => {
-    try {
-      const commentId = parseInt(req.params.id);
-      if (isNaN(commentId)) {
-        return res.status(400).json({ message: "Invalid comment ID" });
-      }
 
-      const { password } = req.body;
-      if (!password || password.length !== 4) {
-        return res.status(400).json({ message: "Invalid password" });
-      }
-
-      const comment = await storage.getCommentForEdit(commentId, password);
-      if (!comment) {
-        return res.status(404).json({ message: "Comment not found" });
-      }
-      
-      res.json(comment);
-    } catch (error: any) {
-      if (error.message === "잘못된 비밀번호입니다.") {
-        return res.status(401).json({ message: error.message });
-      }
-      console.error("Error getting comment for edit:", error);
-      res.status(500).json({ message: "Failed to get comment" });
-    }
-  });
 
   // Update admin memo (이 라우트를 먼저 배치)
   app.put("/api/admin/comments/:id/memo", async (req: Request, res: Response) => {

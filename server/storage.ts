@@ -151,23 +151,18 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async createComment(comment: InsertComment): Promise<Comment> {
+  async createComment(comment: InsertComment & { userId: number }): Promise<Comment> {
     const [result] = await db
       .insert(comments)
-      .values(comment)
+      .values({
+        ...comment,
+        userId: comment.userId,
+      })
       .returning();
     return result;
   }
 
   async updateComment(id: number, updateData: UpdateComment): Promise<Comment | undefined> {
-    // 비밀번호가 제공된 경우에만 확인 (로그인 사용자는 비밀번호 불필요)
-    if (updateData.password) {
-      const isValid = await this.verifyCommentPassword(id, updateData.password);
-      if (!isValid) {
-        throw new Error("잘못된 비밀번호입니다.");
-      }
-    }
-
     const [result] = await db
       .update(comments)
       .set({
@@ -191,13 +186,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCommentWithPassword(id: number, deleteData: DeleteComment): Promise<boolean> {
-    // 비밀번호가 제공된 경우에만 확인 (로그인 사용자는 비밀번호 불필요)
-    if (deleteData.password) {
-      const isValid = await this.verifyCommentPassword(id, deleteData.password);
-      if (!isValid) {
-        throw new Error("잘못된 비밀번호입니다.");
-      }
-    }
+    // 회원 전용 시스템에서는 비밀번호 확인 불필요
 
     const [result] = await db
       .update(comments)
