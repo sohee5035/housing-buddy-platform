@@ -1,6 +1,7 @@
-import { pgTable, text, serial, integer, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, jsonb, timestamp, varchar, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 export const properties = pgTable("properties", {
   id: serial("id").primaryKey(),
@@ -28,27 +29,39 @@ export const insertPropertySchema = createInsertSchema(properties).omit({
 export type InsertProperty = z.infer<typeof insertPropertySchema>;
 export type Property = typeof properties.$inferSelect;
 
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table for Replit Auth
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  id: varchar("id").primaryKey().notNull(), // Replit user ID (string)
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
-
-export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
 // Comments table
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   propertyId: integer("property_id").notNull().references(() => properties.id),
-  parentId: integer("parent_id").references(() => comments.id), // 대댓글을 위한 부모 댓글 ID
+  parentId: integer("parent_id"), // 대댓글을 위한 부모 댓글 ID - self reference 제거
+  userId: varchar("user_id").references(() => users.id), // 로그인한 사용자 ID (nullable for anonymous)
   authorName: text("author_name").notNull(),
-  authorPassword: text("author_password").notNull().default("0000"), // 4자리 숫자 비밀번호
+  authorPassword: text("author_password").default("0000"), // 4자리 숫자 비밀번호 (익명 댓글용)
   authorContact: text("author_contact"), // 연락처 (관리자만 볼 수 있음)
   content: text("content").notNull(),
   isAdminOnly: integer("is_admin_only").default(0), // 1 = 관리자만 볼 수 있음
@@ -58,11 +71,30 @@ export const comments = pgTable("comments", {
   isDeleted: integer("is_deleted").default(0), // 0 = active, 1 = deleted
 });
 
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  comments: many(comments),
+}));
+
+export const commentsRelations = relations(comments, ({ one }) => ({
+  user: one(users, {
+    fields: [comments.userId],
+    references: [users.id],
+  }),
+  property: one(properties, {
+    fields: [comments.propertyId],
+    references: [properties.id],
+  }),
+}));
+
 export const insertCommentSchema = createInsertSchema(comments).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
   isDeleted: true,
+}).extend({
+  // authorPassword는 로그인한 사용자의 경우 선택사항으로 만듦
+  authorPassword: z.string().optional(),
 });
 
 export const updateCommentSchema = createInsertSchema(comments).pick({
@@ -70,11 +102,11 @@ export const updateCommentSchema = createInsertSchema(comments).pick({
   authorContact: true,
   isAdminOnly: true,
 }).extend({
-  password: z.string().length(4, "비밀번호는 4자리 숫자여야 합니다."),
+  password: z.string().optional(), // 로그인한 사용자는 비밀번호 불필요
 });
 
 export const deleteCommentSchema = z.object({
-  password: z.string().length(4, "비밀번호는 4자리 숫자여야 합니다."),
+  password: z.string().optional(), // 로그인한 사용자는 비밀번호 불필요
 });
 
 export type InsertComment = z.infer<typeof insertCommentSchema>;
