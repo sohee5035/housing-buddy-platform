@@ -16,6 +16,7 @@ import { useTranslation } from "@/contexts/TranslationContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import AdminLogin from "@/components/admin-login";
 import AdminPanel from "@/components/admin-panel";
+import Navbar from "@/components/navbar";
 import { translateText, supportedLanguages } from "@/lib/translate";
 import { useToast } from "@/hooks/use-toast";
 
@@ -203,26 +204,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
+      {/* Navbar */}
+      <Navbar onCreateListing={() => setShowCreateModal(true)} />
+      
+      {/* Header with Admin Controls */}
+      <header className="bg-white shadow-sm border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Title Row */}
-          <div className="flex items-center justify-between py-4 border-b border-neutral-100">
-            <div className="flex items-center gap-3">
-              <button 
-                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = "/";
-                }}
-              >
-                <HomeIcon className="h-8 w-8 text-primary mr-3" />
-                <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
-              </button>
-            </div>
-            
-            {/* Admin Status Indicator */}
-            {isAdmin && (
+          {/* Admin Status Indicator */}
+          {isAdmin && (
+            <div className="flex items-center justify-end py-2">
               <AdminPanel
                 trigger={
                   <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">
@@ -242,8 +232,8 @@ export default function Home() {
                   });
                 }}
               />
-            )}
-          </div>
+            </div>
+          )}
           
           {/* Controls Row */}
           <div className="flex flex-wrap items-center justify-between gap-3 py-3">
