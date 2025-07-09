@@ -103,6 +103,7 @@ export default function SignupPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           name: data.name,
           email: data.email,
@@ -118,15 +119,32 @@ export default function SignupPage() {
 
       const result = await response.json();
       
-      toast({
-        title: "회원가입 성공",
-        description: "계정이 생성되었습니다. 로그인해주세요.",
-      });
-      
-      // 로그인 탭으로 전환하고 이메일 자동 입력
-      setActiveTab("login");
-      loginForm.setValue("email", data.email);
-      registrationForm.reset();
+      // 회원가입 성공 후 자동으로 로그인 시도
+      try {
+        await login({
+          email: data.email,
+          password: data.password,
+        });
+        
+        toast({
+          title: "회원가입 및 로그인 성공",
+          description: "Housing Buddy에 오신 것을 환영합니다!",
+        });
+        
+        setLocation("/");
+        
+      } catch (loginError: any) {
+        // 자동 로그인 실패 시 수동 로그인 유도
+        toast({
+          title: "회원가입 성공",
+          description: "계정이 생성되었습니다. 로그인해주세요.",
+        });
+        
+        // 로그인 탭으로 전환하고 이메일 자동 입력
+        setActiveTab("login");
+        loginForm.setValue("email", data.email);
+        registrationForm.reset();
+      }
       
     } catch (error: any) {
       toast({
