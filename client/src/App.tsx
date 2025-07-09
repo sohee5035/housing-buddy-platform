@@ -8,6 +8,7 @@ import { AdminProvider } from "@/contexts/AdminContext";
 import Footer from "@/components/footer";
 import Home from "@/pages/home";
 import PropertyDetail from "@/pages/property-detail";
+import Favorites from "@/pages/favorites";
 import Trash from "@/pages/trash";
 import AdminComments from "@/pages/admin-comments";
 import VerifyEmail from "@/pages/verify-email";
@@ -20,6 +21,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/property/:id" component={PropertyDetail} />
+      <Route path="/favorites" component={Favorites} />
       <Route path="/signup" component={SignupPage} />
       <Route path="/trash" component={Trash} />
       <Route path="/admin/comments" component={AdminComments} />

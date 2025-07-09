@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, Plus, Menu, User, LogOut, Settings } from "lucide-react";
+import { Home, Plus, Menu, User, LogOut, Settings, Heart } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -36,9 +36,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
   const navItems = [
     { href: "/", label: "매물 보기", active: location === "/", id: "home" },
-    { href: "#favorites", label: "즐겨찾기", id: "favorites" },
-    { href: "#inquiries", label: "문의 내역", id: "inquiries" },
-    { href: "#help", label: "도움말", id: "help" },
+    { href: "/favorites", label: "관심 매물", active: location === "/favorites", id: "favorites" },
   ];
 
   const handleLogin = () => {
@@ -122,9 +120,11 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                     <Settings className="h-4 w-4 mr-2" />
                     계정 설정
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Home className="h-4 w-4 mr-2" />
-                    즐겨찾기
+                  <DropdownMenuItem asChild>
+                    <Link href="/favorites" className="w-full flex items-center">
+                      <Heart className="h-4 w-4 mr-2" />
+                      관심 매물
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {!isAdmin && (

@@ -1,4 +1,4 @@
-import { properties, comments, users, type Property, type InsertProperty, type Comment, type InsertComment, type UpdateComment, type DeleteComment, type User, type InsertUser, type LoginUser } from "@shared/schema";
+import { properties, comments, users, favorites, type Property, type InsertProperty, type Comment, type InsertComment, type UpdateComment, type DeleteComment, type User, type InsertUser, type LoginUser, type Favorite, type InsertFavorite } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -35,6 +35,12 @@ export interface IStorage {
   generateEmailVerificationToken(): string;
   verifyEmailToken(userId: number, token: string): Promise<boolean>;
   updateUserVerification(userId: number, isVerified: boolean): Promise<User | undefined>;
+  
+  // Favorites methods
+  getUserFavorites(userId: number): Promise<Property[]>;
+  addToFavorites(userId: number, propertyId: number): Promise<Favorite>;
+  removeFromFavorites(userId: number, propertyId: number): Promise<boolean>;
+  isFavorite(userId: number, propertyId: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -316,6 +322,63 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return updatedUser;
+  }
+
+  // Favorites methods
+  async getUserFavorites(userId: number): Promise<Property[]> {
+    const result = await db
+      .select({
+        id: properties.id,
+        title: properties.title,
+        address: properties.address,
+        description: properties.description,
+        category: properties.category,
+        deposit: properties.deposit,
+        monthlyRent: properties.monthlyRent,
+        maintenanceFee: properties.maintenanceFee,
+        photos: properties.photos,
+        createdAt: properties.createdAt,
+        updatedAt: properties.updatedAt,
+        isDeleted: properties.isDeleted,
+        otherInfo: properties.otherInfo,
+        mapUrl: properties.mapUrl,
+        contactInfo: properties.contactInfo,
+      })
+      .from(properties)
+      .innerJoin(favorites, eq(properties.id, favorites.propertyId))
+      .where(and(eq(favorites.userId, userId), eq(properties.isDeleted, 0)))
+      .orderBy(desc(favorites.createdAt));
+
+    return result;
+  }
+
+  async addToFavorites(userId: number, propertyId: number): Promise<Favorite> {
+    const [favorite] = await db
+      .insert(favorites)
+      .values({
+        userId,
+        propertyId,
+      })
+      .returning();
+
+    return favorite;
+  }
+
+  async removeFromFavorites(userId: number, propertyId: number): Promise<boolean> {
+    const result = await db
+      .delete(favorites)
+      .where(and(eq(favorites.userId, userId), eq(favorites.propertyId, propertyId)));
+
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  async isFavorite(userId: number, propertyId: number): Promise<boolean> {
+    const [favorite] = await db
+      .select()
+      .from(favorites)
+      .where(and(eq(favorites.userId, userId), eq(favorites.propertyId, propertyId)));
+
+    return !!favorite;
   }
 }
 

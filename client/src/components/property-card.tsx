@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SmartTextWithTooltips from "@/components/smart-text-with-tooltips";
+import FavoriteButton from "@/components/favorite-button";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { 
   MapPin, 
@@ -22,7 +23,6 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({ property, onTranslate, viewMode = "grid" }: PropertyCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   const { 
@@ -66,19 +66,13 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
                 <Badge variant="secondary">임대</Badge>
               </div>
               
-              <div className="absolute top-3 right-3">
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="bg-white/80 backdrop-blur-sm w-8 h-8 z-10"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsFavorite(!isFavorite);
-                  }}
-                >
-                  <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current text-red-500' : ''}`} />
-                </Button>
+              <div className="absolute top-3 right-3" onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}>
+                <div className="bg-white/80 backdrop-blur-sm rounded-md">
+                  <FavoriteButton propertyId={property.id} size="sm" variant="ghost" />
+                </div>
               </div>
             </div>
 
@@ -198,19 +192,13 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
               <Badge variant="secondary">임대</Badge>
             </div>
             
-            <div className="absolute top-4 right-4">
-              <Button
-                variant="secondary"
-                size="icon"
-                className="bg-white/80 backdrop-blur-sm z-10"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsFavorite(!isFavorite);
-                }}
-              >
-                <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current text-red-500' : ''}`} />
-              </Button>
+            <div className="absolute top-4 right-4" onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}>
+              <div className="bg-white/80 backdrop-blur-sm rounded-md">
+                <FavoriteButton propertyId={property.id} size="sm" variant="ghost" />
+              </div>
             </div>
           </div>
           
