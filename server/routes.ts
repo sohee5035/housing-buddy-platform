@@ -361,21 +361,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password, name, phone, verificationCode } = req.body;
       
-      // Validate input
-      if (!email || !password || !name || !verificationCode) {
-        return res.status(400).json({ message: "필수 정보가 누락되었습니다." });
+      // Validate input - verification code is now optional
+      if (!email || !password || !name) {
+        return res.status(400).json({ message: "이름, 이메일, 비밀번호를 모두 입력해주세요." });
       }
 
-      // Check verification code
-      global.tempVerificationCodes = global.tempVerificationCodes || {};
-      const storedCode = global.tempVerificationCodes[email];
-      
-      if (!storedCode || storedCode.expires < Date.now()) {
-        return res.status(400).json({ message: "인증번호가 만료되었습니다. 다시 요청해주세요." });
-      }
-      
-      if (storedCode.code !== verificationCode.toUpperCase()) {
-        return res.status(400).json({ message: "인증번호가 올바르지 않습니다." });
+      // Check verification code only if provided
+      let isVerified = false;
+      if (verificationCode) {
+        global.tempVerificationCodes = global.tempVerificationCodes || {};
+        const storedCode = global.tempVerificationCodes[email];
+        
+        if (!storedCode || storedCode.expires < Date.now()) {
+          return res.status(400).json({ message: "인증번호가 만료되었습니다. 다시 요청해주세요." });
+        }
+        
+        if (storedCode.code !== verificationCode.toUpperCase()) {
+          return res.status(400).json({ message: "인증번호가 올바르지 않습니다." });
+        }
+        
+        isVerified = true;
+        // Clean up verification code
+        delete global.tempVerificationCodes[email];
       }
 
       // Check if user already exists (double check)
@@ -384,28 +391,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "이미 등록된 이메일입니다." });
       }
 
-      // Create user with email already verified
+      // Create user with conditional email verification
       const userData = {
         email,
         password,
         name,
         phone: phone || undefined,
-        isEmailVerified: true // Since we verified via code
+        isEmailVerified: isVerified // True only if verification code was provided and valid
       };
 
       const user = await storage.createUser(userData);
       
-      // Clean up verification code
-      delete global.tempVerificationCodes[email];
-      
-      // Send welcome email
-      await sendWelcomeEmail({
-        to: user.email,
-        userName: user.name
-      });
+      // Send welcome email only if verification was completed
+      if (isVerified) {
+        await sendWelcomeEmail({
+          to: user.email,
+          userName: user.name
+        });
+      }
 
       res.status(201).json({ 
-        message: "회원가입이 완료되었습니다. 환영합니다!",
+        message: isVerified 
+          ? "회원가입이 완료되었습니다. 환영합니다!" 
+          : "회원가입이 완료되었습니다. (도메인 구매 후 이메일 인증 가능)",
         user: {
           id: user.id,
           email: user.email,

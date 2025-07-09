@@ -6,7 +6,7 @@ import { Home, Plus, Menu, User, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
-import SimpleAuthModal from "./simple-auth-modal";
+
 import AdminLogin from "./admin-login";
 import AdminPanel from "./admin-panel";
 import {
@@ -22,9 +22,9 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onCreateListing }: NavbarProps) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+
 
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   
@@ -33,14 +33,14 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const { isAdmin } = useAdmin();
 
   const navItems = [
-    { href: "/", label: "매물 보기", active: location === "/" },
-    { href: "#", label: "즐겨찾기" },
-    { href: "#", label: "문의 내역" },
-    { href: "#", label: "도움말" },
+    { href: "/", label: "매물 보기", active: location === "/", id: "home" },
+    { href: "#favorites", label: "즐겨찾기", id: "favorites" },
+    { href: "#inquiries", label: "문의 내역", id: "inquiries" },
+    { href: "#help", label: "도움말", id: "help" },
   ];
 
   const handleLogin = () => {
-    setShowAuthModal(true);
+    setLocation("/signup");
   };
 
   const handleLogout = async () => {
@@ -74,7 +74,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
             <div className="hidden md:flex space-x-6">
               {navItems.map((item) => (
                 <Link
-                  key={item.href}
+                  key={item.id}
                   href={item.href}
                   className={`transition-colors ${
                     item.active
@@ -172,7 +172,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                   
                   {navItems.map((item) => (
                     <Link
-                      key={item.href}
+                      key={item.id}
                       href={item.href}
                       className={`text-left px-4 py-2 rounded-lg transition-colors ${
                         item.active
@@ -263,12 +263,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         </div>
       </div>
       
-      {/* Simple Auth Modal */}
-      <SimpleAuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)}
-      />
-      
+
       {/* Admin Login Modal */}
       <AdminLogin 
         isOpen={showAdminLogin} 
