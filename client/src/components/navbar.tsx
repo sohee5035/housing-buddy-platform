@@ -90,7 +90,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
           {/* Desktop Actions */}
           <div className="flex items-center space-x-4">
-            {isAuthenticated && (
+            {/* 관리자인 경우에만 매물 등록 버튼 표시 */}
+            {isAuthenticated && isAdmin && (
               <Button
                 variant="outline"
                 onClick={onCreateListing}
@@ -100,11 +101,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 매물 등록
               </Button>
             )}
-            
-            {/* 사용자 아이콘 */}
-            <Button variant="ghost" size="icon" onClick={handleLogin}>
-              <User className="h-5 w-5" />
-            </Button>
             
             {isAuthenticated ? (
               <DropdownMenu>
@@ -141,12 +137,18 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : null}
+            ) : (
+              /* 로그인하지 않은 경우 로그인 버튼 */
+              <Button variant="ghost" size="icon" onClick={handleLogin}>
+                <User className="h-5 w-5" />
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu */}
           <div className="md:hidden flex items-center space-x-2">
-            {isAuthenticated && (
+            {/* 관리자인 경우에만 모바일 매물 등록 버튼 표시 */}
+            {isAuthenticated && isAdmin && (
               <Button
                 variant="outline"
                 size="sm"
@@ -193,17 +195,20 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                           <p className="text-xs text-gray-600">{user?.email}</p>
                         </div>
                         
-                        <Button
-                          variant="outline"
-                          className="w-full mb-2"
-                          onClick={() => {
-                            onCreateListing?.();
-                            setIsMobileMenuOpen(false);
-                          }}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          매물 등록
-                        </Button>
+                        {/* 관리자인 경우에만 사이드바 매물 등록 버튼 표시 */}
+                        {isAdmin && (
+                          <Button
+                            variant="outline"
+                            className="w-full mb-2"
+                            onClick={() => {
+                              onCreateListing?.();
+                              setIsMobileMenuOpen(false);
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            매물 등록
+                          </Button>
+                        )}
                         
                         <Button 
                           variant="ghost" 

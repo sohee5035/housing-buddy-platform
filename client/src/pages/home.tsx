@@ -357,11 +357,15 @@ export default function Home() {
           <div className="text-center py-16">
             <HomeIcon className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-neutral-900 mb-2">{translateUI('매물이 없습니다')}</h3>
-            <p className="text-neutral-600 mb-6">첫 번째 매물을 등록해보세요!</p>
-            <Button onClick={() => setShowCreateModal(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              {translateUI('매물 등록')}하기
-            </Button>
+            <p className="text-neutral-600 mb-6">
+              {isAdmin ? "첫 번째 매물을 등록해보세요!" : "매물이 등록되면 여기에 표시됩니다."}
+            </p>
+            {isAdmin && (
+              <Button onClick={() => setShowCreateModal(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                {translateUI('매물 등록')}하기
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
