@@ -10,6 +10,7 @@ import Home from "@/pages/home";
 import PropertyDetail from "@/pages/property-detail";
 import Trash from "@/pages/trash";
 import AdminComments from "@/pages/admin-comments";
+import VerifyEmail from "@/pages/verify-email";
 import NotFound from "@/pages/not-found";
 import AdminIconPreview from "@/components/admin-icon-preview";
 
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/trash" component={Trash} />
       <Route path="/admin/comments" component={AdminComments} />
       <Route path="/admin-icons" component={AdminIconPreview} />
+      <Route path="/verify-email" component={VerifyEmail} />
       <Route component={NotFound} />
     </Switch>
   );

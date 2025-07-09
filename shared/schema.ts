@@ -45,12 +45,9 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: text("password").notNull(), // hashed password
-  firstName: varchar("first_name", { length: 100 }),
-  lastName: varchar("last_name", { length: 100 }),
+  name: varchar("name", { length: 100 }).notNull(), // 사용자 이름
   isEmailVerified: integer("is_email_verified").default(0), // 0 = not verified, 1 = verified
   emailVerificationToken: varchar("email_verification_token", { length: 255 }),
-  resetPasswordToken: varchar("reset_password_token", { length: 255 }),
-  resetPasswordExpires: timestamp("reset_password_expires"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -60,11 +57,10 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
   updatedAt: true,
   emailVerificationToken: true,
-  resetPasswordToken: true,
-  resetPasswordExpires: true,
 }).extend({
   email: z.string().email("올바른 이메일을 입력해주세요"),
   password: z.string().min(6, "비밀번호는 최소 6자리 이상이어야 합니다"),
+  name: z.string().min(2, "이름은 최소 2자리 이상이어야 합니다"),
 });
 
 export const loginUserSchema = z.object({
