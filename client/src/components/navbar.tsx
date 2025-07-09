@@ -31,7 +31,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   
   const { user, isAuthenticated, logout } = useAuth();
   const { toast } = useToast();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, logout: adminLogout } = useAdmin();
   const { getTranslatedText, isTranslated } = useTranslation();
 
   const navItems = [
@@ -47,6 +47,10 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const handleLogout = async () => {
     try {
       await logout();
+      // 관리자 로그아웃 시 관리자 상태도 초기화
+      if (isAdmin) {
+        adminLogout();
+      }
       toast({
         title: "로그아웃 완료",
         description: "성공적으로 로그아웃되었습니다.",

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAdmin } from "@/contexts/AdminContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,15 +17,19 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAdmin();
+  const { logout: userLogout } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (login(password)) {
+      // 관리자 로그인 시 일반 계정 로그아웃
+      userLogout();
+      
       toast({
-        title: "로그인 성공",
-        description: "관리자 모드로 전환되었습니다.",
+        title: "관리자 로그인 성공",
+        description: "관리자 모드로 전환되었습니다. 일반 계정은 로그아웃됩니다.",
       });
       setPassword("");
       onClose();
