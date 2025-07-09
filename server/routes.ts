@@ -711,7 +711,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Comment routes
-  // Get comments for a property
+  // Get comments for a property (본인 댓글만)
   app.get("/api/properties/:id/comments", async (req: Request, res: Response) => {
     try {
       const propertyId = parseInt(req.params.id);
@@ -719,9 +719,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid property ID" });
       }
       
-      // 관리자 여부 확인 (간단히 헤더로 체크, 실제로는 세션 등을 사용)
+      // 관리자 여부 확인
       const isAdmin = req.headers['x-admin'] === 'true';
-      const comments = await storage.getComments(propertyId, isAdmin);
+      
+      // 로그인한 사용자 ID 가져오기
+      const user = req.user as any;
+      const userId = user?.id;
+      
+      const comments = await storage.getComments(propertyId, userId, isAdmin);
       res.json(comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -829,6 +834,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update admin reply
+  app.put("/api/admin/comments/:id/reply", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { reply } = req.body;
+      
+      const updatedComment = await storage.updateAdminReply(parseInt(id), reply || "");
+      
+      if (!updatedComment) {
+        return res.status(404).json({ message: "댓글을 찾을 수 없습니다." });
+      }
+      
+      res.json(updatedComment);
+    } catch (error) {
+      console.error("Error updating admin reply:", error);
+      res.status(500).json({ message: "관리자 답변 업데이트에 실패했습니다." });
+    }
+  });
+
   // Get all comments for admin
   app.get("/api/admin/comments", async (req: Request, res: Response) => {
     try {
@@ -837,6 +861,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching admin comments:", error);
       res.status(500).json({ message: "Failed to fetch comments" });
+    }
+  });
+
+  // Get user's own inquiries with property details
+  app.get("/api/my-inquiries", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as any;
+      const inquiries = await storage.getUserInquiries(user.id);
+      res.json(inquiries);
+    } catch (error) {
+      console.error("Error fetching user inquiries:", error);
+      res.status(500).json({ message: "Failed to fetch inquiries" });
     }
   });
 

@@ -17,7 +17,7 @@ export interface IStorage {
   permanentDeleteProperty(id: number): Promise<boolean>;
   
   // Comment methods
-  getComments(propertyId: number): Promise<Comment[]>;
+  getComments(propertyId: number, userId?: number, isAdmin?: boolean): Promise<Comment[]>;
   createComment(comment: InsertComment): Promise<Comment>;
   updateComment(id: number, updateData: UpdateComment): Promise<Comment | undefined>;
   deleteComment(id: number): Promise<boolean>; // Admin only
@@ -26,6 +26,8 @@ export interface IStorage {
   getCommentForEdit(id: number, password: string): Promise<Comment | undefined>; // 수정용 댓글 조회
   getAllCommentsForAdmin(): Promise<Comment[]>; // 관리자용 전체 문의 조회
   updateAdminMemo(id: number, memo: string): Promise<Comment | undefined>; // 관리자 메모 업데이트
+  updateAdminReply(id: number, reply: string): Promise<Comment | undefined>; // 관리자 답변 추가
+  getUserInquiries(userId: number): Promise<(Comment & { property: { title: string; id: number } })[]>; // 사용자 문의 내역 조회
   
   // User authentication methods
   createUser(userData: InsertUser): Promise<User>;
@@ -131,12 +133,17 @@ export class DatabaseStorage implements IStorage {
     return (result.rowCount || 0) > 0;
   }
 
-  // Comment methods
-  async getComments(propertyId: number, isAdmin: boolean = false): Promise<Comment[]> {
+  // Comment methods - 본인 댓글만 조회
+  async getComments(propertyId: number, userId?: number, isAdmin: boolean = false): Promise<Comment[]> {
     let whereConditions = [
       eq(comments.propertyId, propertyId),
       eq(comments.isDeleted, 0)
     ];
+    
+    // 일반 사용자는 본인 댓글만 볼 수 있음
+    if (!isAdmin && userId) {
+      whereConditions.push(eq(comments.userId, userId));
+    }
     
     // 관리자가 아니면 관리자 전용 댓글 제외
     if (!isAdmin) {
@@ -240,6 +247,47 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return updatedComment;
+  }
+
+  async updateAdminReply(id: number, reply: string): Promise<Comment | undefined> {
+    const [result] = await db
+      .update(comments)
+      .set({ 
+        adminReply: reply,
+        adminReplyAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(comments.id, id))
+      .returning();
+    return result;
+  }
+
+  async getUserInquiries(userId: number): Promise<(Comment & { property: { title: string; id: number } })[]> {
+    const result = await db
+      .select({
+        id: comments.id,
+        content: comments.content,
+        authorName: comments.authorName,
+        authorContact: comments.authorContact,
+        isAdminOnly: comments.isAdminOnly,
+        adminReply: comments.adminReply,
+        adminReplyAt: comments.adminReplyAt,
+        adminMemo: comments.adminMemo,
+        propertyId: comments.propertyId,
+        userId: comments.userId,
+        createdAt: comments.createdAt,
+        updatedAt: comments.updatedAt,
+        property: {
+          id: properties.id,
+          title: properties.title,
+        },
+      })
+      .from(comments)
+      .innerJoin(properties, eq(comments.propertyId, properties.id))
+      .where(eq(comments.userId, userId))
+      .orderBy(desc(comments.createdAt));
+    
+    return result;
   }
 
   // User authentication methods

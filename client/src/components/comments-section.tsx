@@ -18,6 +18,57 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { MessageCircle, Send, Trash2, User, Edit, ShieldCheck, Eye, EyeOff, LogIn } from "lucide-react";
 import AuthModal from "@/components/auth-modal";
 
+// 관리자 답변 컴포넌트
+function AdminReplyForm({ commentId, onSuccess }: { commentId: number; onSuccess: () => void }) {
+  const [reply, setReply] = useState("");
+  const { toast } = useToast();
+
+  const replyMutation = useMutation({
+    mutationFn: async (replyText: string) => {
+      const response = await apiRequest("PUT", `/api/admin/comments/${commentId}/reply`, { reply: replyText });
+      return response.json();
+    },
+    onSuccess: () => {
+      setReply("");
+      onSuccess();
+      toast({
+        title: "답변 등록 완료",
+        description: "관리자 답변이 등록되었습니다.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "답변 등록 실패",
+        description: error.message || "답변 등록 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  return (
+    <div className="space-y-2">
+      <Textarea
+        placeholder="고객에게 보낼 답변을 작성하세요..."
+        value={reply}
+        onChange={(e) => setReply(e.target.value)}
+        rows={3}
+        className="w-full resize-none"
+      />
+      <div className="flex justify-end">
+        <Button
+          onClick={() => replyMutation.mutate(reply)}
+          disabled={!reply.trim() || replyMutation.isPending}
+          size="sm"
+          className="bg-green-600 hover:bg-green-700"
+        >
+          <Send className="h-4 w-4 mr-2" />
+          {replyMutation.isPending ? "답변 등록 중..." : "답변 등록"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 interface CommentsSectionProps {
   propertyId: number;
 }
@@ -40,7 +91,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
   const { getTranslatedText } = useTranslation();
   const { user, isAuthenticated } = useAuth();
 
-  // 댓글 목록 가져오기
+  // 댓글 목록 가져오기 (본인 댓글만)
   const { data: comments = [], isLoading } = useQuery<Comment[]>({
     queryKey: [`/api/properties/${propertyId}/comments`],
     queryFn: async () => {
@@ -48,6 +99,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
         headers: {
           'x-admin': isAdmin.toString(),
         },
+        credentials: 'include',
       });
       if (!response.ok) throw new Error("Failed to fetch comments");
       return response.json();
@@ -300,24 +352,26 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
               <Card className={comment.isAdminOnly === 1 ? "border-blue-200 bg-blue-50/50" : ""}>
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <User className="h-4 w-4 text-neutral-500" />
-                      <Badge variant="outline">{comment.authorName || user?.name}</Badge>
-                      {comment.isAdminOnly === 1 && (
-                        <Badge variant="secondary" className="text-blue-600 bg-blue-100">
-                          <ShieldCheck className="h-3 w-3 mr-1" />
-                          {getTranslatedText("관리자 전용")}
-                        </Badge>
-                      )}
-                      <span className="text-sm text-neutral-500">
-                        {comment.createdAt && new Date(comment.createdAt).toLocaleString('ko-KR')}
-                      </span>
-                      {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
-                        <span className="text-xs text-neutral-400">({getTranslatedText("수정됨")})</span>
-                      )}
+                    <div className="flex flex-col space-y-1 mb-3">
+                      <div className="flex items-center space-x-2">
+                        <User className="h-4 w-4 text-neutral-500" />
+                        <span className="font-medium text-gray-900">{comment.authorName || user?.name}</span>
+                        {comment.isAdminOnly === 1 && (
+                          <Badge variant="secondary" className="text-blue-600 bg-blue-100">
+                            <ShieldCheck className="h-3 w-3 mr-1" />
+                            {getTranslatedText("관리자 전용")}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-neutral-500">
+                        <span>{comment.createdAt && new Date(comment.createdAt).toLocaleString('ko-KR')}</span>
+                        {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
+                          <span className="text-xs text-neutral-400">({getTranslatedText("수정됨")})</span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex space-x-1">
-                      {isAuthenticated && (
+                      {isAuthenticated && user?.id === comment.userId && (
                         <>
                           <Button
                             variant="ghost"
@@ -372,12 +426,39 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                         <strong>휴대폰번호:</strong> {comment.authorContact}
                       </div>
                     )}
-                    {/* 관리자만 실제 내용 표시 */}
-                    {isAdmin && (
+                    {/* 본인 댓글 또는 관리자만 실제 내용 표시 */}
+                    {(user?.id === comment.userId || isAdmin) && (
                       <div className="mt-2 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
                         <p className="text-blue-900 whitespace-pre-wrap leading-relaxed">
                           {comment.content}
                         </p>
+                      </div>
+                    )}
+                    
+                    {/* 관리자 답변 표시 */}
+                    {comment.adminReply && (
+                      <div className="mt-3 p-3 bg-green-50 border-l-4 border-green-400 rounded">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <ShieldCheck className="h-4 w-4 text-green-600" />
+                          <span className="text-sm font-medium text-green-800">관리자 답변</span>
+                          {comment.adminReplyAt && (
+                            <span className="text-xs text-green-600">
+                              {new Date(comment.adminReplyAt).toLocaleString('ko-KR')}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-green-900 whitespace-pre-wrap leading-relaxed">
+                          {comment.adminReply}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* 관리자 답변 작성 (관리자만) */}
+                    {isAdmin && !comment.adminReply && (
+                      <div className="mt-3">
+                        <AdminReplyForm commentId={comment.id} onSuccess={() => {
+                          queryClient.invalidateQueries({ queryKey: [`/api/properties/${propertyId}/comments`] });
+                        }} />
                       </div>
                     )}
                   </div>

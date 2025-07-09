@@ -83,6 +83,8 @@ export const comments = pgTable("comments", {
   content: text("content").notNull(),
   isAdminOnly: integer("is_admin_only").default(0), // 1 = 관리자만 볼 수 있음
   adminMemo: text("admin_memo"), // 관리자 전용 메모
+  adminReply: text("admin_reply"), // 관리자 답변
+  adminReplyAt: timestamp("admin_reply_at"), // 관리자 답변 시간
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at"),
   isDeleted: integer("is_deleted").default(0), // 0 = active, 1 = deleted
