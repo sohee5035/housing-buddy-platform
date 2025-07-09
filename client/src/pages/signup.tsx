@@ -5,7 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, CheckCircle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, CheckCircle, FileText } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,7 +25,19 @@ const registrationSchema = z.object({
   name: z.string().min(2, "이름은 2자 이상이어야 합니다."),
   email: z.string().email("올바른 이메일 주소를 입력해주세요."),
   password: z.string().min(6, "비밀번호는 6자 이상이어야 합니다."),
+  confirmPassword: z.string().min(6, "비밀번호 확인을 입력해주세요."),
   verificationCode: z.string().optional(), // 선택사항으로 변경
+  agreeToPrivacy: z.boolean(),
+  agreeToTerms: z.boolean(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "비밀번호가 일치하지 않습니다.",
+  path: ["confirmPassword"],
+}).refine((data) => data.agreeToPrivacy === true, {
+  message: "개인정보 수집·이용 동의는 필수입니다.",
+  path: ["agreeToPrivacy"],
+}).refine((data) => data.agreeToTerms === true, {
+  message: "이용약관 동의는 필수입니다.",
+  path: ["agreeToTerms"],
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -32,8 +47,10 @@ export default function SignupPage() {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [emailForCode, setEmailForCode] = useState("");
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
   
   const { toast } = useToast();
   const { login, register, isLoginLoading, isRegisterLoading } = useAuth();
@@ -54,7 +71,10 @@ export default function SignupPage() {
       name: "",
       email: "",
       password: "",
+      confirmPassword: "",
       verificationCode: "",
+      agreeToPrivacy: false,
+      agreeToTerms: false,
     },
   });
 
@@ -116,6 +136,60 @@ export default function SignupPage() {
       });
     }
   };
+
+  // Terms of Service Component
+  const TermsOfService = () => (
+    <ScrollArea className="h-[300px] w-full rounded border p-4 text-sm">
+      <div className="space-y-4">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold">Housing Buddy 이용약관</h3>
+          <p className="text-gray-600 text-sm">시행일자: 2025년 7월 10일</p>
+        </div>
+        
+        <div>
+          <h4 className="font-semibold mb-2">제1조 (서비스 이용)</h4>
+          <p className="text-gray-700">
+            Housing Buddy는 부동산 매물 정보를 제공하는 플랫폼입니다. 본 서비스를 이용함으로써 이용약관에 동의하는 것으로 간주됩니다.
+          </p>
+        </div>
+        
+        <div>
+          <h4 className="font-semibold mb-2">제2조 (회원 의무)</h4>
+          <ul className="text-gray-700 space-y-1">
+            <li>- 정확한 정보로 회원가입을 해주세요</li>
+            <li>- 타인에게 피해를 주는 행위는 금지됩니다</li>
+            <li>- 허위 매물 정보 등록은 제재 대상입니다</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 className="font-semibold mb-2">제3조 (서비스 제공)</h4>
+          <p className="text-gray-700">
+            회사는 안정적인 서비스 제공을 위해 노력하며, 시스템 점검 등으로 일시 중단될 수 있습니다.
+          </p>
+        </div>
+        
+        <div>
+          <h4 className="font-semibold mb-2">제4조 (개인정보)</h4>
+          <p className="text-gray-700">
+            이용자의 개인정보는 관련 법령에 따라 보호되며, 자세한 내용은 개인정보처리방침을 참고해주세요.
+          </p>
+        </div>
+        
+        <div>
+          <h4 className="font-semibold mb-2">제5조 (기타)</h4>
+          <p className="text-gray-700">
+            본 약관은 대한민국 법령을 준수하며, 문의사항은 고객센터로 연락 바랍니다.
+          </p>
+        </div>
+        
+        <div className="text-center border-t pt-4">
+          <p className="font-semibold">Team Housing Buddy</p>
+          <p className="text-gray-600">📧 kbbuddy2025@gmail.com</p>
+        </div>
+      </div>
+    </ScrollArea>
+  );
 
   const sendVerificationCode = async () => {
     const email = registrationForm.getValues("email");
@@ -326,6 +400,38 @@ export default function SignupPage() {
                     )}
                   </div>
 
+                  <div>
+                    <Label htmlFor="register-confirm-password">비밀번호 확인</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="register-confirm-password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="비밀번호를 다시 입력하세요"
+                        className="pl-10 pr-10"
+                        {...registrationForm.register("confirmPassword")}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </Button>
+                    </div>
+                    {registrationForm.formState.errors.confirmPassword && (
+                      <p className="text-sm text-red-600 mt-1">
+                        {registrationForm.formState.errors.confirmPassword.message}
+                      </p>
+                    )}
+                  </div>
+
                   {/* 이메일 인증 섹션 (선택사항) */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -354,7 +460,7 @@ export default function SignupPage() {
                       />
                     </div>
                     <p className="text-xs text-gray-500">
-                      도메인 구매 후 이메일 인증이 활성화됩니다. 현재는 인증 없이 가입 가능합니다.
+                      현재는 이메일 인증 없이 가입 가능합니다
                     </p>
                     {isCodeSent && (
                       <p className="text-sm text-green-600">
@@ -363,10 +469,90 @@ export default function SignupPage() {
                     )}
                   </div>
 
+                  {/* 동의 체크박스 섹션 */}
+                  <div className="space-y-3 pt-4 border-t">
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="agree-privacy"
+                        checked={registrationForm.watch("agreeToPrivacy")}
+                        onCheckedChange={(checked) => 
+                          registrationForm.setValue("agreeToPrivacy", !!checked)
+                        }
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label
+                          htmlFor="agree-privacy"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          개인정보 수집·이용에 동의합니다 (필수)
+                        </Label>
+                      </div>
+                    </div>
+                    {registrationForm.formState.errors.agreeToPrivacy && (
+                      <p className="text-sm text-red-600">
+                        {registrationForm.formState.errors.agreeToPrivacy.message}
+                      </p>
+                    )}
+
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="agree-terms"
+                        checked={registrationForm.watch("agreeToTerms")}
+                        onCheckedChange={(checked) => 
+                          registrationForm.setValue("agreeToTerms", !!checked)
+                        }
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label
+                          htmlFor="agree-terms"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-1"
+                        >
+                          이용약관에 동의합니다 (필수)
+                          <Dialog open={showTermsDialog} onOpenChange={setShowTermsDialog}>
+                            <DialogTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-auto p-1 text-blue-600 hover:text-blue-800"
+                              >
+                                <FileText className="h-3 w-3" />
+                                보기
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>이용약관</DialogTitle>
+                                <DialogDescription>
+                                  Housing Buddy 서비스 이용약관을 확인해주세요.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <TermsOfService />
+                              <div className="flex justify-end">
+                                <Button onClick={() => setShowTermsDialog(false)}>
+                                  확인
+                                </Button>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </Label>
+                      </div>
+                    </div>
+                    {registrationForm.formState.errors.agreeToTerms && (
+                      <p className="text-sm text-red-600">
+                        {registrationForm.formState.errors.agreeToTerms.message}
+                      </p>
+                    )}
+                  </div>
+
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={isRegisterLoading}
+                    disabled={
+                      isRegisterLoading || 
+                      !registrationForm.watch("agreeToPrivacy") || 
+                      !registrationForm.watch("agreeToTerms")
+                    }
                   >
                     {isRegisterLoading ? "회원가입 중..." : "회원가입"}
                   </Button>
