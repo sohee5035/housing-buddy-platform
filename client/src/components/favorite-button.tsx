@@ -108,11 +108,11 @@ export default function FavoriteButton({
   const getSizeClasses = () => {
     switch (size) {
       case "sm":
-        return "h-4 w-4";
-      case "lg":
         return "h-6 w-6";
+      case "lg":
+        return "h-8 w-8";
       default:
-        return "h-5 w-5";
+        return "h-7 w-7";
     }
   };
 
@@ -135,10 +135,10 @@ export default function FavoriteButton({
       size={getButtonSize()}
       onClick={handleClick}
       disabled={isPending || isLoading}
-      className={`transition-colors ${
+      className={`transition-all duration-200 ${
         isFavorite 
-          ? "text-red-500 hover:text-red-600" 
-          : "text-neutral-400 hover:text-red-500"
+          ? "text-red-500 hover:text-red-600 hover:scale-110" 
+          : "text-neutral-400 hover:text-red-500 hover:scale-110"
       }`}
       title={
         isAuthenticated 
@@ -149,8 +149,8 @@ export default function FavoriteButton({
       }
     >
       <Heart 
-        className={`${getSizeClasses()} transition-all ${
-          isFavorite ? "fill-current" : ""
+        className={`${getSizeClasses()} transition-all duration-200 ${
+          isFavorite ? "fill-current scale-110" : ""
         } ${isPending ? "animate-pulse" : ""}`} 
       />
     </Button>
