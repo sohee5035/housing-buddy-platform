@@ -5,10 +5,12 @@ let resend: Resend | null = null;
 
 function getResendInstance(): Resend {
   if (!resend) {
-    const apiKey = process.env.RESEND_API_KEY || 're_43imXPMR_EbrgwjB7zsWGLEUAmxBLX9XT';
-    if (!apiKey || apiKey === 're_43imXPMR_EbrgwjB7zsWGLEUAmxBLX9XT') {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
       console.warn("RESEND_API_KEY not properly configured. Email functionality may not work.");
+      throw new Error("RESEND_API_KEY is required");
     }
+    console.log("✅ Resend API key configured");
     resend = new Resend(apiKey);
   }
   return resend;
@@ -26,9 +28,11 @@ export async function sendEmailVerification({
   verificationLink
 }: EmailVerificationParams): Promise<boolean> {
   try {
+    console.log('🔄 Attempting to send email verification to:', to);
+    console.log('📧 Verification code:', verificationCode);
     const resendInstance = getResendInstance();
     const { data, error } = await resendInstance.emails.send({
-      from: 'Housing Buddy <noreply@housingbuddy.app>',
+      from: 'Housing Buddy <onboarding@resend.dev>',
       to: [to],
       subject: '🏠 Housing Buddy 이메일 인증',
       html: `
@@ -101,7 +105,7 @@ export async function sendWelcomeEmail({
   try {
     const resendInstance = getResendInstance();
     const { data, error } = await resendInstance.emails.send({
-      from: 'Housing Buddy <noreply@housingbuddy.app>',
+      from: 'Housing Buddy <onboarding@resend.dev>',
       to: [to],
       subject: '🎉 Housing Buddy에 오신 것을 환영합니다!',
       html: `
