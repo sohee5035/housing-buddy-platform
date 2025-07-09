@@ -70,8 +70,8 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
                 e.preventDefault();
                 e.stopPropagation();
               }}>
-                <div className="bg-white/80 backdrop-blur-sm rounded-md">
-                  <FavoriteButton propertyId={property.id} size="sm" variant="ghost" />
+                <div className="bg-white/90 backdrop-blur-sm rounded-lg p-1 shadow-sm">
+                  <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
                 </div>
               </div>
             </div>
@@ -196,8 +196,8 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
               e.preventDefault();
               e.stopPropagation();
             }}>
-              <div className="bg-white/80 backdrop-blur-sm rounded-md">
-                <FavoriteButton propertyId={property.id} size="sm" variant="ghost" />
+              <div className="bg-white/90 backdrop-blur-sm rounded-lg p-1 shadow-sm">
+                <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
               </div>
             </div>
           </div>

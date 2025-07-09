@@ -110,9 +110,9 @@ export default function FavoriteButton({
       case "sm":
         return "h-6 w-6";
       case "lg":
-        return "h-8 w-8";
+        return "h-10 w-10";
       default:
-        return "h-7 w-7";
+        return "h-8 w-8";
     }
   };
 
