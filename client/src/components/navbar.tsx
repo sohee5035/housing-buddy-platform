@@ -89,7 +89,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
           </div>
 
           {/* Desktop Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4">
             {/* 관리자인 경우에만 매물 등록 버튼 표시 */}
             {isAuthenticated && isAdmin && (
               <Button
