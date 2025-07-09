@@ -326,38 +326,27 @@ export class DatabaseStorage implements IStorage {
 
   // Favorites methods
   async getUserFavorites(userId: number): Promise<Property[]> {
-    const result = await db
-      .select({
-        id: properties.id,
-        title: properties.title,
-        address: properties.address,
-        description: properties.description,
-        category: properties.category,
-        deposit: properties.deposit,
-        monthlyRent: properties.monthlyRent,
-        maintenanceFee: properties.maintenanceFee,
-        photos: properties.photos,
-        createdAt: properties.createdAt,
-        updatedAt: properties.updatedAt,
-        isDeleted: properties.isDeleted,
-        otherInfo: properties.otherInfo,
-        mapUrl: properties.mapUrl,
-        contactInfo: properties.contactInfo,
-      })
-      .from(properties)
-      .innerJoin(favorites, eq(properties.id, favorites.propertyId))
-      .where(and(eq(favorites.userId, userId), eq(properties.isDeleted, 0)))
-      .orderBy(desc(favorites.createdAt));
+    try {
+      const result = await db
+        .select()
+        .from(properties)
+        .innerJoin(favorites, eq(properties.id, favorites.propertyId))
+        .where(and(eq(favorites.userId, userId), eq(properties.isDeleted, 0)))
+        .orderBy(desc(favorites.createdAt));
 
-    return result;
+      return result.map(row => row.properties);
+    } catch (error) {
+      console.error("Error in getUserFavorites:", error);
+      return [];
+    }
   }
 
   async addToFavorites(userId: number, propertyId: number): Promise<Favorite> {
     const [favorite] = await db
       .insert(favorites)
       .values({
-        userId,
-        propertyId,
+        userId: userId,
+        propertyId: propertyId,
       })
       .returning();
 

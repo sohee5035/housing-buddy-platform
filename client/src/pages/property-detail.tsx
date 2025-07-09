@@ -4,6 +4,7 @@ import { Property } from "@shared/schema";
 import { useState, useEffect } from "react";
 import PropertyForm from "@/components/property-form";
 import ImageGalleryModal from "@/components/image-gallery-modal";
+import FavoriteButton from "@/components/favorite-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -316,13 +317,18 @@ export default function PropertyDetail() {
           <div className="space-y-6">
             <Card>
               <CardContent className="p-6">
-                <h1 className="text-2xl font-bold text-neutral-900 mb-4">
-                  <SmartTextWithTooltips
-                    text={getTranslatedPropertyText('title') || property.title}
-                    originalText={property.title}
-                    isTranslated={isTranslated}
-                  />
-                </h1>
+                <div className="flex items-start justify-between mb-4">
+                  <h1 className="text-2xl font-bold text-neutral-900 flex-1">
+                    <SmartTextWithTooltips
+                      text={getTranslatedPropertyText('title') || property.title}
+                      originalText={property.title}
+                      isTranslated={isTranslated}
+                    />
+                  </h1>
+                  <div className="ml-4">
+                    <FavoriteButton propertyId={property.id} size="lg" variant="ghost" />
+                  </div>
+                </div>
                 
                 <div className="flex items-center text-neutral-600 mb-4">
                   <MapPin className="h-4 w-4 mr-2" />
