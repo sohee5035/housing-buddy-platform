@@ -56,7 +56,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
 
   // 댓글 작성 mutation
   const createCommentMutation = useMutation({
-    mutationFn: async (commentData: Omit<InsertComment, 'propertyId' | 'authorName' | 'authorPassword'>) => {
+    mutationFn: async (commentData: Omit<InsertComment, 'propertyId' | 'authorName'>) => {
       const response = await apiRequest("POST", `/api/properties/${propertyId}/comments`, commentData);
       return response.json();
     },
@@ -240,9 +240,11 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                 </div>
                 <div>
                   <Input
-                    placeholder={getTranslatedText("이메일 또는 한국 전화번호 (선택사항)")}
+                    placeholder="한국 휴대폰번호 (선택사항) - 예: 010-1234-5678"
                     value={authorContact}
                     onChange={(e) => setAuthorContact(e.target.value)}
+                    pattern="[0-9-]+"
+                    maxLength={13}
                   />
                 </div>
               </div>
@@ -367,7 +369,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
                     {/* 관리자만 연락처 표시 */}
                     {isAdmin && comment.authorContact && (
                       <div className="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded">
-                        <strong>연락처:</strong> {comment.authorContact}
+                        <strong>휴대폰번호:</strong> {comment.authorContact}
                       </div>
                     )}
                     {/* 관리자만 실제 내용 표시 */}
@@ -407,12 +409,14 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">
-                {getTranslatedText("연락처 (선택사항)")}
+                휴대폰번호 (선택사항)
               </label>
               <Input
                 value={editContact}
                 onChange={(e) => setEditContact(e.target.value)}
-                placeholder={getTranslatedText("연락처 (선택사항)")}
+                placeholder="010-1234-5678"
+                pattern="[0-9-]+"
+                maxLength={13}
               />
             </div>
             {isAdmin && (
