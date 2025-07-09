@@ -101,12 +101,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
               </Button>
             )}
             
-            {/* 디버깅: 빨간 배경 테스트 */}
-            <div style={{background: 'red', padding: '10px', color: 'white'}}>
-              테스트 버튼
-            </div>
-            
-            {/* 항상 보이는 사용자 아이콘 (디버깅용) */}
+            {/* 사용자 아이콘 */}
             <Button variant="ghost" size="icon" onClick={handleLogin}>
               <User className="h-5 w-5" />
             </Button>
