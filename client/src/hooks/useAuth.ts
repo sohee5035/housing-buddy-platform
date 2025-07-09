@@ -25,6 +25,9 @@ export function useAuth() {
   const { data: user, isLoading } = useQuery({
     queryKey: ["/api/auth/me"],
     retry: false,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0, // 항상 최신 상태 확인
     queryFn: async () => {
       try {
         const res = await fetch("/api/auth/me", {
@@ -38,6 +41,7 @@ export function useAuth() {
         }
         return await res.json();
       } catch (error) {
+        console.log("Auth check error:", error);
         return null;
       }
     },
@@ -45,7 +49,7 @@ export function useAuth() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      return apiRequest("POST", "/api/auth/login", credentials);
+      return apiRequest("/api/auth/login", { method: "POST", body: credentials });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
@@ -54,13 +58,13 @@ export function useAuth() {
 
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterData) => {
-      return apiRequest("POST", "/api/auth/register", userData);
+      return apiRequest("/api/auth/register", { method: "POST", body: userData });
     },
   });
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("POST", "/api/auth/logout");
+      return apiRequest("/api/auth/logout", { method: "POST" });
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/auth/me"], null);
@@ -70,7 +74,7 @@ export function useAuth() {
 
   const resendVerificationMutation = useMutation({
     mutationFn: async (email: string) => {
-      return apiRequest("POST", "/api/auth/resend-verification", { email });
+      return apiRequest("/api/auth/resend-verification", { method: "POST", body: { email } });
     },
   });
 
