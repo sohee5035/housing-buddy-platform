@@ -11,6 +11,7 @@ import { useAdmin } from "@/contexts/AdminContext";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Link } from "wouter";
+import AdminPanel from "@/components/admin-panel";
 
 export default function AdminComments() {
   const { getTranslatedText } = useTranslation();
@@ -20,6 +21,7 @@ export default function AdminComments() {
   
   const [editingMemo, setEditingMemo] = useState<number | null>(null);
   const [memoTexts, setMemoTexts] = useState<Record<number, string>>({});
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // 관리자용 전체 댓글 조회
   const { data: comments = [], isLoading } = useQuery<Comment[]>({
@@ -136,22 +138,28 @@ export default function AdminComments() {
             <div className="flex items-center">
               <Link href="/">
                 <button className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0">
-                  <ArrowLeft className="h-6 w-6 text-neutral-600 mr-2" />
-                  <span className="text-sm text-neutral-600 mr-4">뒤로가기</span>
+                  <ArrowLeft className="h-6 w-6 text-neutral-600" />
                 </button>
               </Link>
-              <div className="flex items-center">
+              <div className="flex items-center ml-4">
                 <HomeIcon className="h-8 w-8 text-primary mr-3" />
                 <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
               </div>
             </div>
             
-            {/* Admin Status Indicator */}
+            {/* Admin Panel Button */}
             {isAdmin && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">
-                <ShieldCheck className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700">관리자</span>
-              </div>
+              <AdminPanel
+                onCreateListing={() => {}}
+                onCategoryManager={() => {}}
+                onTrashView={() => {}}
+                onCommentsView={() => {}}
+                trigger={
+                  <button className="p-2 hover:bg-blue-50 rounded-lg transition-colors">
+                    <ShieldCheck className="h-6 w-6 text-blue-600" />
+                  </button>
+                }
+              />
             )}
           </div>
         </div>
