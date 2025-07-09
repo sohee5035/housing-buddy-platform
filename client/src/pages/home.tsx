@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X, Settings, Languages, Globe, RotateCcw, ShieldCheck, LogOut } from "lucide-react";
+import FavoriteButton from "@/components/favorite-button";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -406,17 +407,25 @@ export default function Home() {
                 </Link>
                 
                 <CardContent className="p-4">
-                  <Link href={`/property/${property.id}`}>
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-2 hover:text-primary transition-colors cursor-pointer line-clamp-1">
-                      <SmartTextWithTooltips 
-                        text={isTranslated && translatedData[`title_${property.id}`] 
-                          ? translatedData[`title_${property.id}`] 
-                          : property.title}
-                        originalText={property.title}
-                        isTranslated={isTranslated}
-                      />
-                    </h3>
-                  </Link>
+                  <div className="flex items-center justify-between mb-2">
+                    <Link href={`/property/${property.id}`} className="flex-1">
+                      <h3 className="text-lg font-semibold text-neutral-900 hover:text-primary transition-colors cursor-pointer line-clamp-1">
+                        <SmartTextWithTooltips 
+                          text={isTranslated && translatedData[`title_${property.id}`] 
+                            ? translatedData[`title_${property.id}`] 
+                            : property.title}
+                          originalText={property.title}
+                          isTranslated={isTranslated}
+                        />
+                      </h3>
+                    </Link>
+                    <div className="ml-2" onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}>
+                      <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
+                    </div>
+                  </div>
                   
                   <div className="flex items-center text-sm text-neutral-500 mb-2">
                     <MapPin className="h-4 w-4 mr-1" />
