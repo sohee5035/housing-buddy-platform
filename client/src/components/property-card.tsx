@@ -80,15 +80,23 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
             <CardContent className="flex-1 p-6">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">🏠</span>
-                    <h3 className="text-xl font-semibold text-neutral-900 hover:text-primary transition-colors">
-                      <SmartTextWithTooltips 
-                        text={displayTitle}
-                        originalText={property.title}
-                        isTranslated={isTranslated}
-                      />
-                    </h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 flex-1">
+                      <span className="text-lg">🏠</span>
+                      <h3 className="text-xl font-semibold text-neutral-900 hover:text-primary transition-colors">
+                        <SmartTextWithTooltips 
+                          text={displayTitle}
+                          originalText={property.title}
+                          isTranslated={isTranslated}
+                        />
+                      </h3>
+                    </div>
+                    <div onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}>
+                      <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
+                    </div>
                   </div>
                   
                   <div className="flex items-center text-sm text-neutral-500 mb-3">
@@ -205,15 +213,23 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">🏠</span>
-                  <h3 className="text-xl font-semibold text-neutral-900 hover:text-primary transition-colors">
-                    <SmartTextWithTooltips 
-                      text={displayTitle}
-                      originalText={property.title}
-                      isTranslated={isTranslated}
-                    />
-                  </h3>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="text-lg">🏠</span>
+                    <h3 className="text-xl font-semibold text-neutral-900 hover:text-primary transition-colors">
+                      <SmartTextWithTooltips 
+                        text={displayTitle}
+                        originalText={property.title}
+                        isTranslated={isTranslated}
+                      />
+                    </h3>
+                  </div>
+                  <div onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}>
+                    <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
+                  </div>
                 </div>
                 
                 <div className="flex items-center text-sm text-neutral-500 mb-3">
