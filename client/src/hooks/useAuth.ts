@@ -49,7 +49,7 @@ export function useAuth() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      return apiRequest("/api/auth/login", { method: "POST", body: credentials });
+      return apiRequest("POST", "/api/auth/login", credentials);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
@@ -58,13 +58,25 @@ export function useAuth() {
 
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterData) => {
-      return apiRequest("/api/auth/register", { method: "POST", body: userData });
+      return apiRequest("POST", "/api/auth/register", userData);
     },
   });
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/auth/logout", { method: "POST" });
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`로그아웃 실패: ${response.statusText}`);
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/auth/me"], null);
@@ -74,7 +86,7 @@ export function useAuth() {
 
   const resendVerificationMutation = useMutation({
     mutationFn: async (email: string) => {
-      return apiRequest("/api/auth/resend-verification", { method: "POST", body: { email } });
+      return apiRequest("POST", "/api/auth/resend-verification", { email });
     },
   });
 
