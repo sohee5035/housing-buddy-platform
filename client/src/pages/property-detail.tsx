@@ -15,6 +15,7 @@ import SmartTextWithTooltips from "@/components/smart-text-with-tooltips";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import CommentsSection from "@/components/comments-section";
+import AdminPanel from "@/components/admin-panel";
 import { 
   ArrowLeft, 
   Edit, 
@@ -36,6 +37,9 @@ export default function PropertyDetail() {
   const { isAdmin } = useAdmin();
   const [showImageGallery, setShowImageGallery] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [showTrashView, setShowTrashView] = useState(false);
+  const [showCommentsView, setShowCommentsView] = useState(false);
   
   // 로컬 스토리지에서 커스텀 카테고리 가져오기
   const [customCategories, setCustomCategories] = useState<string[]>(() => {
@@ -230,12 +234,23 @@ export default function PropertyDetail() {
               </div>
             </div>
             
-            {/* Admin Status Indicator */}
+            {/* Admin Panel Trigger */}
             {isAdmin && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">
-                <ShieldCheck className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700">관리자</span>
-              </div>
+              <AdminPanel
+                onCreateListing={() => setShowEditModal(true)}
+                onCategoryManager={() => setShowCategoryManager(true)}
+                onTrashView={() => setShowTrashView(true)}
+                onCommentsView={() => setShowCommentsView(true)}
+                onEditProperty={() => setShowEditModal(true)}
+                onDeleteProperty={handleDelete}
+                currentPropertyId={property?.id}
+                trigger={
+                  <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">
+                    <ShieldCheck className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-700">관리자</span>
+                  </div>
+                }
+              />
             )}
           </div>
         </div>
