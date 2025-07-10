@@ -85,6 +85,7 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
   const [deletingComment, setDeletingComment] = useState<Comment | null>(null);
   const [deletePassword, setDeletePassword] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [expandedComment, setExpandedComment] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAdmin } = useAdmin();
@@ -347,126 +348,164 @@ export default function CommentsSection({ propertyId }: CommentsSectionProps) {
             {getTranslatedText("아직 문의가 없습니다. 첫 번째 문의를 남겨보세요!", "no-comments")}
           </div>
         ) : (
-          comments.map((comment, index) => (
-            <div key={comment.id}>
-              <Card className={comment.isAdminOnly === 1 ? "border-blue-200 bg-blue-50/50" : ""}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex flex-col space-y-1 mb-3">
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4 text-neutral-500" />
-                        <span className="font-medium text-gray-900">{comment.authorName || user?.name}</span>
-                        {comment.isAdminOnly === 1 && (
-                          <Badge variant="secondary" className="text-blue-600 bg-blue-100">
-                            <ShieldCheck className="h-3 w-3 mr-1" />
-                            {getTranslatedText("관리자 전용")}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-neutral-500">
-                        <span>{comment.createdAt && new Date(comment.createdAt).toLocaleString('ko-KR')}</span>
-                        {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
-                          <span className="text-xs text-neutral-400">({getTranslatedText("수정됨")})</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex space-x-1">
-                      {isAuthenticated && user?.id === comment.userId && (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditComment(comment)}
-                            className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteCommentUser(comment)}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                      {isAdmin && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteComment(comment.id)}
-                          disabled={deleteCommentMutation.isPending}
-                          className="text-red-600 hover:text-red-800 hover:bg-red-100"
-                          title="관리자 삭제"
-                        >
-                          <ShieldCheck className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="mt-2">
-                    {comment.isAdminOnly === 1 && !isAdmin ? (
-                      <div className="text-blue-600 italic">
-                        {getTranslatedText("관리자 전용 문의입니다.", "admin-only-message")}
-                      </div>
-                    ) : (
-                      <div className="bg-gray-50 p-3 rounded-md border">
-                        <p className="text-gray-600 text-sm mb-2">
-                          {getTranslatedText("개인정보 보호를 위해 내용이 숨겨집니다. 수정하려면 비밀번호를 입력하세요.", "privacy-message")}
-                        </p>
-                        <div className="text-gray-400 text-xs">
-                          {getTranslatedText("문의 내용 및 연락처는 관리자에게만 전달됩니다.", "admin-only-content")}
+          comments.map((comment, index) => {
+            const isExpanded = expandedComment === comment.id;
+            const canViewContent = user?.id === comment.userId || isAdmin;
+            const contentPreview = comment.content.length > 50 ? comment.content.substring(0, 50) + "..." : comment.content;
+            
+            return (
+              <div key={comment.id}>
+                <Card className={comment.isAdminOnly === 1 ? "border-blue-200 bg-blue-50/50" : ""}>
+                  <CardContent className="p-4">
+                    {/* 질문 제목 헤더 - 클릭 가능 */}
+                    <div 
+                      className="cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                      onClick={() => setExpandedComment(isExpanded ? null : comment.id)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex flex-col space-y-1 flex-1">
+                          <div className="flex items-center space-x-2">
+                            <User className="h-4 w-4 text-neutral-500" />
+                            <span className="font-medium text-gray-900">{comment.authorName || user?.name}</span>
+                            {comment.isAdminOnly === 1 && (
+                              <Badge variant="secondary" className="text-blue-600 bg-blue-100">
+                                <ShieldCheck className="h-3 w-3 mr-1" />
+                                {getTranslatedText("관리자 전용")}
+                              </Badge>
+                            )}
+                            {comment.adminReply && (
+                              <Badge variant="outline" className="text-green-600 border-green-200">
+                                답변완료
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-2 text-sm text-neutral-500">
+                            <span>{comment.createdAt && new Date(comment.createdAt).toLocaleString('ko-KR')}</span>
+                            {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
+                              <span className="text-xs text-neutral-400">({getTranslatedText("수정됨")})</span>
+                            )}
+                          </div>
+                          {/* 미리보기 제목 */}
+                          <div className="text-gray-700 font-medium mt-1">
+                            {canViewContent ? contentPreview : "문의 내용 (본인만 확인 가능)"}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {isExpanded ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </div>
                       </div>
-                    )}
-                    {/* 관리자만 연락처 표시 */}
-                    {isAdmin && comment.authorContact && (
-                      <div className="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded">
-                        <strong>휴대폰번호:</strong> {comment.authorContact}
+                    </div>
+
+                    {/* 상세 내용 - 확장 시에만 표시 */}
+                    {isExpanded && (
+                      <div className="mt-4 border-t pt-4">
+                        {/* 접근 권한 확인 */}
+                        {!canViewContent ? (
+                          <div className="text-center py-8">
+                            <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                              <ShieldCheck className="h-6 w-6 text-red-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                              접근 권한이 없습니다
+                            </h3>
+                            <p className="text-gray-600 mb-4">
+                              이 문의는 작성자 본인만 확인할 수 있습니다.
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              본인의 문의를 확인하려면 해당 계정으로 로그인해주세요.
+                            </p>
+                          </div>
+                        ) : (
+                          <>
+                            {/* 관리자만 연락처 표시 */}
+                            {isAdmin && comment.authorContact && (
+                              <div className="mb-3 text-sm text-blue-600 bg-blue-50 p-2 rounded">
+                                <strong>휴대폰번호:</strong> {comment.authorContact}
+                              </div>
+                            )}
+                            
+                            {/* 문의 내용 */}
+                            <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
+                              <p className="text-blue-900 whitespace-pre-wrap leading-relaxed">
+                                {comment.content}
+                              </p>
+                            </div>
+                            
+                            {/* 관리자 답변 표시 */}
+                            {comment.adminReply && (
+                              <div className="mb-4 p-3 bg-green-50 border-l-4 border-green-400 rounded">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <ShieldCheck className="h-4 w-4 text-green-600" />
+                                  <span className="text-sm font-medium text-green-800">관리자 답변</span>
+                                  {comment.adminReplyAt && (
+                                    <span className="text-xs text-green-600">
+                                      {new Date(comment.adminReplyAt).toLocaleString('ko-KR')}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-green-900 whitespace-pre-wrap leading-relaxed">
+                                  {comment.adminReply}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {/* 관리자 답변 작성 (관리자만) */}
+                            {isAdmin && !comment.adminReply && (
+                              <div className="mb-4">
+                                <AdminReplyForm commentId={comment.id} onSuccess={() => {
+                                  queryClient.invalidateQueries({ queryKey: [`/api/properties/${propertyId}/comments`] });
+                                }} />
+                              </div>
+                            )}
+                            
+                            {/* 수정/삭제 버튼 */}
+                            <div className="flex justify-end space-x-2">
+                              {isAuthenticated && user?.id === comment.userId && (
+                                <>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleEditComment(comment)}
+                                    className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                                  >
+                                    <Edit className="h-4 w-4 mr-1" />
+                                    수정
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDeleteCommentUser(comment)}
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-1" />
+                                    삭제
+                                  </Button>
+                                </>
+                              )}
+                              {isAdmin && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeleteComment(comment.id)}
+                                  disabled={deleteCommentMutation.isPending}
+                                  className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                                  title="관리자 삭제"
+                                >
+                                  <ShieldCheck className="h-4 w-4 mr-1" />
+                                  관리자 삭제
+                                </Button>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
-                    {/* 본인 댓글 또는 관리자만 실제 내용 표시 */}
-                    {(user?.id === comment.userId || isAdmin) && (
-                      <div className="mt-2 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
-                        <p className="text-blue-900 whitespace-pre-wrap leading-relaxed">
-                          {comment.content}
-                        </p>
-                      </div>
-                    )}
-                    
-                    {/* 관리자 답변 표시 */}
-                    {comment.adminReply && (
-                      <div className="mt-3 p-3 bg-green-50 border-l-4 border-green-400 rounded">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <ShieldCheck className="h-4 w-4 text-green-600" />
-                          <span className="text-sm font-medium text-green-800">관리자 답변</span>
-                          {comment.adminReplyAt && (
-                            <span className="text-xs text-green-600">
-                              {new Date(comment.adminReplyAt).toLocaleString('ko-KR')}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-green-900 whitespace-pre-wrap leading-relaxed">
-                          {comment.adminReply}
-                        </p>
-                      </div>
-                    )}
-                    
-                    {/* 관리자 답변 작성 (관리자만) */}
-                    {isAdmin && !comment.adminReply && (
-                      <div className="mt-3">
-                        <AdminReplyForm commentId={comment.id} onSuccess={() => {
-                          queryClient.invalidateQueries({ queryKey: [`/api/properties/${propertyId}/comments`] });
-                        }} />
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-              {index < comments.length - 1 && <Separator className="my-2" />}
-            </div>
-          ))
+                  </CardContent>
+                </Card>
+                {index < comments.length - 1 && <Separator className="my-2" />}
+              </div>
+            );
+          })
         )}
       </div>
 
