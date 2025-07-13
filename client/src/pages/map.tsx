@@ -80,20 +80,16 @@ export default function MapPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* 헤더 */}
-      <div className="bg-white border-b shadow-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-primary">🏠 Housing Buddy</h1>
-            <Badge variant="secondary" className="text-sm">
-              지도 기반 매물 탐색
-            </Badge>
-          </div>
-        </div>
+      {/* 간단한 헤더 */}
+      <div className="bg-white border-b p-4 flex items-center justify-between">
+        <h1 className="text-xl font-bold text-primary">🗺️ 지도로 매물 찾기</h1>
+        <Badge variant="secondary" className="text-sm">
+          {filteredProperties.length}개 매물
+        </Badge>
       </div>
 
       {/* 간단한 필터 바 */}
-      <div className="bg-white border-b p-3 sticky top-[73px] z-30">
+      <div className="bg-white border-b p-3 z-30">
         <div className="container mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex gap-3 items-center">
@@ -167,22 +163,35 @@ export default function MapPage() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-120px)]">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-140px)]">
         {/* 지도 영역 */}
         <div className="flex-1 relative">
-          <div className="absolute inset-0 bg-gray-100">
-            {/* Google Maps iframe - 서울 동작구 대방동 중심 */}
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25297.034899!2d126.914!3d37.509!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357c9fb76f936a77%3A0x1!2z7ISc7Jq47Yq567OE7IucIOuPmeyCrOq1rCDrjIXrsqntlZk!5e0!3m2!1sko!2skr!4v1634567890123!5m2!1sko!2skr"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="w-full h-full rounded-none"
-              title="서울 대방동 매물 지도"
-            ></iframe>
+          <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-blue-100 relative overflow-hidden">
+            {/* 지도 시뮬레이션 - 서울 대방동 일대 */}
+            <div className="absolute inset-0">
+              {/* 강 */}
+              <div className="absolute top-0 left-0 w-full h-16 bg-blue-200 transform -rotate-3"></div>
+              <div className="absolute bottom-0 left-0 w-full h-12 bg-blue-200 transform rotate-1"></div>
+              
+              {/* 도로 */}
+              <div className="absolute top-1/3 left-0 w-full h-2 bg-gray-300"></div>
+              <div className="absolute top-1/2 left-1/4 w-2 h-full bg-gray-300"></div>
+              <div className="absolute top-2/3 left-0 w-full h-2 bg-gray-300"></div>
+              <div className="absolute top-0 left-3/4 w-2 h-full bg-gray-300"></div>
+              
+              {/* 지역 라벨 */}
+              <div className="absolute top-20 left-10 text-xs text-gray-600 font-medium">한강</div>
+              <div className="absolute top-32 left-20 text-sm font-bold text-gray-800">대방동</div>
+              <div className="absolute top-48 left-40 text-sm font-bold text-gray-800">상도동</div>
+              <div className="absolute bottom-24 right-20 text-sm font-bold text-gray-800">신길동</div>
+              
+              {/* 지하철역 */}
+              <div className="absolute top-36 left-32 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
+              <div className="absolute top-40 left-28 text-xs text-green-700 font-medium">대방역</div>
+              
+              <div className="absolute top-52 left-48 w-3 h-3 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>
+              <div className="absolute top-56 left-44 text-xs text-blue-700 font-medium">상도역</div>
+            </div>
             
             {/* 매물 마커 시뮬레이션 (향후 실제 Google Maps API로 대체) */}
             <div className="absolute inset-0 pointer-events-none">
@@ -211,7 +220,7 @@ export default function MapPage() {
                 <MapPin className="h-4 w-4 text-red-500" />
                 <span className="font-medium">{filteredProperties.length}개 매물</span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">서울 동작구 중심</p>
+              <p className="text-xs text-gray-500 mt-1">서울 동작구 실시간</p>
             </div>
           </div>
         </div>
