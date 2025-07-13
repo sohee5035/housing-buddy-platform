@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, MessageCircle, Filter, Search } from "lucide-react";
 import { Property } from "@/shared/schema";
-import PropertyCard from "@/components/property-card-simple";
+// import PropertyCard from "@/components/property-card-simple";
 import {
   Dialog,
   DialogContent,
@@ -92,59 +92,37 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* 필터 바 */}
-      <div className="bg-white border-b p-4 sticky top-[73px] z-30">
+      {/* 간단한 필터 바 */}
+      <div className="bg-white border-b p-3 sticky top-[73px] z-30">
         <div className="container mx-auto">
-          <div className="flex flex-wrap gap-2 items-center">
-            <div className="flex gap-2 items-center flex-wrap">
-              <Input
-                placeholder="최소 보증금"
-                value={filters.minDeposit}
-                onChange={(e) => setFilters(prev => ({ ...prev, minDeposit: e.target.value }))}
-                className="w-24 text-xs"
-                type="number"
-              />
-              <span className="text-sm text-muted-foreground">~</span>
-              <Input
-                placeholder="최대 보증금"
-                value={filters.maxDeposit}
-                onChange={(e) => setFilters(prev => ({ ...prev, maxDeposit: e.target.value }))}
-                className="w-24 text-xs"
-                type="number"
-              />
-              <Input
-                placeholder="최소 월세"
-                value={filters.minRent}
-                onChange={(e) => setFilters(prev => ({ ...prev, minRent: e.target.value }))}
-                className="w-20 text-xs"
-                type="number"
-              />
-              <span className="text-sm text-muted-foreground">~</span>
-              <Input
-                placeholder="최대 월세"
-                value={filters.maxRent}
-                onChange={(e) => setFilters(prev => ({ ...prev, maxRent: e.target.value }))}
-                className="w-20 text-xs"
-                type="number"
-              />
+          <div className="flex items-center justify-between">
+            <div className="flex gap-3 items-center">
               <select
                 value={filters.category}
                 onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                className="px-3 py-1 border rounded text-xs"
+                className="px-3 py-2 border rounded-lg text-sm"
               >
-                <option value="">모든 유형</option>
+                <option value="">전체 유형</option>
                 <option value="원룸">원룸</option>
                 <option value="투룸">투룸</option>
                 <option value="오피스텔">오피스텔</option>
               </select>
+              
+              <Input
+                placeholder="최대 월세 (만원)"
+                value={filters.maxRent}
+                onChange={(e) => setFilters(prev => ({ ...prev, maxRent: e.target.value }))}
+                className="w-32 text-sm"
+                type="number"
+              />
             </div>
             
-            <div className="flex gap-2 ml-auto">
+            <div className="flex gap-2">
               <Dialog open={showNLDialog} onOpenChange={setShowNLDialog}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" className="flex items-center gap-1">
                     <MessageCircle className="h-4 w-4" />
-                    자연어 입력
+                    <span className="hidden md:inline">자연어 검색</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
@@ -163,7 +141,7 @@ export default function MapPage() {
                         취소
                       </Button>
                       <Button onClick={handleNaturalLanguageSubmit}>
-                        필터 적용
+                        검색
                       </Button>
                     </div>
                   </div>
@@ -171,7 +149,7 @@ export default function MapPage() {
               </Dialog>
               
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => setFilters({
                   minDeposit: "",
@@ -186,52 +164,24 @@ export default function MapPage() {
               </Button>
             </div>
           </div>
-          
-          {/* 활성 필터 표시 */}
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {filters.minDeposit && (
-              <Badge variant="secondary" className="text-xs">
-                보증금 {parseInt(filters.minDeposit).toLocaleString()}원 이상
-              </Badge>
-            )}
-            {filters.maxDeposit && (
-              <Badge variant="secondary" className="text-xs">
-                보증금 {parseInt(filters.maxDeposit).toLocaleString()}원 이하
-              </Badge>
-            )}
-            {filters.minRent && (
-              <Badge variant="secondary" className="text-xs">
-                월세 {parseInt(filters.minRent).toLocaleString()}원 이상
-              </Badge>
-            )}
-            {filters.maxRent && (
-              <Badge variant="secondary" className="text-xs">
-                월세 {parseInt(filters.maxRent).toLocaleString()}원 이하
-              </Badge>
-            )}
-            {filters.category && (
-              <Badge variant="secondary" className="text-xs">
-                {filters.category}
-              </Badge>
-            )}
-          </div>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-140px)]">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-120px)]">
         {/* 지도 영역 */}
         <div className="flex-1 relative">
-          <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-            {/* Google Maps iframe */}
+          <div className="absolute inset-0 bg-gray-100">
+            {/* Google Maps iframe - 서울 동작구 대방동 중심 */}
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50594.06979766597!2d126.89169842!3d37.5173305!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357c9f6b3a46b8ab%3A0x7e5fe5e5b5b5b5b5!2z64yA67Cp64+ZIOyXreuTsO2PrOq1rCDrjJXsnpHq1rDslq0!5e0!3m2!1sko!2skr!4v1634567890123!5m2!1sko!2skr"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25297.034899!2d126.914!3d37.509!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357c9fb76f936a77%3A0x1!2z7ISc7Jq47Yq567OE7IucIOuPmeyCrOq1rCDrjIXrsqntlZk!5e0!3m2!1sko!2skr!4v1634567890123!5m2!1sko!2skr"
               width="100%"
               height="100%"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="w-full h-full"
+              className="w-full h-full rounded-none"
+              title="서울 대방동 매물 지도"
             ></iframe>
             
             {/* 매물 마커 시뮬레이션 (향후 실제 Google Maps API로 대체) */}
@@ -239,34 +189,35 @@ export default function MapPage() {
               {filteredProperties.map((property, index) => (
                 <div
                   key={property.id}
-                  className="absolute pointer-events-auto cursor-pointer"
+                  className="absolute pointer-events-auto cursor-pointer z-10"
                   style={{
                     // 대방동, 상도동, 신길동 위치를 임시로 시뮬레이션
-                    left: `${20 + (index * 15)}%`,
-                    top: `${30 + (index * 10)}%`,
+                    left: `${25 + (index * 12)}%`,
+                    top: `${35 + (index * 8)}%`,
                   }}
                   onClick={() => setSelectedProperty(property)}
                 >
                   <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-lg hover:bg-red-600 transition-colors">
                     <MapPin className="h-3 w-3 inline mr-1" />
-                    {property.monthlyRent.toLocaleString()}만원
+                    {Math.round(property.monthlyRent / 10000)}만원
                   </div>
                 </div>
               ))}
             </div>
             
-            {/* 지도 위 매물 마커들 (향후 구현) */}
-            <div className="absolute top-4 left-4 bg-white rounded-lg p-2 shadow-lg">
+            {/* 지도 위 정보 */}
+            <div className="absolute top-4 left-4 bg-white rounded-lg p-3 shadow-lg z-10">
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-red-500" />
                 <span className="font-medium">{filteredProperties.length}개 매물</span>
               </div>
+              <p className="text-xs text-gray-500 mt-1">서울 동작구 중심</p>
             </div>
           </div>
         </div>
 
         {/* 매물 리스트 영역 */}
-        <div className="w-full lg:w-96 bg-white border-l overflow-y-auto">
+        <div className="w-full lg:w-80 bg-white border-l overflow-y-auto">
           <div className="p-4 border-b bg-gray-50">
             <h3 className="font-semibold text-lg">매물 목록</h3>
             <p className="text-sm text-muted-foreground">
