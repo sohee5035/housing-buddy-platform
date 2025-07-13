@@ -14,6 +14,7 @@ import AdminComments from "@/pages/admin-comments";
 import VerifyEmail from "@/pages/verify-email";
 import SignupPage from "@/pages/signup";
 import MyInquiries from "@/pages/my-inquiries";
+import MapPage from "@/pages/map";
 import NotFound from "@/pages/not-found";
 import AdminIconPreview from "@/components/admin-icon-preview";
 
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/favorites" component={Favorites} />
       <Route path="/signup" component={SignupPage} />
       <Route path="/my-inquiries" component={MyInquiries} />
+      <Route path="/map" component={MapPage} />
       <Route path="/trash" component={Trash} />
       <Route path="/admin/comments" component={AdminComments} />
       <Route path="/admin-icons" component={AdminIconPreview} />

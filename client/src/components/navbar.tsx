@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, Plus, Menu, User, LogOut, Settings, Heart, MessageCircle } from "lucide-react";
+import { Home, Plus, Menu, User, LogOut, Settings, Heart, MessageCircle, MapPin } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -36,6 +36,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
   const navItems = [
     { href: "/", label: "매물 보기", active: location === "/", id: "home" },
+    { href: "/map", label: "지도 탐색", active: location === "/map", id: "map" },
     { href: "/favorites", label: "관심 매물", active: location === "/favorites", id: "favorites" },
     { href: "/my-inquiries", label: "문의 내역", active: location === "/my-inquiries", id: "inquiries" },
   ];
