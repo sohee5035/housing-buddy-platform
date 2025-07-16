@@ -268,34 +268,9 @@ export default function Home() {
       {/* Navbar */}
       <Navbar onCreateListing={() => setShowCreateModal(true)} />
       
-      {/* Header with Admin Controls */}
+      {/* Header with Controls */}
       <header className="bg-white shadow-sm border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Admin Status Indicator */}
-          {isAdmin && (
-            <div className="flex items-center justify-end py-2">
-              <AdminPanel
-                trigger={
-                  <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">
-                    <ShieldCheck className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-700">관리자</span>
-                  </div>
-                }
-                onCreateListing={() => setShowCreateModal(true)}
-                onCategoryManager={() => setShowCategoryManager(true)}
-                onTrashView={() => window.location.href = "/trash"}
-                onCommentsView={() => window.location.href = "/admin/comments"}
-                onLogout={() => {
-                  logout();
-                  toast({
-                    title: "로그아웃",
-                    description: "관리자 모드에서 로그아웃되었습니다.",
-                  });
-                }}
-              />
-            </div>
-          )}
-          
           {/* Controls Row */}
           <div className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
