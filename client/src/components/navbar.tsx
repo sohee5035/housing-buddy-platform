@@ -183,10 +183,31 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              /* 로그인하지 않은 경우 로그인 버튼 */
-              <Button variant="ghost" size="icon" onClick={handleLogin}>
-                <User className="h-5 w-5" />
-              </Button>
+              /* 로그인하지 않은 경우 로그인 버튼과 관리자 로그인 버튼 */
+              <div className="flex items-center space-x-2">
+                {!isAdmin && (
+                  <Button variant="ghost" size="icon" onClick={() => setShowAdminLogin(true)} title="관리자 로그인">
+                    <Shield className="h-4 w-4" />
+                  </Button>
+                )}
+                {isAdmin && (
+                  <AdminPanel
+                    onCreateListing={() => setShowCreateModal(true)}
+                    onCategoryManager={() => setShowCategoryManager(true)}
+                    onTrashView={() => setLocation('/trash')}
+                    onCommentsView={() => setLocation('/admin/comments')}
+                    onLogout={adminLogout}
+                    trigger={
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Shield className="h-4 w-4" />
+                      </Button>
+                    }
+                  />
+                )}
+                <Button variant="ghost" size="icon" onClick={handleLogin}>
+                  <User className="h-5 w-5" />
+                </Button>
+              </div>
             )}
           </div>
 
