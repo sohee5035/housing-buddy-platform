@@ -140,13 +140,24 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
             )}
             
             {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="flex items-center space-x-2">
-                    <User className="h-5 w-5" />
-                    <span className="hidden lg:inline">{user?.name}</span>
-                  </Button>
-                </DropdownMenuTrigger>
+              <div className="flex items-center space-x-2">
+                {/* 관리자 방패 버튼 - 색상 반전 및 패널 열기 */}
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={isAdmin ? () => setShowAdminPanel(true) : () => setShowAdminLogin(true)} 
+                  title={isAdmin ? "관리자 패널" : "관리자 로그인"}
+                  className={isAdmin ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}
+                >
+                  <Shield className="h-4 w-4" />
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex items-center space-x-2">
+                      <User className="h-5 w-5" />
+                      <span className="hidden lg:inline">{user?.name}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuItem disabled>
                     <User className="h-4 w-4 mr-2" />
@@ -181,15 +192,20 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                     로그아웃
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+                </DropdownMenu>
+              </div>
             ) : (
               /* 로그인하지 않은 경우 로그인 버튼과 관리자 로그인 버튼 */
               <div className="flex items-center space-x-2">
-                {!isAdmin && (
-                  <Button variant="ghost" size="icon" onClick={() => setShowAdminLogin(true)} title="관리자 로그인">
-                    <Shield className="h-4 w-4" />
-                  </Button>
-                )}
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setShowAdminLogin(true)} 
+                  title="관리자 로그인"
+                  className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+                >
+                  <Shield className="h-4 w-4" />
+                </Button>
                 <Button variant="ghost" size="icon" onClick={handleLogin}>
                   <User className="h-5 w-5" />
                 </Button>
@@ -213,10 +229,22 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
             
             {/* 모바일에서 사용자 인사말 또는 로그인/관리자 버튼들 표시 */}
             {isAuthenticated ? (
-              <div className="flex items-center text-sm text-neutral-700 bg-neutral-50 px-3 py-1 rounded-full">
-                <span className="font-medium">
-                  {user?.name}{getTranslatedText("님 안녕하세요!", "greeting-suffix")}
-                </span>
+              <div className="flex items-center space-x-1">
+                {/* 관리자 로그인 후 방패 버튼 - 색상 반전 및 패널 열기 */}
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setShowAdminPanel(true)} 
+                  title="관리자 패널"
+                  className={isAdmin ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}
+                >
+                  <Shield className="h-4 w-4" />
+                </Button>
+                <div className="flex items-center text-sm text-neutral-700 bg-neutral-50 px-3 py-1 rounded-full">
+                  <span className="font-medium">
+                    {user?.name}{getTranslatedText("님 안녕하세요!", "greeting-suffix")}
+                  </span>
+                </div>
               </div>
             ) : (
               <div className="flex items-center space-x-1">
