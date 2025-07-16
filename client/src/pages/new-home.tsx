@@ -254,7 +254,7 @@ export default function NewHome() {
             </div>
             <Link href="/properties">
               <Button variant="outline">
-                전체보기 <ArrowRight className="h-4 w-4 ml-2" />
+                {getTranslatedText("전체보기", "view-all")} <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
           </div>
@@ -279,7 +279,7 @@ export default function NewHome() {
                     </div>
                   )}
                   <div className="absolute top-3 left-3">
-                    <Badge variant="secondary">신규</Badge>
+                    <Badge variant="secondary">{getTranslatedText("신규", "new-badge")}</Badge>
                   </div>
                   <div className="absolute top-3 right-3" onClick={(e) => e.stopPropagation()}>
                     <FavoriteButton propertyId={property.id} size="sm" variant="ghost" />
@@ -295,22 +295,22 @@ export default function NewHome() {
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">보증금</span>
+                      <span className="text-sm text-gray-600">{getTranslatedText("보증금", "deposit")}</span>
                       <span className="font-semibold text-blue-600">
-                        {property.deposit.toLocaleString()}원
+                        {property.deposit.toLocaleString()}{getTranslatedText("원", "won")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">월세</span>
+                      <span className="text-sm text-gray-600">{getTranslatedText("월세", "monthly-rent")}</span>
                       <span className="font-semibold text-green-600">
-                        {property.monthlyRent.toLocaleString()}원
+                        {property.monthlyRent.toLocaleString()}{getTranslatedText("원", "won")}
                       </span>
                     </div>
                   </div>
                   
                   <div onClick={(e) => e.stopPropagation()}>
                     <Link href={`/property/${property.id}`}>
-                      <Button className="w-full">자세히 보기</Button>
+                      <Button className="w-full">{getTranslatedText("자세히 보기", "view-details")}</Button>
                     </Link>
                   </div>
                 </CardContent>

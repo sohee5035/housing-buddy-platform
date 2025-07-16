@@ -106,7 +106,12 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'university-property-search', text: '대학교별 매물 찾기' },
         { key: 'university-property-desc', text: '내가 다닐 대학교 근처의 안전하고 편리한 매물을 확인해보세요' },
         { key: 'recommended-properties', text: '추천 매물' },
-        { key: 'recommended-desc', text: '하우징버디가 엄선한 외국인 유학생에게 인기 있는 매물들' }
+        { key: 'recommended-desc', text: '하우징버디가 엄선한 외국인 유학생에게 인기 있는 매물들' },
+        { key: 'new-badge', text: '신규' },
+        { key: 'deposit', text: '보증금' },
+        { key: 'won', text: '원' },
+        { key: 'view-details', text: '자세히 보기' },
+        { key: 'view-all', text: '전체보기' }
       ];
 
       // 일괄 번역 API 호출
