@@ -134,9 +134,7 @@ export default function NewHome() {
               <span className="text-blue-600 block mt-2">{getTranslatedText("나의 첫 집", "main-title-2")}</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              {getTranslatedText("외국인 유학생을 위한 안전하고 편리한 주거 솔루션", "main-desc-1")}
-              <br />
-              <span className="text-blue-500 font-medium">{getTranslatedText("하우징버디", "housing-buddy-name")}</span>{getTranslatedText("가 함께합니다", "main-desc-2")}
+              {getTranslatedText("외국인을 위한 편리한 주거 솔루션", "main-desc-new")}, <span className="text-blue-500 font-medium">{getTranslatedText("하우징버디", "housing-buddy-name")}</span>{getTranslatedText("를 만나보세요", "meet-housing-buddy")}
             </p>
           </div>
 

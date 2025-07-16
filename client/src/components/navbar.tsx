@@ -94,9 +94,9 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         // 메인 페이지 텍스트
         { key: 'main-title-1', text: '한국에서 찾는' },
         { key: 'main-title-2', text: '나의 첫 집' },
-        { key: 'main-desc-1', text: '외국인 유학생을 위한 안전하고 편리한 주거 솔루션' },
+        { key: 'main-desc-new', text: '외국인을 위한 편리한 주거 솔루션' },
         { key: 'housing-buddy-name', text: '하우징버디' },
-        { key: 'main-desc-2', text: '가 함께합니다' },
+        { key: 'meet-housing-buddy', text: '를 만나보세요' },
         { key: 'university', text: '대학교' },
         { key: 'university-select', text: '대학교 선택' },
         { key: 'monthly-rent', text: '월세' },
