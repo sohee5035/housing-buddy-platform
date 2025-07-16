@@ -350,6 +350,10 @@ export default function PropertyDetail() {
                 {/* 연결된 대학교 정보 - 매물 제목 위에 표시 */}
                 {propertyUniversities && propertyUniversities.length > 0 && (
                   <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
+                      <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
+                      근처 대학교
+                    </h3>
                     <div className="flex flex-wrap gap-2">
                       {propertyUniversities.map((pu: any) => (
                         <div 
