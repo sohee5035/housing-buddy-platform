@@ -106,6 +106,15 @@
     -webkit-line-clamp: 2;
   }
   
+  .address-text {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-break: break-word;
+    line-height: 1.4;
+  }
+  
   /* Toast 진행 바 애니메이션 */
   .toast-progress-bar {
     animation: toast-progress linear forwards;
