@@ -3,9 +3,11 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface TranslationContextType {
   translatedData: Record<string, string>;
   isTranslated: boolean;
+  isTranslating: boolean;
   targetLanguage: string;
   setTranslatedData: (data: Record<string, string>) => void;
   setIsTranslated: (translated: boolean) => void;
+  setIsTranslating: (translating: boolean) => void;
   setTargetLanguage: (language: string) => void;
   updateTargetLanguage: (language: string) => void;
   getTranslatedText: (originalText: string, key?: string) => string;
@@ -17,6 +19,7 @@ const TranslationContext = createContext<TranslationContextType | undefined>(und
 export function TranslationProvider({ children }: { children: ReactNode }) {
   const [translatedData, setTranslatedData] = useState<Record<string, string>>({});
   const [isTranslated, setIsTranslated] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const [targetLanguage, setTargetLanguage] = useState(() => {
     try {
       return localStorage.getItem('selectedLanguage') || 'ko';
@@ -63,9 +66,11 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     <TranslationContext.Provider value={{
       translatedData,
       isTranslated,
+      isTranslating,
       targetLanguage,
       setTranslatedData,
       setIsTranslated,
+      setIsTranslating,
       setTargetLanguage,
       updateTargetLanguage,
       getTranslatedText,

@@ -45,7 +45,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const { user, isAuthenticated, logout } = useAuth();
   const { toast } = useToast();
   const { isAdmin, logout: adminLogout } = useAdmin();
-  const { getTranslatedText, isTranslated, targetLanguage, updateTargetLanguage, setIsTranslated, setTranslatedData } = useTranslation();
+  const { getTranslatedText, isTranslated, isTranslating, targetLanguage, updateTargetLanguage, setIsTranslated, setIsTranslating, setTranslatedData } = useTranslation();
   
   // 지원 언어 목록
   const languages = [
@@ -72,8 +72,9 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
     }
     
     updateTargetLanguage(languageCode);
+    setIsTranslating(true);
     
-    // 페이지 번역 실행
+    // 일괄 번역 실행
     try {
       const textsToTranslate = [
         { key: 'home', text: '홈' },
@@ -92,39 +93,28 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'login', text: '로그인' }
       ];
 
-      const newTranslatedData: Record<string, string> = {};
-      
-      // 개별 텍스트 번역 요청
-      for (const item of textsToTranslate) {
-        try {
-          const response = await fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              text: item.text,
-              targetLang: languageCode
-            })
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            newTranslatedData[item.key] = result.translatedText || item.text;
-          } else {
-            newTranslatedData[item.key] = item.text;
-          }
-        } catch (error) {
-          console.error(`번역 실패 (${item.key}):`, error);
-          newTranslatedData[item.key] = item.text;
-        }
-      }
-
-      setTranslatedData(newTranslatedData);
-      setIsTranslated(true);
-      
-      toast({
-        title: "번역 완료",
-        description: `${currentLanguage.name}로 번역되었습니다.`
+      // 일괄 번역 API 호출
+      const response = await fetch('/api/translate-batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          texts: textsToTranslate,
+          targetLang: languageCode
+        })
       });
+
+      if (response.ok) {
+        const result = await response.json();
+        setTranslatedData(result.translations);
+        setIsTranslated(true);
+        
+        toast({
+          title: "번역 완료",
+          description: `${currentLanguage.name}로 번역되었습니다.`
+        });
+      } else {
+        throw new Error('번역 API 오류');
+      }
     } catch (error) {
       console.error('번역 실패:', error);
       toast({
@@ -132,6 +122,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         description: "번역 중 오류가 발생했습니다.",
         variant: "destructive"
       });
+    } finally {
+      setIsTranslating(false);
     }
   };
   
@@ -217,9 +209,10 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
             {/* 언어 선택 드롭다운 */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                  <Languages className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2" disabled={isTranslating}>
+                  <Languages className={`h-4 w-4 ${isTranslating ? 'animate-spin' : ''}`} />
                   <span className="text-sm">{currentLanguage.flag}</span>
+                  {isTranslating && <span className="text-xs ml-1">번역중...</span>}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -313,7 +306,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
             {/* 모바일 언어 선택 */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" disabled={isTranslating}>
                   <Languages className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>

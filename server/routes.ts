@@ -705,21 +705,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // POST /api/translate - Translate text
+  // POST /api/translate - Translate single text
   app.post("/api/translate", async (req: Request, res: Response) => {
     try {
-      console.log("=== TRANSLATE ENDPOINT CALLED ===");
       const { text, targetLang } = req.body;
-      console.log("Request data:", { text, targetLang });
       
       if (!text || !targetLang) {
-        console.log("Missing required fields");
         return res.status(400).json({ message: "Text and target language are required" });
       }
 
       const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
       if (!apiKey) {
-        console.log("No API key found");
         return res.status(500).json({ message: "Translation service not configured" });
       }
 
@@ -732,14 +728,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const lineBreakMarker = '<<<LINEBREAK>>>';
       const textWithMarkers = text.replace(/\n/g, lineBreakMarker);
 
-      // 한국어로 번역할 때는 소스 언어를 자동 감지하고, 다른 언어로 번역할 때는 한국어에서 번역
       const requestBody: any = {
         q: textWithMarkers,
         target: targetLang,
         source: 'ko',
       };
 
-      console.log("Making API request to Google Translate...");
       const response = await fetch(
         `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
         {
@@ -751,10 +745,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       );
 
-      console.log("API response status:", response.status);
       if (!response.ok) {
         const errorText = await response.text();
-        console.log("API error response:", errorText);
         throw new Error(`Translation API error: ${response.statusText}`);
       }
 
@@ -768,6 +760,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error translating text:", error);
       res.status(500).json({ message: "Translation failed" });
+    }
+  });
+
+  // POST /api/translate-batch - Translate multiple texts at once
+  app.post("/api/translate-batch", async (req: Request, res: Response) => {
+    try {
+      const { texts, targetLang } = req.body;
+      
+      if (!texts || !Array.isArray(texts) || !targetLang) {
+        return res.status(400).json({ message: "Texts array and target language are required" });
+      }
+
+      const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: "Translation service not configured" });
+      }
+
+      // 같은 언어로 번역하는 경우 원본 텍스트 그대로 반환
+      if (targetLang === 'ko') {
+        const result: Record<string, string> = {};
+        texts.forEach((item: { key: string; text: string }) => {
+          result[item.key] = item.text;
+        });
+        return res.json({ translations: result });
+      }
+
+      // 줄바꿈 보존을 위해 특별한 마커로 대체
+      const lineBreakMarker = '<<<LINEBREAK>>>';
+      const textsToTranslate = texts.map((item: { key: string; text: string }) => 
+        item.text.replace(/\n/g, lineBreakMarker)
+      );
+
+      const requestBody: any = {
+        q: textsToTranslate,
+        target: targetLang,
+        source: 'ko',
+      };
+
+      const response = await fetch(
+        `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Translation API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const translations = data.data.translations;
+      
+      // 결과를 key-value 형태로 매핑
+      const result: Record<string, string> = {};
+      texts.forEach((item: { key: string; text: string }, index: number) => {
+        let translatedText = translations[index].translatedText;
+        // 마커를 다시 줄바꿈으로 복원
+        translatedText = translatedText.replace(new RegExp(lineBreakMarker, 'g'), '\n');
+        result[item.key] = translatedText;
+      });
+      
+      res.json({ translations: result });
+    } catch (error: any) {
+      console.error("Error batch translating texts:", error);
+      res.status(500).json({ message: "Batch translation failed" });
     }
   });
 
