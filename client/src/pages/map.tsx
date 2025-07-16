@@ -169,7 +169,7 @@ export default function MapPage() {
           <div className="w-full h-full relative">
             {/* Google Maps iframe */}
             <iframe
-              src="https://maps.google.com/maps?q=서울특별시+동작구+대방동,상도동,신길동&output=embed&z=14"
+              src="https://maps.google.com/maps?q=서울특별시+동작구&output=embed&z=13&t=m"
               width="100%"
               height="100%"
               style={{ border: 0 }}
