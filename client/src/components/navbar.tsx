@@ -140,6 +140,11 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
               />
             )}
             
+            {/* 디버깅용 상태 표시 */}
+            <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+              Admin: {isAdmin ? 'true' : 'false'}
+            </div>
+            
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
