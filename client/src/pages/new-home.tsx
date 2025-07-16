@@ -91,8 +91,23 @@ export default function NewHome() {
   };
 
   const handleUniversityClick = (universityId: string) => {
-    // 해당 대학교 매물 필터링된 페이지로 이동
-    window.location.href = `/properties?university=${universityId}`;
+    // 대학교 ID를 데이터베이스 ID로 매핑
+    const universityIdMap: { [key: string]: number } = {
+      'snu': 1,        // 서울대학교
+      'yonsei': 2,     // 연세대학교  
+      'korea': 3,      // 고려대학교
+      'hongik': 4,     // 홍익대학교
+      'ewha': 5,       // 이화여자대학교
+      'sogang': 6,     // 서강대학교
+      'skku': 7,       // 성균관대학교
+      'kyunghee': 8    // 경희대학교
+    };
+    
+    const dbUniversityId = universityIdMap[universityId];
+    if (dbUniversityId) {
+      // 해당 대학교 매물 필터링된 페이지로 이동
+      window.location.href = `/properties?university=${dbUniversityId}`;
+    }
   };
 
   const handleSearch = () => {
