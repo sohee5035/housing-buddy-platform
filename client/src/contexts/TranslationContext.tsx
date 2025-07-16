@@ -7,6 +7,7 @@ interface TranslationContextType {
   setTranslatedData: (data: Record<string, string>) => void;
   setIsTranslated: (translated: boolean) => void;
   setTargetLanguage: (language: string) => void;
+  updateTargetLanguage: (language: string) => void;
   getTranslatedText: (originalText: string, key?: string) => string;
   clearTranslations: () => void;
 }
@@ -16,7 +17,13 @@ const TranslationContext = createContext<TranslationContextType | undefined>(und
 export function TranslationProvider({ children }: { children: ReactNode }) {
   const [translatedData, setTranslatedData] = useState<Record<string, string>>({});
   const [isTranslated, setIsTranslated] = useState(false);
-  const [targetLanguage, setTargetLanguage] = useState('en');
+  const [targetLanguage, setTargetLanguage] = useState(() => {
+    try {
+      return localStorage.getItem('selectedLanguage') || 'ko';
+    } catch {
+      return 'ko';
+    }
+  });
 
   const getTranslatedText = (originalText: string, key?: string) => {
     console.log('getTranslatedText 호출:', {
@@ -45,6 +52,13 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     setIsTranslated(false);
   };
 
+  const updateTargetLanguage = (language: string) => {
+    setTargetLanguage(language);
+    localStorage.setItem('selectedLanguage', language);
+    // 언어 변경 시 기존 번역 데이터 초기화
+    clearTranslations();
+  };
+
   return (
     <TranslationContext.Provider value={{
       translatedData,
@@ -53,6 +67,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       setTranslatedData,
       setIsTranslated,
       setTargetLanguage,
+      updateTargetLanguage,
       getTranslatedText,
       clearTranslations
     }}>

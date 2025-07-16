@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, Plus, Menu, User, LogOut, Settings, Heart, MessageCircle, MapPin, Shield } from "lucide-react";
+import { Home, Plus, Menu, User, LogOut, Settings, Heart, MessageCircle, MapPin, Shield, Languages, Globe } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -44,7 +44,75 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const { user, isAuthenticated, logout } = useAuth();
   const { toast } = useToast();
   const { isAdmin, logout: adminLogout } = useAdmin();
-  const { getTranslatedText, isTranslated } = useTranslation();
+  const { getTranslatedText, isTranslated, targetLanguage, updateTargetLanguage, setIsTranslated, setTranslatedData } = useTranslation();
+  
+  // 지원 언어 목록
+  const languages = [
+    { code: 'ko', name: '한국어', flag: '🇰🇷' },
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'ja', name: '日本語', flag: '🇯🇵' },
+    { code: 'zh', name: '中文', flag: '🇨🇳' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+    { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+    { code: 'th', name: 'ไทย', flag: '🇹🇭' }
+  ];
+
+  const currentLanguage = languages.find(lang => lang.code === targetLanguage) || languages[0];
+  
+  // 언어 변경 및 번역 함수
+  const handleLanguageChange = async (languageCode: string) => {
+    if (languageCode === 'ko') {
+      // 한국어로 변경 시 번역 해제
+      updateTargetLanguage('ko');
+      return;
+    }
+    
+    updateTargetLanguage(languageCode);
+    
+    // 페이지 번역 실행
+    try {
+      const textsToTranslate = [
+        { key: 'home', text: '홈' },
+        { key: 'favorites', text: '관심 매물' },
+        { key: 'inquiries', text: '문의 내역' },
+        { key: 'login-signup', text: '로그인 / 회원가입' },
+        { key: 'logout', text: '로그아웃' },
+        { key: 'account-settings', text: '계정 설정' },
+        { key: 'greeting-suffix', text: '님 안녕하세요!' },
+        { key: 'admin-login', text: '관리자 로그인' },
+        { key: 'housing-buddy', text: 'Housing Buddy' }
+      ];
+
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          texts: textsToTranslate,
+          targetLanguage: languageCode
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setIsTranslated(true);
+        setTranslatedData(result.translations);
+        toast({
+          title: "번역 완료",
+          description: `${currentLanguage.name}로 번역되었습니다.`
+        });
+      }
+    } catch (error) {
+      console.error('번역 실패:', error);
+      toast({
+        title: "번역 실패",
+        description: "번역 중 오류가 발생했습니다.",
+        variant: "destructive"
+      });
+    }
+  };
   
   // 매물 데이터를 가져와서 카테고리 추출 (옵셔널)
   const { data: properties = [] } = useQuery({
@@ -63,9 +131,9 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   });
 
   const navItems = [
-    { href: "/", label: "홈", active: location === "/", id: "home" },
-    { href: "/favorites", label: "관심 매물", active: location === "/favorites", id: "favorites" },
-    { href: "/my-inquiries", label: "문의 내역", active: location === "/my-inquiries", id: "inquiries" },
+    { href: "/", label: getTranslatedText("홈", "home"), active: location === "/", id: "home" },
+    { href: "/favorites", label: getTranslatedText("관심 매물", "favorites"), active: location === "/favorites", id: "favorites" },
+    { href: "/my-inquiries", label: getTranslatedText("문의 내역", "inquiries"), active: location === "/my-inquiries", id: "inquiries" },
   ];
 
   const handleLogin = () => {
@@ -100,7 +168,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center">
               <Home className="h-6 w-6 text-primary mr-2" />
-              <span className="text-xl font-bold text-neutral-900">Housing Buddy</span>
+              <span className="text-xl font-bold text-neutral-900">{getTranslatedText("Housing Buddy", "housing-buddy")}</span>
             </Link>
             
             {/* Desktop Navigation */}
@@ -123,6 +191,31 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* 언어 선택 드롭다운 */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <Languages className="h-4 w-4" />
+                  <span className="text-sm">{currentLanguage.flag}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {languages.map((language) => (
+                  <DropdownMenuItem
+                    key={language.code}
+                    onClick={() => handleLanguageChange(language.code)}
+                    className={targetLanguage === language.code ? "bg-blue-50" : ""}
+                  >
+                    <span className="mr-2">{language.flag}</span>
+                    {language.name}
+                    {targetLanguage === language.code && (
+                      <span className="ml-auto text-blue-600">✓</span>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* 관리자 방패 버튼 - 로그인 후에만 표시 */}
             {isAdmin && (
               <AdminPanel
@@ -156,30 +249,30 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <Settings className="h-4 w-4 mr-2" />
-                    계정 설정
+                    {getTranslatedText("계정 설정", "account-settings")}
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/favorites" className="w-full flex items-center">
                       <Heart className="h-4 w-4 mr-2" />
-                      관심 매물
+                      {getTranslatedText("관심 매물", "favorites")}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/my-inquiries" className="w-full flex items-center">
                       <MessageCircle className="h-4 w-4 mr-2" />
-                      문의 내역
+                      {getTranslatedText("문의 내역", "inquiries")}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {!isAdmin && (
                     <DropdownMenuItem onClick={() => setShowAdminLogin(true)}>
                       <Settings className="h-4 w-4 mr-2" />
-                      관리자 로그인
+                      {getTranslatedText("관리자 로그인", "admin-login")}
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
-                    로그아웃
+                    {getTranslatedText("로그아웃", "logout")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
                 </DropdownMenu>
@@ -194,6 +287,30 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
           {/* Mobile Menu */}
           <div className="md:hidden flex items-center space-x-1">
+            {/* 모바일 언어 선택 */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Languages className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {languages.map((language) => (
+                  <DropdownMenuItem
+                    key={language.code}
+                    onClick={() => handleLanguageChange(language.code)}
+                    className={targetLanguage === language.code ? "bg-blue-50" : ""}
+                  >
+                    <span className="mr-2">{language.flag}</span>
+                    {language.name}
+                    {targetLanguage === language.code && (
+                      <span className="ml-auto text-blue-600">✓</span>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* 관리자인 경우에만 모바일 매물 등록 버튼 표시 */}
             {isAuthenticated && isAdmin && (
               <Button
@@ -245,7 +362,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 <div className="flex flex-col space-y-4 mt-8">
                   <div className="flex items-center mb-6">
                     <Home className="h-6 w-6 text-primary mr-2" />
-                    <span className="text-xl font-bold text-neutral-900">Housing Buddy</span>
+                    <span className="text-xl font-bold text-neutral-900">{getTranslatedText("Housing Buddy", "housing-buddy")}</span>
                   </div>
                   
                   {navItems.map((item) => (
@@ -294,7 +411,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                             trigger={
                               <Button variant="outline" className="w-full mb-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white">
                                 <Settings className="h-4 w-4 mr-2" />
-                                관리자
+                                {getTranslatedText("관리자", "admin")}
                               </Button>
                             }
                           />
@@ -306,7 +423,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           <Settings className="h-4 w-4 mr-2" />
-                          계정 설정
+                          {getTranslatedText("계정 설정", "account-settings")}
                         </Button>
                         
                         {!isAdmin && (
@@ -319,7 +436,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                             }}
                           >
                             <Settings className="h-4 w-4 mr-2" />
-                            관리자 로그인
+                            {getTranslatedText("관리자 로그인", "admin-login")}
                           </Button>
                         )}
                         
@@ -332,7 +449,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                           }}
                         >
                           <LogOut className="h-4 w-4 mr-2" />
-                          로그아웃
+                          {getTranslatedText("로그아웃", "logout")}
                         </Button>
                       </>
                     ) : (
@@ -345,7 +462,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                         }}
                       >
                         <User className="h-4 w-4 mr-2" />
-                        로그인 / 회원가입
+                        {getTranslatedText("로그인 / 회원가입", "login-signup")}
                       </Button>
                     )}
                   </div>
@@ -366,7 +483,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
       {/* 매물 등록 모달 */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogTitle>새 매물 등록</DialogTitle>
+          <DialogTitle>{getTranslatedText("새 매물 등록", "new-property")}</DialogTitle>
           <PropertyForm 
             onSuccess={() => setShowCreateModal(false)}
             onCancel={() => setShowCreateModal(false)}
@@ -378,7 +495,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
       {/* 카테고리 관리 모달 */}
       <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
         <DialogContent>
-          <DialogTitle>카테고리 관리</DialogTitle>
+          <DialogTitle>{getTranslatedText("카테고리 관리", "category-management")}</DialogTitle>
           <CategoryManager
             isOpen={showCategoryManager}
             onClose={() => setShowCategoryManager(false)}
