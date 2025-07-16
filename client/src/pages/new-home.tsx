@@ -379,19 +379,7 @@ export default function NewHome() {
         </div>
       )}
       
-      {/* 관리자 로그아웃 버튼 (테스트용) */}
-      {isAdmin && (
-        <div
-          className="fixed bottom-16 right-4 bg-red-500 text-white p-2 rounded cursor-pointer text-xs"
-          onClick={() => {
-            console.log('관리자 로그아웃');
-            localStorage.removeItem('housing-buddy-admin');
-            window.location.reload();
-          }}
-        >
-          로그아웃
-        </div>
-      )}
+
 
       {/* 관리자 버튼 - 트리거 클릭 시에만 표시 */}
       {showAdminTrigger && !isAdmin && (
