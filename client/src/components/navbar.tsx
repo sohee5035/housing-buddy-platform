@@ -35,8 +35,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const { getTranslatedText, isTranslated } = useTranslation();
 
   const navItems = [
-    { href: "/", label: "매물 보기", active: location === "/", id: "home" },
-    { href: "/map", label: "🗺️ 지도로 찾기", active: location === "/map", id: "map" },
+    { href: "/", label: "홈", active: location === "/", id: "home" },
     { href: "/favorites", label: "관심 매물", active: location === "/favorites", id: "favorites" },
     { href: "/my-inquiries", label: "문의 내역", active: location === "/my-inquiries", id: "inquiries" },
   ];
