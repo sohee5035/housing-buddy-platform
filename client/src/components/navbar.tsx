@@ -123,34 +123,33 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* 관리자 패널 버튼 - 관리자 로그인 시에만 표시 */}
-            {isAdmin && (
-              <AdminPanel
-                onCreateListing={() => setShowCreateModal(true)}
-                onCategoryManager={() => setShowCategoryManager(true)}
-                onTrashView={() => setLocation('/trash')}
-                onCommentsView={() => setLocation('/admin/comments')}
-                onLogout={adminLogout}
-                trigger={
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    <Shield className="h-4 w-4" />
-                  </Button>
-                }
-              />
-            )}
-            
             {isAuthenticated ? (
               <div className="flex items-center space-x-2">
                 {/* 관리자 방패 버튼 - 색상 반전 및 패널 열기 */}
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={isAdmin ? () => setShowAdminPanel(true) : () => setShowAdminLogin(true)} 
-                  title={isAdmin ? "관리자 패널" : "관리자 로그인"}
-                  className={isAdmin ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}
-                >
-                  <Shield className="h-4 w-4" />
-                </Button>
+                {isAdmin ? (
+                  <AdminPanel
+                    onCreateListing={() => setShowCreateModal(true)}
+                    onCategoryManager={() => setShowCategoryManager(true)}
+                    onTrashView={() => setLocation('/trash')}
+                    onCommentsView={() => setLocation('/admin/comments')}
+                    onLogout={adminLogout}
+                    trigger={
+                      <Button className="bg-blue-600 text-white hover:bg-blue-700">
+                        <Shield className="h-4 w-4" />
+                      </Button>
+                    }
+                  />
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => setShowAdminLogin(true)} 
+                    title="관리자 로그인"
+                    className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+                  >
+                    <Shield className="h-4 w-4" />
+                  </Button>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="flex items-center space-x-2">
@@ -230,16 +229,31 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
             {/* 모바일에서 사용자 인사말 또는 로그인/관리자 버튼들 표시 */}
             {isAuthenticated ? (
               <div className="flex items-center space-x-1">
-                {/* 관리자 로그인 후 방패 버튼 - 색상 반전 및 패널 열기 */}
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setShowAdminPanel(true)} 
-                  title="관리자 패널"
-                  className={isAdmin ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}
-                >
-                  <Shield className="h-4 w-4" />
-                </Button>
+                {/* 관리자 방패 버튼 - 색상 반전 및 패널 열기 */}
+                {isAdmin ? (
+                  <AdminPanel
+                    onCreateListing={() => setShowCreateModal(true)}
+                    onCategoryManager={() => setShowCategoryManager(true)}
+                    onTrashView={() => setLocation('/trash')}
+                    onCommentsView={() => setLocation('/admin/comments')}
+                    onLogout={adminLogout}
+                    trigger={
+                      <Button variant="ghost" size="icon" className="bg-blue-600 text-white hover:bg-blue-700">
+                        <Shield className="h-4 w-4" />
+                      </Button>
+                    }
+                  />
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => setShowAdminLogin(true)} 
+                    title="관리자 로그인"
+                    className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+                  >
+                    <Shield className="h-4 w-4" />
+                  </Button>
+                )}
                 <div className="flex items-center text-sm text-neutral-700 bg-neutral-50 px-3 py-1 rounded-full">
                   <span className="font-medium">
                     {user?.name}{getTranslatedText("님 안녕하세요!", "greeting-suffix")}
