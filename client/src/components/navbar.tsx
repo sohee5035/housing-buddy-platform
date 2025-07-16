@@ -190,20 +190,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                     <Shield className="h-4 w-4" />
                   </Button>
                 )}
-                {isAdmin && (
-                  <AdminPanel
-                    onCreateListing={() => setShowCreateModal(true)}
-                    onCategoryManager={() => setShowCategoryManager(true)}
-                    onTrashView={() => setLocation('/trash')}
-                    onCommentsView={() => setLocation('/admin/comments')}
-                    onLogout={adminLogout}
-                    trigger={
-                      <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                        <Shield className="h-4 w-4" />
-                      </Button>
-                    }
-                  />
-                )}
                 <Button variant="ghost" size="icon" onClick={handleLogin}>
                   <User className="h-5 w-5" />
                 </Button>
@@ -340,6 +326,20 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                       </>
                     ) : (
                       <>
+                        {!isAdmin && (
+                          <Button 
+                            variant="ghost" 
+                            className="w-full mb-2"
+                            onClick={() => {
+                              setShowAdminLogin(true);
+                              setIsMobileMenuOpen(false);
+                            }}
+                          >
+                            <Shield className="h-4 w-4 mr-2" />
+                            관리자 로그인
+                          </Button>
+                        )}
+                        
                         <Button 
                           variant="outline" 
                           className="w-full"
