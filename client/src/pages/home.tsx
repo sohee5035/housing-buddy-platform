@@ -425,13 +425,17 @@ export default function Home() {
             {filteredProperties.map((property) => (
               <div 
                 key={property.id} 
-                onClick={() => {
-                  console.log('Card clicked, navigating to:', `/property/${property.id}`);
-                  setLocation(`/property/${property.id}`);
+                onClick={(e) => {
+                  // 하트 버튼이나 상세보기 버튼이 아닌 경우에만 네비게이션
+                  if (!(e.target as HTMLElement).closest('button')) {
+                    console.log('Card clicked, navigating to:', `/property/${property.id}`);
+                    setLocation(`/property/${property.id}`);
+                  }
                 }}
-                className="cursor-pointer transition-transform hover:scale-105"
+                className="cursor-pointer transition-transform hover:scale-105 block"
+                style={{ WebkitUserSelect: 'none', userSelect: 'none' }}
               >
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full pointer-events-none">
                     <div className="relative h-48 bg-neutral-200">
                       {property.photos && property.photos.length > 0 ? (
                         <img
@@ -458,7 +462,7 @@ export default function Home() {
                           />
                         </h3>
                         <div 
-                          className="ml-2" 
+                          className="ml-2 pointer-events-auto" 
                           onClick={(e) => {
                             e.stopPropagation();
                           }}
@@ -526,6 +530,7 @@ export default function Home() {
                     <Button 
                       size="sm" 
                       variant="outline"
+                      className="pointer-events-auto"
                       onClick={(e) => {
                         e.stopPropagation();
                         setLocation(`/property/${property.id}`);
