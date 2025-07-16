@@ -460,8 +460,8 @@ export default function Home() {
                     
                     <div className="flex items-start text-sm text-neutral-500 mb-2">
                       <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 overflow-hidden">
-                        <div className="line-clamp-2 leading-relaxed text-ellipsis">
+                      <div className="flex-1">
+                        <div className="address-text">
                           <SmartTextWithTooltips 
                             text={isTranslated && translatedData[`address_${property.id}`] 
                               ? translatedData[`address_${property.id}`] 
