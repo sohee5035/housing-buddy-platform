@@ -131,8 +131,10 @@ export default function PropertyDetail() {
       if (!response.ok) return [];
       const data = await response.json();
       console.log('Property Universities API Response:', data);
+      console.log('Number of universities:', data.length);
       return data;
     },
+    staleTime: 0, // 항상 최신 데이터 가져오기
   });
 
   const deleteMutation = useMutation({
