@@ -524,6 +524,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all property-university relationships
+  app.get("/api/properties/universities", async (req, res) => {
+    try {
+      // Get all properties and their university relationships
+      const properties = await storage.getProperties();
+      const allPropertyUniversities = [];
+      
+      for (const property of properties) {
+        const universities = await storage.getPropertyUniversities(property.id);
+        for (const uni of universities) {
+          allPropertyUniversities.push({
+            propertyId: property.id,
+            universityId: uni.universityId,
+            distanceKm: uni.distanceKm,
+            isRecommended: uni.isRecommended
+          });
+        }
+      }
+      
+      res.json(allPropertyUniversities);
+    } catch (error) {
+      console.error("Error fetching property universities:", error);
+      res.status(500).json({ message: "Failed to fetch property universities" });
+    }
+  });
+
   // GET /api/trash - Get deleted properties
   app.get("/api/trash", async (req, res) => {
     try {

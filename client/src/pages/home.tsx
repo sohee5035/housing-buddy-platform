@@ -41,6 +41,21 @@ export default function Home() {
   // URL 쿼리 파라미터에서 대학교 ID 추출
   const urlParams = new URLSearchParams(window.location.search);
   const universityFilter = urlParams.get('university');
+
+  // 대학교 정보 가져오기 (필터링된 대학교 이름 표시용)
+  const { data: universities = [] } = useQuery({
+    queryKey: ["/api/universities"],
+    queryFn: async () => {
+      const response = await fetch("/api/universities");
+      if (!response.ok) throw new Error("Failed to fetch universities");
+      return response.json();
+    },
+  });
+
+  // 선택된 대학교 정보
+  const selectedUniversity = universities.find(
+    (uni: any) => uni.id === parseInt(universityFilter || '0')
+  );
   
   // Translation context
   const { 
@@ -207,6 +222,16 @@ export default function Home() {
     return `${translateUI('보증금')} ${depositStr}${translateUI('만원')} / ${translateUI('월세')} ${rentStr}${translateUI('만원')}`;
   };
 
+  // 모든 매물의 대학교 관계 데이터 가져오기 
+  const { data: allPropertyUniversities = [] } = useQuery({
+    queryKey: ["/api/properties/universities"],
+    queryFn: async () => {
+      const response = await fetch("/api/properties/universities");
+      if (!response.ok) return [];
+      return response.json();
+    },
+  });
+
   // 카테고리별 및 대학교별 매물 필터링
   const filteredProperties = properties.filter(property => {
     // 카테고리 필터
@@ -216,10 +241,11 @@ export default function Home() {
     
     // 대학교 필터 (URL 파라미터 기반)
     if (universityFilter) {
-      // 해당 대학교와 연결된 매물만 표시
-      // TODO: property.universities 배열이나 관련 필드를 확인
-      // 현재는 임시로 모든 매물을 보여줌
-      return true;
+      // 해당 대학교와 연결된 매물인지 확인
+      const hasUniversity = allPropertyUniversities.some(
+        (pu: any) => pu.propertyId === property.id && pu.universityId === parseInt(universityFilter)
+      );
+      return hasUniversity;
     }
     
     return true;
@@ -366,11 +392,17 @@ export default function Home() {
       {/* Property List */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-2">{translateUI('등록된 매물')}</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-2">
+            {universityFilter && selectedUniversity ? 
+              `${selectedUniversity.name} 주변 매물` : 
+              translateUI('등록된 매물')}
+          </h2>
           <p className="text-neutral-600">
-            {selectedCategory === '전체' 
-              ? `${translateUI('총')} ${properties.length}${translateUI('개의 매물이 등록되어 있습니다')}.`
-              : `'${selectedCategory}' 카테고리에 ${filteredProperties.length}개의 매물이 있습니다.`
+            {universityFilter && selectedUniversity ? 
+              `${selectedUniversity.name} 관련 매물 ${filteredProperties.length}개를 찾았습니다` : 
+              selectedCategory === '전체' 
+                ? `${translateUI('총')} ${filteredProperties.length}${translateUI('개의 매물이 등록되어 있습니다')}.`
+                : `'${selectedCategory}' 카테고리에 ${filteredProperties.length}개의 매물이 있습니다.`
             }
           </p>
         </div>

@@ -122,6 +122,17 @@ export default function PropertyDetail() {
     },
   });
 
+  // 매물의 연결된 대학교들 조회
+  const { data: propertyUniversities = [] } = useQuery({
+    queryKey: [`/api/properties/${id}/universities`],
+    enabled: !!id,
+    queryFn: async () => {
+      const response = await fetch(`/api/properties/${id}/universities`);
+      if (!response.ok) return [];
+      return response.json();
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest("DELETE", `/api/properties/${id}`);
@@ -417,6 +428,43 @@ export default function PropertyDetail() {
                           isTranslated={isTranslated}
                         />
                       </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* 연결된 대학교 섹션 */}
+                {propertyUniversities && propertyUniversities.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
+                      <div className="w-1 h-6 bg-purple-500 rounded-full mr-3"></div>
+                      근처 대학교
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {propertyUniversities.map((pu: any) => (
+                        <div key={pu.universityId} className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <div className="text-2xl mr-3">{pu.university.icon}</div>
+                              <div>
+                                <div className="font-semibold text-purple-900">{pu.university.name}</div>
+                                <div className="text-sm text-purple-600">{pu.university.nameEn}</div>
+                              </div>
+                            </div>
+                            {pu.distanceKm && (
+                              <div className="text-sm text-purple-700 font-medium">
+                                약 {pu.distanceKm}km
+                              </div>
+                            )}
+                          </div>
+                          {pu.isRecommended && (
+                            <div className="mt-2">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                ⭐ 추천
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
