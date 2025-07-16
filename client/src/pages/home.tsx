@@ -423,15 +423,21 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProperties.map((property) => (
-              <Card 
-                key={property.id} 
-                className="overflow-hidden hover:shadow-lg transition-shadow h-full cursor-pointer transition-transform hover:scale-105"
-                style={{ pointerEvents: 'auto' }}
-                onClick={() => {
-                  console.log('Card clicked, navigating to:', `/property/${property.id}`);
+              <div 
+                key={property.id}
+                className="cursor-pointer block w-full"
+                style={{ 
+                  pointerEvents: 'auto',
+                  position: 'relative',
+                  zIndex: 1
+                }}
+                onClick={(e) => {
+                  console.log('Wrapper clicked', e.target);
                   setLocation(`/property/${property.id}`);
                 }}
               >
+                <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow h-full"
+                >
                   <div className="relative h-48 bg-neutral-200">
                     {property.photos && property.photos.length > 0 ? (
                       <img
@@ -446,7 +452,7 @@ export default function Home() {
                     )}
                   </div>
                   
-                  <CardContent className="p-4">
+                  <div className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-lg font-semibold text-neutral-900 hover:text-primary transition-colors line-clamp-1 flex-1">
                         <SmartTextWithTooltips 
@@ -536,8 +542,9 @@ export default function Home() {
                         {translateUI('상세보기')}
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
