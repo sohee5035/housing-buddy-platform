@@ -355,7 +355,7 @@ export default function PropertyDetail() {
                   <div className="mb-4">
                     <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
                       <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
-                      근처 대학교 (상단)
+                      근처 대학교
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {propertyUniversities.map((pu: any) => (
@@ -468,7 +468,44 @@ export default function PropertyDetail() {
                   </div>
                 )}
 
-                {/* 중복된 대학교 섹션 제거 - 상단에만 표시 */}
+                {/* 연결된 대학교 섹션 - 하단에 더 자세히 표시 */}
+                {propertyUniversities && propertyUniversities.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="text-xl font-bold text-neutral-900 mb-4 flex items-center">
+                      <div className="w-2 h-8 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full mr-3"></div>
+                      근처 대학교
+                    </h3>
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-5 border border-blue-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {propertyUniversities.map((pu: any) => (
+                          <div key={pu.universityId} className="bg-white rounded-lg p-4 border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <div className="text-3xl mr-3">{pu.university.icon}</div>
+                                <div>
+                                  <div className="font-bold text-blue-900 text-base">{pu.university.name}</div>
+                                  <div className="text-sm text-blue-600 font-medium">{pu.university.nameEn}</div>
+                                </div>
+                              </div>
+                              {pu.distanceKm && (
+                                <div className="text-sm text-blue-700 font-bold bg-blue-100 px-2 py-1 rounded-full">
+                                  약 {pu.distanceKm}km
+                                </div>
+                              )}
+                            </div>
+                            {pu.isRecommended && (
+                              <div className="mt-3">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-yellow-400 to-orange-400 text-white shadow-sm">
+                                  ⭐ 추천 매물
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* 지도 섹션 - 마커 포함 */}
                 <div className="mt-6">
