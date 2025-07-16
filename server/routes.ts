@@ -94,6 +94,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     res.status(401).json({ message: '로그인이 필요합니다.' });
   };
+
+  // University routes
+  app.get("/api/universities", async (req: Request, res: Response) => {
+    try {
+      const universities = await storage.getUniversities();
+      res.json(universities);
+    } catch (error) {
+      console.error("Error fetching universities:", error);
+      res.status(500).json({ message: "대학교 목록을 가져오는데 실패했습니다." });
+    }
+  });
   // Health check endpoint specifically for deployment health checks
   app.get("/health", (req, res) => {
     const uptime = Date.now() - serverStartTime;
@@ -545,8 +556,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new property
   app.post("/api/properties", async (req, res) => {
     try {
-      const validatedData = insertPropertySchema.parse(req.body);
+      const { selectedUniversities, ...propertyData } = req.body;
+      const validatedData = insertPropertySchema.parse(propertyData);
       const property = await storage.createProperty(validatedData);
+      
+      // Add university relationships if provided
+      if (selectedUniversities && Array.isArray(selectedUniversities) && selectedUniversities.length > 0) {
+        await storage.addPropertyUniversities(property.id, selectedUniversities);
+      }
+      
       res.status(201).json(property);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -555,6 +573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           errors: error.errors 
         });
       }
+      console.error("Error creating property:", error);
       res.status(500).json({ message: "Failed to create property" });
     }
   });
@@ -563,11 +582,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/properties/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const validatedData = insertPropertySchema.partial().parse(req.body);
+      const { selectedUniversities, ...propertyData } = req.body;
+      const validatedData = insertPropertySchema.partial().parse(propertyData);
       const property = await storage.updateProperty(id, validatedData);
       
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
+      }
+
+      // Update university relationships if provided
+      if (selectedUniversities && Array.isArray(selectedUniversities)) {
+        const universitiesWithSelected = selectedUniversities.map(uni => ({
+          ...uni,
+          isSelected: true
+        }));
+        await storage.updatePropertyUniversities(id, universitiesWithSelected);
       }
 
       res.json(property);
@@ -578,6 +607,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           errors: error.errors 
         });
       }
+      console.error("Error updating property:", error);
       res.status(500).json({ message: "Failed to update property" });
     }
   });

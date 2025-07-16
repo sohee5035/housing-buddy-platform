@@ -1,4 +1,4 @@
-import { properties, comments, users, favorites, type Property, type InsertProperty, type Comment, type InsertComment, type UpdateComment, type DeleteComment, type User, type InsertUser, type LoginUser, type Favorite, type InsertFavorite } from "@shared/schema";
+import { properties, comments, users, favorites, universities, propertyUniversities, type Property, type InsertProperty, type Comment, type InsertComment, type UpdateComment, type DeleteComment, type User, type InsertUser, type LoginUser, type Favorite, type InsertFavorite, type University, type PropertyUniversity } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -43,6 +43,15 @@ export interface IStorage {
   addToFavorites(userId: number, propertyId: number): Promise<Favorite>;
   removeFromFavorites(userId: number, propertyId: number): Promise<boolean>;
   isFavorite(userId: number, propertyId: number): Promise<boolean>;
+  
+  // University methods
+  getUniversities(): Promise<University[]>;
+  getUniversityById(id: number): Promise<University | undefined>;
+  
+  // Property-University relationship methods
+  addPropertyUniversities(propertyId: number, universities: { universityId: number; distanceKm?: number; isRecommended?: boolean }[]): Promise<PropertyUniversity[]>;
+  getPropertyUniversities(propertyId: number): Promise<(PropertyUniversity & { university: University })[]>;
+  updatePropertyUniversities(propertyId: number, universities: { universityId: number; distanceKm?: number; isRecommended?: boolean; isSelected: boolean }[]): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -405,6 +414,75 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(favorites.userId, userId), eq(favorites.propertyId, propertyId)));
 
     return !!favorite;
+  }
+
+  // University methods
+  async getUniversities(): Promise<University[]> {
+    return await db.select().from(universities).where(eq(universities.isActive, true));
+  }
+
+  async getUniversityById(id: number): Promise<University | undefined> {
+    const [university] = await db.select().from(universities).where(eq(universities.id, id));
+    return university || undefined;
+  }
+
+  // Property-University relationship methods
+  async addPropertyUniversities(
+    propertyId: number, 
+    universityList: { universityId: number; distanceKm?: number; isRecommended?: boolean }[]
+  ): Promise<PropertyUniversity[]> {
+    const results = [];
+    for (const uni of universityList) {
+      const [result] = await db
+        .insert(propertyUniversities)
+        .values({
+          propertyId,
+          universityId: uni.universityId,
+          distanceKm: uni.distanceKm?.toString(),
+          isRecommended: uni.isRecommended || false,
+          isSelected: true
+        })
+        .returning();
+      results.push(result);
+    }
+    return results;
+  }
+
+  async getPropertyUniversities(propertyId: number): Promise<(PropertyUniversity & { university: University })[]> {
+    const results = await db
+      .select({
+        id: propertyUniversities.id,
+        propertyId: propertyUniversities.propertyId,
+        universityId: propertyUniversities.universityId,
+        distanceKm: propertyUniversities.distanceKm,
+        isRecommended: propertyUniversities.isRecommended,
+        isSelected: propertyUniversities.isSelected,
+        createdAt: propertyUniversities.createdAt,
+        university: universities
+      })
+      .from(propertyUniversities)
+      .innerJoin(universities, eq(propertyUniversities.universityId, universities.id))
+      .where(and(
+        eq(propertyUniversities.propertyId, propertyId),
+        eq(propertyUniversities.isSelected, true)
+      ));
+    
+    // 타입 안전성을 위해 필터링
+    return results.filter(result => result.university !== null) as (PropertyUniversity & { university: University })[];
+  }
+
+  async updatePropertyUniversities(
+    propertyId: number, 
+    universityList: { universityId: number; distanceKm?: number; isRecommended?: boolean; isSelected: boolean }[]
+  ): Promise<void> {
+    // 기존 관계 모두 삭제
+    await db.delete(propertyUniversities).where(eq(propertyUniversities.propertyId, propertyId));
+    
+    // 새로운 관계 추가 (선택된 것만)
+    const selectedUniversities = universityList.filter(uni => uni.isSelected);
+    if (selectedUniversities.length > 0) {
+      await this.addPropertyUniversities(propertyId, selectedUniversities);
+    }
   }
 }
 

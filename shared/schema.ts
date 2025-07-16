@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, jsonb, timestamp, varchar, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, jsonb, timestamp, varchar, index, numeric, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
@@ -7,6 +7,8 @@ export const properties = pgTable("properties", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   address: text("address").notNull(),
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
   deposit: integer("deposit").notNull(),
   monthlyRent: integer("monthly_rent").notNull(),
   maintenanceFee: integer("maintenance_fee"), // 관리비 (null이면 "알 수 없음")
@@ -155,3 +157,55 @@ export const insertFavoriteSchema = createInsertSchema(favorites).omit({
 
 export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
 export type Favorite = typeof favorites.$inferSelect;
+
+// Universities table
+export const universities = pgTable("universities", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  nameEn: text("name_en").notNull(),
+  location: text("location").notNull(),
+  latitude: numeric("latitude", { precision: 10, scale: 8 }).notNull(),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }).notNull(),
+  icon: text("icon").notNull(),
+  isActive: boolean("is_active").default(true),
+});
+
+// Property-University relationship table
+export const propertyUniversities = pgTable("property_universities", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").notNull().references(() => properties.id, { onDelete: "cascade" }),
+  universityId: integer("university_id").notNull().references(() => universities.id, { onDelete: "cascade" }),
+  distanceKm: numeric("distance_km", { precision: 5, scale: 2 }), // 거리(km)
+  isRecommended: boolean("is_recommended").default(false), // 시스템 추천 여부
+  isSelected: boolean("is_selected").default(true), // 관리자 선택 여부
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// University relations
+export const universitiesRelations = relations(universities, ({ many }) => ({
+  propertyUniversities: many(propertyUniversities),
+}));
+
+export const propertyUniversitiesRelations = relations(propertyUniversities, ({ one }) => ({
+  property: one(properties, {
+    fields: [propertyUniversities.propertyId],
+    references: [properties.id],
+  }),
+  university: one(universities, {
+    fields: [propertyUniversities.universityId],
+    references: [universities.id],
+  }),
+}));
+
+export const propertiesRelations = relations(properties, ({ many }) => ({
+  propertyUniversities: many(propertyUniversities),
+}));
+
+export const insertPropertyUniversitySchema = createInsertSchema(propertyUniversities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type University = typeof universities.$inferSelect;
+export type PropertyUniversity = typeof propertyUniversities.$inferSelect;
+export type InsertPropertyUniversity = z.infer<typeof insertPropertyUniversitySchema>;
