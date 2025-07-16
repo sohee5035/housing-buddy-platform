@@ -365,19 +365,22 @@ export default function NewHome() {
         </div>
       </section>
 
-      {/* 숨겨진 관리자 트리거 - 비로그인 시에만 표시 */}
-      {!isAdmin && (
-        <div
-          className="fixed bottom-4 right-4 w-8 h-8 cursor-pointer z-50 opacity-20 hover:opacity-50 transition-all duration-200 flex items-center justify-center bg-black/10 rounded-full backdrop-blur-sm"
-          onClick={() => {
-            console.log('방패 클릭됨!');
-            setShowAdminTrigger(!showAdminTrigger);
-          }}
-          title="관리자"
-        >
-          <Shield className="h-5 w-5 text-white drop-shadow-lg" />
-        </div>
-      )}
+      {/* 숨겨진 관리자 트리거 - 항상 표시 (디버깅) */}
+      <div
+        className="fixed bottom-4 right-4 w-10 h-10 cursor-pointer z-50 bg-blue-500 hover:bg-blue-600 transition-all duration-200 flex items-center justify-center rounded-full"
+        onClick={() => {
+          console.log('방패 클릭됨! isAdmin:', isAdmin);
+          setShowAdminTrigger(!showAdminTrigger);
+        }}
+        title="관리자 (디버깅)"
+      >
+        <Shield className="h-6 w-6 text-white" />
+      </div>
+      
+      {/* 디버깅 정보 */}
+      <div className="fixed bottom-16 right-4 bg-yellow-400 text-black p-2 rounded text-xs z-50">
+        Admin: {isAdmin ? 'true' : 'false'}
+      </div>
       
 
 
