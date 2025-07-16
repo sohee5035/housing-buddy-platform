@@ -166,81 +166,37 @@ export default function MapPage() {
       <div className="flex flex-col lg:flex-row h-[calc(100vh-140px)]">
         {/* 지도 영역 */}
         <div className="flex-1 relative min-h-[400px] lg:min-h-full">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-blue-100 overflow-hidden">
-            {/* 지도 시뮬레이션 - 서울 대방동 일대 */}
-            <div className="absolute inset-0">
-              {/* 큰 지도 타이틀 */}
-              <div className="absolute top-8 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-lg z-20">
-                <h2 className="text-lg font-bold text-gray-800">서울 동작구 매물 지도</h2>
-              </div>
-              
-              {/* 강 - 한강 */}
-              <div className="absolute top-0 left-0 w-full h-20 bg-blue-300 transform -rotate-2 opacity-80"></div>
-              <div className="absolute top-4 left-1/4 text-sm font-bold text-blue-800 bg-white px-2 py-1 rounded">한강</div>
-              
-              {/* 도로망 */}
-              <div className="absolute top-1/4 left-0 w-full h-3 bg-gray-400 opacity-90"></div>
-              <div className="absolute top-1/2 left-1/3 w-3 h-full bg-gray-400 opacity-90"></div>
-              <div className="absolute top-3/4 left-0 w-full h-3 bg-gray-400 opacity-90"></div>
-              <div className="absolute top-0 left-2/3 w-3 h-full bg-gray-400 opacity-90"></div>
-              
-              {/* 지역 구분 */}
-              <div className="absolute top-1/4 left-1/4 w-32 h-24 bg-green-200 opacity-50 rounded-lg"></div>
-              <div className="absolute top-1/2 left-1/2 w-32 h-24 bg-yellow-200 opacity-50 rounded-lg"></div>
-              <div className="absolute bottom-1/4 right-1/4 w-32 h-24 bg-pink-200 opacity-50 rounded-lg"></div>
-              
-              {/* 지역 라벨 */}
-              <div className="absolute top-32 left-20 text-lg font-bold text-gray-800 bg-white px-2 py-1 rounded shadow">대방동</div>
-              <div className="absolute top-48 left-56 text-lg font-bold text-gray-800 bg-white px-2 py-1 rounded shadow">상도동</div>
-              <div className="absolute bottom-20 right-20 text-lg font-bold text-gray-800 bg-white px-2 py-1 rounded shadow">신길동</div>
-              
-              {/* 지하철역 */}
-              <div className="absolute top-40 left-32 w-4 h-4 bg-green-600 rounded-full border-2 border-white shadow-lg z-10"></div>
-              <div className="absolute top-44 left-24 text-sm text-green-800 font-bold bg-white px-2 py-1 rounded">대방역</div>
-              
-              <div className="absolute top-56 left-60 w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-lg z-10"></div>
-              <div className="absolute top-60 left-52 text-sm text-blue-800 font-bold bg-white px-2 py-1 rounded">상도역</div>
-            </div>
+          <div className="w-full h-full relative">
+            {/* Google Maps iframe */}
+            <iframe
+              src="https://maps.google.com/maps?q=서울특별시+동작구+대방동,상도동,신길동&output=embed&z=14"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Housing Buddy 매물 지도"
+              className="w-full h-full"
+            />
             
-            {/* 매물 마커 시뮬레이션 */}
-            <div className="absolute inset-0 pointer-events-none z-30">
-              {filteredProperties.map((property, index) => {
-                // 지역별로 위치 분산
-                const positions = [
-                  { left: '22%', top: '38%' }, // 대방동 1
-                  { left: '28%', top: '42%' }, // 대방동 2
-                  { left: '58%', top: '55%' }, // 상도동 1
-                  { left: '62%', top: '48%' }, // 상도동 2
-                  { left: '75%', top: '75%' }, // 신길동 1
-                ];
-                const position = positions[index % positions.length];
-                
-                return (
-                  <div
-                    key={property.id}
-                    className="absolute pointer-events-auto cursor-pointer transform hover:scale-110 transition-transform"
-                    style={{
-                      left: position.left,
-                      top: position.top,
-                    }}
-                    onClick={() => setSelectedProperty(property)}
-                  >
-                    <div className="bg-red-500 text-white text-sm px-3 py-2 rounded-full shadow-xl hover:bg-red-600 transition-colors border-2 border-white">
-                      <MapPin className="h-4 w-4 inline mr-1" />
-                      {Math.round(property.monthlyRent / 10000)}만원
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            
-            {/* 지도 위 정보 */}
-            <div className="absolute bottom-4 left-4 bg-white rounded-lg p-3 shadow-xl z-20 border">
+            {/* 지도 위 정보 오버레이 */}
+            <div className="absolute bottom-4 left-4 bg-white rounded-lg p-3 shadow-xl z-10 border">
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-red-500" />
                 <span className="font-medium">{filteredProperties.length}개 매물</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">서울 동작구 실시간</p>
+            </div>
+            
+            {/* 매물 위치 가이드 */}
+            <div className="absolute top-4 left-4 bg-white rounded-lg p-3 shadow-xl z-10 border max-w-xs">
+              <h3 className="font-semibold text-sm mb-2">매물 위치</h3>
+              <div className="space-y-1 text-xs text-gray-600">
+                <div>• 대방동: {filteredProperties.filter(p => p.address.includes('대방동')).length}개</div>
+                <div>• 상도동: {filteredProperties.filter(p => p.address.includes('상도동')).length}개</div>
+                <div>• 신길동: {filteredProperties.filter(p => p.address.includes('신길동')).length}개</div>
+              </div>
             </div>
           </div>
         </div>
