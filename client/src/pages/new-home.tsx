@@ -362,17 +362,16 @@ export default function NewHome() {
         </div>
       </section>
 
-      {/* 숨겨진 관리자 트리거 - 테스트용 (항상 표시) */}
-      <div
-        className="fixed bottom-4 right-4 w-12 h-12 cursor-pointer z-50 bg-red-500 hover:bg-red-600 transition-all duration-200 flex items-center justify-center rounded-full"
-        onClick={() => {
-          console.log('방패 아이콘 클릭됨!');
-          setShowAdminTrigger(!showAdminTrigger);
-        }}
-        title="관리자 테스트"
-      >
-        <Shield className="h-6 w-6 text-white" />
-      </div>
+      {/* 숨겨진 관리자 트리거 - 관리자 로그인 전에만 표시 */}
+      {!isAdmin && (
+        <div
+          className="fixed bottom-4 right-4 w-8 h-8 cursor-pointer z-50 opacity-20 hover:opacity-50 transition-all duration-200 flex items-center justify-center bg-black/10 rounded-full backdrop-blur-sm"
+          onClick={() => setShowAdminTrigger(!showAdminTrigger)}
+          title="관리자"
+        >
+          <Shield className="h-5 w-5 text-white drop-shadow-lg" />
+        </div>
+      )}
 
       {/* 관리자 버튼 - 트리거 클릭 시에만 표시 */}
       {showAdminTrigger && !isAdmin && (
