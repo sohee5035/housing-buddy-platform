@@ -460,15 +460,17 @@ export default function Home() {
                     
                     <div className="flex items-start text-sm text-neutral-500 mb-2">
                       <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
-                      <span className="line-clamp-2 leading-relaxed">
-                        <SmartTextWithTooltips 
-                          text={isTranslated && translatedData[`address_${property.id}`] 
-                            ? translatedData[`address_${property.id}`] 
-                            : property.address}
-                          originalText={property.address}
-                          isTranslated={isTranslated}
-                        />
-                      </span>
+                      <div className="flex-1 overflow-hidden">
+                        <div className="line-clamp-2 leading-relaxed text-ellipsis">
+                          <SmartTextWithTooltips 
+                            text={isTranslated && translatedData[`address_${property.id}`] 
+                              ? translatedData[`address_${property.id}`] 
+                              : property.address}
+                            originalText={property.address}
+                            isTranslated={isTranslated}
+                          />
+                        </div>
+                      </div>
                     </div>
                   
                   {/* 연결된 대학교 표시 */}
