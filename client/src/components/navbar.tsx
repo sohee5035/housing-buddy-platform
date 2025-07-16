@@ -195,21 +195,10 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 </DropdownMenu>
               </div>
             ) : (
-              /* 로그인하지 않은 경우 로그인 버튼과 관리자 로그인 버튼 */
-              <div className="flex items-center space-x-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setShowAdminLogin(true)} 
-                  title="관리자 로그인"
-                  className="bg-blue-50 text-blue-600 hover:bg-blue-100"
-                >
-                  <Shield className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={handleLogin}>
-                  <User className="h-5 w-5" />
-                </Button>
-              </div>
+              /* 로그인하지 않은 경우 로그인 버튼만 표시 */
+              <Button variant="ghost" size="icon" onClick={handleLogin}>
+                <User className="h-5 w-5" />
+              </Button>
             )}
           </div>
 
