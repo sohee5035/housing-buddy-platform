@@ -46,9 +46,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const { isAdmin, logout: adminLogout } = useAdmin();
   const { getTranslatedText, isTranslated } = useTranslation();
   
-  // 디버깅용 로그
-  console.log('Navbar - isAuthenticated:', isAuthenticated, 'isAdmin:', isAdmin);
-  
   // 매물 데이터를 가져와서 카테고리 추출 (옵셔널)
   const { data: properties = [] } = useQuery({
     queryKey: ["/api/properties"],
@@ -126,33 +123,34 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-2">
-                {/* 관리자 방패 버튼 - 색상 반전 및 패널 열기 */}
-                {isAdmin ? (
-                  <AdminPanel
-                    onCreateListing={() => setShowCreateModal(true)}
-                    onCategoryManager={() => setShowCategoryManager(true)}
-                    onTrashView={() => setLocation('/trash')}
-                    onCommentsView={() => setLocation('/admin/comments')}
-                    onLogout={adminLogout}
-                    trigger={
-                      <Button className="bg-blue-600 text-white hover:bg-blue-700">
-                        <Shield className="h-4 w-4" />
-                      </Button>
-                    }
-                  />
-                ) : (
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => setShowAdminLogin(true)} 
-                    title="관리자 로그인"
-                    className="bg-blue-50 text-blue-600 hover:bg-blue-100"
-                  >
+            {/* 관리자 방패 버튼 - 항상 표시, 상태에 따라 색상 변경 */}
+            {isAdmin ? (
+              <AdminPanel
+                onCreateListing={() => setShowCreateModal(true)}
+                onCategoryManager={() => setShowCategoryManager(true)}
+                onTrashView={() => setLocation('/trash')}
+                onCommentsView={() => setLocation('/admin/comments')}
+                onLogout={adminLogout}
+                trigger={
+                  <Button className="bg-blue-600 text-white hover:bg-blue-700">
                     <Shield className="h-4 w-4" />
                   </Button>
-                )}
+                }
+              />
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowAdminLogin(true)} 
+                title="관리자 로그인"
+                className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+              >
+                <Shield className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="flex items-center space-x-2">
@@ -229,57 +227,43 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
               </Button>
             )}
             
-            {/* 모바일에서 사용자 인사말 또는 로그인/관리자 버튼들 표시 */}
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-1">
-                {/* 관리자 방패 버튼 - 색상 반전 및 패널 열기 */}
-                {isAdmin ? (
-                  <AdminPanel
-                    onCreateListing={() => setShowCreateModal(true)}
-                    onCategoryManager={() => setShowCategoryManager(true)}
-                    onTrashView={() => setLocation('/trash')}
-                    onCommentsView={() => setLocation('/admin/comments')}
-                    onLogout={adminLogout}
-                    trigger={
-                      <Button variant="ghost" size="icon" className="bg-blue-600 text-white hover:bg-blue-700">
-                        <Shield className="h-4 w-4" />
-                      </Button>
-                    }
-                  />
-                ) : (
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => setShowAdminLogin(true)} 
-                    title="관리자 로그인"
-                    className="bg-blue-50 text-blue-600 hover:bg-blue-100"
-                  >
+            {/* 모바일 관리자 방패 버튼 - 항상 표시 */}
+            {isAdmin ? (
+              <AdminPanel
+                onCreateListing={() => setShowCreateModal(true)}
+                onCategoryManager={() => setShowCategoryManager(true)}
+                onTrashView={() => setLocation('/trash')}
+                onCommentsView={() => setLocation('/admin/comments')}
+                onLogout={adminLogout}
+                trigger={
+                  <Button variant="ghost" size="icon" className="bg-blue-600 text-white hover:bg-blue-700">
                     <Shield className="h-4 w-4" />
                   </Button>
-                )}
-                <div className="flex items-center text-sm text-neutral-700 bg-neutral-50 px-3 py-1 rounded-full">
-                  <span className="font-medium">
-                    {user?.name}{getTranslatedText("님 안녕하세요!", "greeting-suffix")}
-                  </span>
-                </div>
+                }
+              />
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowAdminLogin(true)} 
+                title="관리자 로그인"
+                className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+              >
+                <Shield className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {/* 모바일에서 사용자 인사말 또는 로그인 버튼 표시 */}
+            {isAuthenticated ? (
+              <div className="flex items-center text-sm text-neutral-700 bg-neutral-50 px-3 py-1 rounded-full">
+                <span className="font-medium">
+                  {user?.name}{getTranslatedText("님 안녕하세요!", "greeting-suffix")}
+                </span>
               </div>
             ) : (
-              <div className="flex items-center space-x-1">
-                {/* 관리자 로그인 버튼 - 항상 표시 */}
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setShowAdminLogin(true)} 
-                  title="관리자 로그인"
-                  className="bg-blue-50 text-blue-600 hover:bg-blue-100"
-                >
-                  <Shield className="h-4 w-4" />
-                </Button>
-                {/* 일반 로그인 버튼 */}
-                <Button variant="ghost" size="icon" onClick={handleLogin}>
-                  <User className="h-5 w-5" />
-                </Button>
-              </div>
+              <Button variant="ghost" size="icon" onClick={handleLogin}>
+                <User className="h-5 w-5" />
+              </Button>
             )}
             
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
