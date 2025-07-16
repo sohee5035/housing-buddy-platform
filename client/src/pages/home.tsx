@@ -38,6 +38,10 @@ export default function Home() {
   });
   const [, setLocation] = useLocation();
   
+  // URL 쿼리 파라미터에서 대학교 ID 추출
+  const urlParams = new URLSearchParams(window.location.search);
+  const universityFilter = urlParams.get('university');
+  
   // Translation context
   const { 
     isTranslated, 
@@ -203,10 +207,22 @@ export default function Home() {
     return `${translateUI('보증금')} ${depositStr}${translateUI('만원')} / ${translateUI('월세')} ${rentStr}${translateUI('만원')}`;
   };
 
-  // 카테고리별 매물 필터링
+  // 카테고리별 및 대학교별 매물 필터링
   const filteredProperties = properties.filter(property => {
-    if (selectedCategory === '전체') return true;
-    return property.category === selectedCategory;
+    // 카테고리 필터
+    if (selectedCategory !== '전체' && property.category !== selectedCategory) {
+      return false;
+    }
+    
+    // 대학교 필터 (URL 파라미터 기반)
+    if (universityFilter) {
+      // 해당 대학교와 연결된 매물만 표시
+      // TODO: property.universities 배열이나 관련 필드를 확인
+      // 현재는 임시로 모든 매물을 보여줌
+      return true;
+    }
+    
+    return true;
   });
   
 

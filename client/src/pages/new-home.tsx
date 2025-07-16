@@ -90,6 +90,11 @@ export default function NewHome() {
     // 해당 대학교 근처 매물로 필터링 로직 추가
   };
 
+  const handleUniversityClick = (universityId: string) => {
+    // 해당 대학교 매물 필터링된 페이지로 이동
+    window.location.href = `/properties?university=${universityId}`;
+  };
+
   const handleSearch = () => {
     // 검색 로직 구현
     console.log('검색 조건:', {
@@ -103,27 +108,7 @@ export default function NewHome() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       <Navbar />
       
-      {/* 상단 관리자 버튼 - 관리자 상태일 때만 표시 */}
-      {isAdmin && (
-        <div className="fixed top-20 right-4 z-50">
-          <AdminPanel
-            onCreateListing={() => setShowCreateModal(true)}
-            onCategoryManager={() => setShowCategoryManager(true)}
-            onTrashView={() => {}} // 휴지통 기능
-            onCommentsView={() => {}} // 문의 관리 기능
-            onLogout={() => {
-              localStorage.removeItem('housing-buddy-admin');
-              window.location.reload();
-            }}
-            trigger={
-              <Button className="bg-green-600 hover:bg-green-700 text-white shadow-lg">
-                <Settings className="h-4 w-4 mr-2" />
-                관리자
-              </Button>
-            }
-          />
-        </div>
-      )}
+
       
       {/* Hero Section */}
       <section className="relative py-20 px-4">
@@ -225,7 +210,7 @@ export default function NewHome() {
               <Card 
                 key={uni.id}
                 className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105"
-                onClick={() => handleUniversitySelect(uni.id)}
+                onClick={() => handleUniversityClick(uni.id)}
               >
                 <CardContent className="p-6 text-center">
                   <div className="text-4xl mb-3">{uni.icon}</div>

@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, Plus, Menu, User, LogOut, Settings, Heart, MessageCircle, MapPin } from "lucide-react";
+import { Home, Plus, Menu, User, LogOut, Settings, Heart, MessageCircle, MapPin, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -132,18 +132,12 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 onCommentsView={() => setLocation('/admin/comments')}
                 onLogout={adminLogout}
                 trigger={
-                  <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white">
-                    <Settings className="h-4 w-4 mr-2" />
-                    관리자
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Shield className="h-4 w-4" />
                   </Button>
                 }
               />
             )}
-            
-            {/* 디버깅용 상태 표시 */}
-            <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-              Admin: {isAdmin ? 'true' : 'false'}
-            </div>
             
             {isAuthenticated ? (
               <DropdownMenu>
