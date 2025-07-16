@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -41,6 +41,35 @@ export default function PropertyForm({ onSuccess, onCancel, initialData, availab
       return response.json();
     },
   });
+
+  // 수정 모드일 때 기존 연결된 대학교 정보 불러오기
+  const { data: existingUniversities = [] } = useQuery({
+    queryKey: [`/api/properties/${initialData?.id}/universities`],
+    queryFn: async () => {
+      if (!initialData?.id) return [];
+      const response = await fetch(`/api/properties/${initialData.id}/universities`);
+      if (!response.ok) return [];
+      return response.json();
+    },
+    enabled: !!initialData?.id,
+  });
+
+  // 기존 대학교 정보로 selectedUniversities 초기화
+  useEffect(() => {
+    if (existingUniversities.length > 0 && initialData?.id) {
+      const universityIds = existingUniversities.map((pu: any) => pu.universityId);
+      setSelectedUniversities(universityIds);
+      
+      // 추천 대학교 정보도 설정
+      const recommended = existingUniversities
+        .filter((pu: any) => pu.isRecommended)
+        .map((pu: any) => ({
+          id: pu.universityId,
+          distance: pu.distanceKm || 0
+        }));
+      setRecommendedUniversities(recommended);
+    }
+  }, [existingUniversities, initialData?.id]);
 
   const form = useForm<InsertProperty>({
     resolver: zodResolver(insertPropertySchema),
