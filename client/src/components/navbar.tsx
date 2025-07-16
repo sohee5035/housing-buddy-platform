@@ -211,6 +211,13 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
               </Button>
             )}
             
+            {/* 모바일에서도 관리자 로그인 버튼 표시 (로그인하지 않은 경우) */}
+            {!isAuthenticated && !isAdmin && (
+              <Button variant="ghost" size="icon" onClick={() => setShowAdminLogin(true)} title="관리자 로그인">
+                <Shield className="h-4 w-4" />
+              </Button>
+            )}
+            
             {/* 모바일에서 사용자 인사말 또는 로그인 아이콘 표시 */}
             {isAuthenticated ? (
               <div className="flex items-center text-sm text-neutral-700 bg-neutral-50 px-3 py-1 rounded-full">
