@@ -365,10 +365,12 @@ export default function NewHome() {
       {/* 숨겨진 관리자 트리거 - 비로그인 시에만 */}
       {!isAdmin && (
         <div
-          className="fixed bottom-0 right-0 w-8 h-8 cursor-pointer z-50 opacity-5 hover:opacity-20 transition-opacity"
+          className="fixed bottom-2 right-2 w-6 h-6 cursor-pointer z-50 opacity-10 hover:opacity-30 transition-opacity flex items-center justify-center"
           onClick={() => setShowAdminTrigger(!showAdminTrigger)}
           title="관리자"
-        />
+        >
+          <Shield className="h-4 w-4 text-white drop-shadow-sm" />
+        </div>
       )}
 
       {/* 관리자 버튼 - 트리거 클릭 시에만 표시 */}
