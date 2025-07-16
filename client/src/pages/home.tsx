@@ -426,9 +426,14 @@ export default function Home() {
               <Card 
                 key={property.id} 
                 className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full"
-                onClick={() => setLocation(`/property/${property.id}`)}
+                onClick={(e) => {
+                  // 하트 버튼이 아닌 경우에만 이동
+                  if (!(e.target as HTMLElement).closest('[data-favorite-button]')) {
+                    setLocation(`/property/${property.id}`);
+                  }
+                }}
               >
-                  <div className="relative h-48 bg-neutral-200">
+                  <div className="relative h-48 bg-neutral-200" onClick={() => setLocation(`/property/${property.id}`)}>
                     {property.photos && property.photos.length > 0 ? (
                       <img
                         src={property.photos[0]}
@@ -442,7 +447,7 @@ export default function Home() {
                     )}
                   </div>
                   
-                  <CardContent className="p-4">
+                  <CardContent className="p-4" onClick={() => setLocation(`/property/${property.id}`)}>
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-lg font-semibold text-neutral-900 hover:text-primary transition-colors line-clamp-1 flex-1">
                         <SmartTextWithTooltips 
@@ -453,10 +458,14 @@ export default function Home() {
                           isTranslated={isTranslated}
                         />
                       </h3>
-                      <div className="ml-2" onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}>
+                      <div 
+                        className="ml-2" 
+                        data-favorite-button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                      >
                         <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
                       </div>
                     </div>
