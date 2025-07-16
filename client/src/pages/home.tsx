@@ -423,15 +423,15 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProperties.map((property) => (
-              <div 
+              <Card 
                 key={property.id} 
+                className="overflow-hidden hover:shadow-lg transition-shadow h-full cursor-pointer transition-transform hover:scale-105"
+                style={{ pointerEvents: 'auto' }}
                 onClick={() => {
                   console.log('Card clicked, navigating to:', `/property/${property.id}`);
                   setLocation(`/property/${property.id}`);
                 }}
-                className="cursor-pointer transition-transform hover:scale-105"
               >
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
                   <div className="relative h-48 bg-neutral-200">
                     {property.photos && property.photos.length > 0 ? (
                       <img
@@ -459,6 +459,7 @@ export default function Home() {
                       </h3>
                       <div 
                         className="ml-2" 
+                        style={{ position: 'relative', zIndex: 10 }}
                         onClick={(e) => {
                           e.stopPropagation();
                         }}
@@ -526,6 +527,7 @@ export default function Home() {
                       <Button 
                         size="sm" 
                         variant="outline"
+                        style={{ position: 'relative', zIndex: 10 }}
                         onClick={(e) => {
                           e.stopPropagation();
                           setLocation(`/property/${property.id}`);
@@ -536,7 +538,6 @@ export default function Home() {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
             ))}
           </div>
         )}
