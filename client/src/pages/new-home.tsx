@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Home as HomeIcon,
@@ -18,7 +21,8 @@ import {
   Star,
   ArrowRight,
   Banknote,
-  Calendar
+  Calendar,
+  Won
 } from "lucide-react";
 import { Link } from "wouter";
 import Navbar from "@/components/navbar";
@@ -39,8 +43,11 @@ const universities = [
 
 export default function NewHome() {
   const [selectedUniversity, setSelectedUniversity] = useState<string>("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState<string>("");
+  const [minDeposit, setMinDeposit] = useState<number>(0);
+  const [maxDeposit, setMaxDeposit] = useState<number>(5000);
+  const [minRent, setMinRent] = useState<number>(0);
+  const [maxRent, setMaxRent] = useState<number>(100);
+  const [includeMaintenanceFee, setIncludeMaintenanceFee] = useState<boolean>(false);
   
   const { isTranslated, targetLanguage } = useTranslation();
 
@@ -59,6 +66,16 @@ export default function NewHome() {
   const handleUniversitySelect = (universityId: string) => {
     setSelectedUniversity(universityId);
     // 해당 대학교 근처 매물로 필터링 로직 추가
+  };
+
+  const handleSearch = () => {
+    // 검색 로직 구현
+    console.log('검색 조건:', {
+      university: selectedUniversity,
+      deposit: [minDeposit, maxDeposit],
+      rent: [minRent, maxRent],
+      includeMaintenance: includeMaintenanceFee
+    });
   };
 
   return (
@@ -81,10 +98,11 @@ export default function NewHome() {
           </div>
 
           {/* 검색 바 */}
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* 대학교 선택 */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">대학교</label>
+                <Label className="text-sm font-medium text-gray-700">대학교</Label>
                 <Select value={selectedUniversity} onValueChange={setSelectedUniversity}>
                   <SelectTrigger>
                     <SelectValue placeholder="대학교 선택" />
@@ -99,36 +117,72 @@ export default function NewHome() {
                 </Select>
               </div>
               
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">지역/키워드</label>
-                <Input
-                  placeholder="대방동, 상도동..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+              {/* 보증금 범위 */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-gray-700">
+                  보증금: {minDeposit}만원 ~ {maxDeposit}만원
+                </Label>
+                <div className="px-2">
+                  <Slider
+                    value={[minDeposit, maxDeposit]}
+                    onValueChange={([min, max]) => {
+                      setMinDeposit(min);
+                      setMaxDeposit(max);
+                    }}
+                    max={10000}
+                    min={0}
+                    step={100}
+                    className="w-full"
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>0만원</span>
+                  <span>1억원</span>
+                </div>
+              </div>
+              
+              {/* 월세 범위 */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-gray-700">
+                  월세: {minRent}만원 ~ {maxRent}만원
+                </Label>
+                <div className="px-2">
+                  <Slider
+                    value={[minRent, maxRent]}
+                    onValueChange={([min, max]) => {
+                      setMinRent(min);
+                      setMaxRent(max);
+                    }}
+                    max={200}
+                    min={0}
+                    step={5}
+                    className="w-full"
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>0만원</span>
+                  <span>200만원</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* 관리비 포함 체크박스 및 검색 버튼 */}
+            <div className="flex items-center justify-between mt-6 pt-4 border-t">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="maintenance-fee"
+                  checked={includeMaintenanceFee}
+                  onCheckedChange={setIncludeMaintenanceFee}
                 />
+                <Label htmlFor="maintenance-fee" className="text-sm text-gray-700">
+                  관리비 포함하여 계산
+                </Label>
               </div>
               
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">예산</label>
-                <Select value={priceRange} onValueChange={setPriceRange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="예산 선택" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0-30">~30만원</SelectItem>
-                    <SelectItem value="30-50">30-50만원</SelectItem>
-                    <SelectItem value="50-70">50-70만원</SelectItem>
-                    <SelectItem value="70+">70만원+</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="flex items-end">
-                <Button className="w-full h-10" size="lg">
-                  <Search className="h-4 w-4 mr-2" />
-                  검색
-                </Button>
-              </div>
+              <Button className="px-8" size="lg" onClick={handleSearch}>
+                <Search className="h-4 w-4 mr-2" />
+                매물 찾기
+              </Button>
             </div>
           </div>
         </div>
