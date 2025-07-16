@@ -425,125 +425,29 @@ export default function Home() {
             {filteredProperties.map((property) => (
               <div 
                 key={property.id}
-                className="cursor-pointer block w-full"
                 style={{ 
-                  pointerEvents: 'auto',
-                  position: 'relative',
-                  zIndex: 1
+                  border: '2px solid red',
+                  padding: '10px',
+                  cursor: 'pointer',
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  margin: '8px'
                 }}
+                onMouseEnter={() => console.log('Mouse enter')}
+                onMouseLeave={() => console.log('Mouse leave')}
+                onMouseDown={() => console.log('Mouse down')}
+                onMouseUp={() => console.log('Mouse up')}
                 onClick={(e) => {
-                  console.log('Wrapper clicked', e.target);
+                  console.log('Card onClick triggered');
+                  console.log('Event target:', e.target);
+                  console.log('Current target:', e.currentTarget);
+                  alert('클릭됨!');
                   setLocation(`/property/${property.id}`);
                 }}
               >
-                <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow h-full"
-                >
-                  <div className="relative h-48 bg-neutral-200">
-                    {property.photos && property.photos.length > 0 ? (
-                      <img
-                        src={property.photos[0]}
-                        alt={property.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-neutral-500">
-                        <HomeIcon className="h-12 w-12" />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-semibold text-neutral-900 hover:text-primary transition-colors line-clamp-1 flex-1">
-                        <SmartTextWithTooltips 
-                          text={isTranslated && translatedData[`title_${property.id}`] 
-                            ? translatedData[`title_${property.id}`] 
-                            : property.title}
-                          originalText={property.title}
-                          isTranslated={isTranslated}
-                        />
-                      </h3>
-                      <div 
-                        className="ml-2" 
-                        style={{ position: 'relative', zIndex: 10 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      >
-                        <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
-                      </div>
-                    </div>
-                  
-                    <div className="flex items-start text-sm text-neutral-500 mb-2">
-                      <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <div className="address-text">
-                          <SmartTextWithTooltips 
-                            text={isTranslated && translatedData[`address_${property.id}`] 
-                              ? translatedData[`address_${property.id}`] 
-                              : property.address}
-                            originalText={property.address}
-                            isTranslated={isTranslated}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                
-                    {/* 연결된 대학교 표시 */}
-                    {(() => {
-                      const propertyUniversities = allPropertyUniversities.filter(
-                        (pu: any) => pu.propertyId === property.id
-                      );
-                      const relatedUniversities = propertyUniversities.map((pu: any) => 
-                        universities.find((uni: any) => uni.id === pu.universityId)
-                      ).filter(Boolean);
-                      
-                      if (relatedUniversities.length > 0) {
-                        return (
-                          <div className="flex items-center text-xs text-blue-600 mb-2">
-                            <GraduationCap className="h-3 w-3 mr-1" />
-                            <span className="line-clamp-1">
-                              {relatedUniversities.map((uni: any) => uni.name).join(', ')} 근처
-                            </span>
-                          </div>
-                        );
-                      }
-                      return null;
-                    })()}
-                    
-                    <div className="text-sm font-medium text-primary mb-3">
-                      {formatPrice(property.deposit, property.monthlyRent)}
-                    </div>
-                    
-                    <p className="text-sm text-neutral-600 line-clamp-2 mb-3">
-                      <SmartTextWithTooltips 
-                        text={isTranslated && translatedData[`description_${property.id}`] 
-                          ? translatedData[`description_${property.id}`] 
-                          : property.description}
-                        originalText={property.description}
-                        isTranslated={isTranslated}
-                      />
-                    </p>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center text-xs text-neutral-400">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
-                      </div>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        style={{ position: 'relative', zIndex: 10 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setLocation(`/property/${property.id}`);
-                        }}
-                      >
-                        {translateUI('상세보기')}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                <p>이 영역을 클릭해보세요 - 매물 ID: {property.id}</p>
+                <h3>{property.title}</h3>
+                <p>{property.address}</p>
               </div>
             ))}
           </div>
