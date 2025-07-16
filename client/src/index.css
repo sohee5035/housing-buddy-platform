@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Pretendard 폰트 설정 (무료, 상업적 이용 가능) */
+* {
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
 :root {
   --background: 210 11% 98%; /* #F8FAFC */
   --foreground: 215 25% 15%; /* #0F172A */
