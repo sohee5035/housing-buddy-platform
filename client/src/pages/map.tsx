@@ -164,8 +164,8 @@ export default function MapPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row h-[calc(100vh-140px)]">
-        {/* 지도 영역 */}
-        <div className="flex-1 relative min-h-[400px] lg:min-h-full">
+        {/* 지도 영역 - 모바일에서는 높이 제한, 데스크탑에서는 50% */}
+        <div className="w-full lg:w-1/2 relative h-[300px] lg:h-full">
           <div className="w-full h-full relative">
             {/* Google Maps iframe */}
             <iframe
@@ -201,16 +201,18 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* 매물 리스트 영역 */}
-        <div className="w-full lg:w-80 bg-white border-l lg:border-t-0 border-t overflow-y-auto">
-          <div className="p-4 border-b bg-gray-50">
+        {/* 매물 리스트 영역 - 스크롤 가능한 전체 영역 */}
+        <div className="w-full lg:w-1/2 bg-white border-l lg:border-t-0 border-t flex flex-col">
+          <div className="p-4 border-b bg-gray-50 flex-shrink-0">
             <h3 className="font-semibold text-lg">매물 목록</h3>
             <p className="text-sm text-muted-foreground">
               총 {filteredProperties.length}개 매물
             </p>
           </div>
           
-          <div className="space-y-4 p-4">
+          {/* 스크롤 가능한 매물 리스트 */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="space-y-4 p-4">
             {isLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
@@ -275,6 +277,7 @@ export default function MapPage() {
                 </Card>
               ))
             )}
+            </div>
           </div>
         </div>
       </div>
