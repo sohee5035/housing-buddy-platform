@@ -57,6 +57,7 @@ export default function NewHome() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [showAdminTrigger, setShowAdminTrigger] = useState(false);
   const [customCategories, setCustomCategories] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('customCategories');
@@ -361,29 +362,54 @@ export default function NewHome() {
         </div>
       </section>
 
-      {/* 관리자 플로팅 버튼 */}
-      {!isAdmin && (
+      {/* 숨겨진 관리자 트리거 - 우측 하단 모서리 */}
+      <div
+        className="fixed bottom-0 right-0 w-8 h-8 cursor-pointer z-50 opacity-5 hover:opacity-20 transition-opacity"
+        onClick={() => setShowAdminTrigger(!showAdminTrigger)}
+        title="관리자"
+      />
+
+      {/* 관리자 버튼 - 트리거 클릭 시에만 표시 */}
+      {showAdminTrigger && !isAdmin && (
         <Button
-          onClick={() => setShowAdminLogin(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 z-50"
+          onClick={() => {
+            setShowAdminLogin(true);
+            setShowAdminTrigger(false);
+          }}
+          className="fixed bottom-6 right-6 w-12 h-12 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 z-50 animate-in fade-in duration-200"
           size="sm"
         >
-          <Shield className="h-6 w-6" />
+          <Shield className="h-5 w-5" />
         </Button>
       )}
 
       {/* 관리자 로그인 후 패널 */}
-      {isAdmin && (
+      {showAdminTrigger && isAdmin && (
         <AdminPanel
-          onCreateListing={() => setShowCreateModal(true)}
-          onCategoryManager={() => setShowCategoryManager(true)}
-          onTrashView={() => window.location.href = '/trash'}
-          onCommentsView={() => window.location.href = '/admin/comments'}
-          onLogout={logout}
-          className="fixed bottom-6 right-6 z-50"
+          onCreateListing={() => {
+            setShowCreateModal(true);
+            setShowAdminTrigger(false);
+          }}
+          onCategoryManager={() => {
+            setShowCategoryManager(true);
+            setShowAdminTrigger(false);
+          }}
+          onTrashView={() => {
+            window.location.href = '/trash';
+            setShowAdminTrigger(false);
+          }}
+          onCommentsView={() => {
+            window.location.href = '/admin/comments';
+            setShowAdminTrigger(false);
+          }}
+          onLogout={() => {
+            logout();
+            setShowAdminTrigger(false);
+          }}
+          className="fixed bottom-6 right-6 z-50 animate-in fade-in duration-200"
           trigger={
-            <Button className="w-14 h-14 rounded-full shadow-lg bg-green-600 hover:bg-green-700">
-              <Settings className="h-6 w-6" />
+            <Button className="w-12 h-12 rounded-full shadow-lg bg-green-600 hover:bg-green-700">
+              <Settings className="h-5 w-5" />
             </Button>
           }
         />
@@ -392,7 +418,10 @@ export default function NewHome() {
       {/* 관리자 로그인 모달 */}
       <AdminLogin 
         isOpen={showAdminLogin} 
-        onClose={() => setShowAdminLogin(false)} 
+        onClose={() => {
+          setShowAdminLogin(false);
+          setShowAdminTrigger(false);
+        }} 
       />
 
       {/* 매물 등록 모달 */}
@@ -400,8 +429,14 @@ export default function NewHome() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogTitle>새 매물 등록</DialogTitle>
           <PropertyForm 
-            onSuccess={() => setShowCreateModal(false)}
-            onCancel={() => setShowCreateModal(false)}
+            onSuccess={() => {
+              setShowCreateModal(false);
+              setShowAdminTrigger(false);
+            }}
+            onCancel={() => {
+              setShowCreateModal(false);
+              setShowAdminTrigger(false);
+            }}
             availableCategories={[...new Set(['기타', ...customCategories])]}
           />
         </DialogContent>
@@ -413,7 +448,10 @@ export default function NewHome() {
           <DialogTitle>카테고리 관리</DialogTitle>
           <CategoryManager
             isOpen={showCategoryManager}
-            onClose={() => setShowCategoryManager(false)}
+            onClose={() => {
+              setShowCategoryManager(false);
+              setShowAdminTrigger(false);
+            }}
             customCategories={customCategories}
             onUpdateCategories={(categories) => {
               setCustomCategories(categories);
