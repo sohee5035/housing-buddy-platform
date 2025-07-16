@@ -252,7 +252,7 @@ export default function NewHome() {
                 하우징버디가 엄선한 외국인 유학생에게 인기 있는 매물들
               </p>
             </div>
-            <Link href="/all-properties">
+            <Link href="/properties">
               <Button variant="outline">
                 전체보기 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -261,7 +261,11 @@ export default function NewHome() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {featuredProperties.map(property => (
-              <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <Card 
+                key={property.id} 
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 transform transition-all duration-200"
+                onClick={() => window.location.href = `/property/${property.id}`}
+              >
                 <div className="relative">
                   {property.photos && property.photos.length > 0 ? (
                     <img
@@ -277,7 +281,7 @@ export default function NewHome() {
                   <div className="absolute top-3 left-3">
                     <Badge variant="secondary">신규</Badge>
                   </div>
-                  <div className="absolute top-3 right-3">
+                  <div className="absolute top-3 right-3" onClick={(e) => e.stopPropagation()}>
                     <FavoriteButton propertyId={property.id} size="sm" variant="ghost" />
                   </div>
                 </div>
@@ -304,9 +308,11 @@ export default function NewHome() {
                     </div>
                   </div>
                   
-                  <Link href={`/property/${property.id}`}>
-                    <Button className="w-full">자세히 보기</Button>
-                  </Link>
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <Link href={`/property/${property.id}`}>
+                      <Button className="w-full">자세히 보기</Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             ))}
