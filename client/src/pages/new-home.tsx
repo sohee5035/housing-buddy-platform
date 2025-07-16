@@ -43,10 +43,8 @@ const universities = [
 
 export default function NewHome() {
   const [selectedUniversity, setSelectedUniversity] = useState<string>("");
-  const [minDeposit, setMinDeposit] = useState<number>(0);
-  const [maxDeposit, setMaxDeposit] = useState<number>(5000);
   const [minRent, setMinRent] = useState<number>(0);
-  const [maxRent, setMaxRent] = useState<number>(100);
+  const [maxRent, setMaxRent] = useState<number>(80);
   const [includeMaintenanceFee, setIncludeMaintenanceFee] = useState<boolean>(false);
   
   const { isTranslated, targetLanguage } = useTranslation();
@@ -72,7 +70,6 @@ export default function NewHome() {
     // 검색 로직 구현
     console.log('검색 조건:', {
       university: selectedUniversity,
-      deposit: [minDeposit, maxDeposit],
       rent: [minRent, maxRent],
       includeMaintenance: includeMaintenanceFee
     });
@@ -98,8 +95,8 @@ export default function NewHome() {
           </div>
 
           {/* 검색 바 */}
-          <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-6 mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* 대학교 선택 */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700">대학교</Label>
@@ -117,36 +114,12 @@ export default function NewHome() {
                 </Select>
               </div>
               
-              {/* 보증금 범위 */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-700">
-                  보증금: {minDeposit}만원 ~ {maxDeposit}만원
-                </Label>
-                <div className="px-2">
-                  <Slider
-                    value={[minDeposit, maxDeposit]}
-                    onValueChange={([min, max]) => {
-                      setMinDeposit(min);
-                      setMaxDeposit(max);
-                    }}
-                    max={10000}
-                    min={0}
-                    step={100}
-                    className="w-full"
-                  />
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>0만원</span>
-                  <span>1억원</span>
-                </div>
-              </div>
-              
               {/* 월세 범위 */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-700">
-                  월세: {minRent}만원 ~ {maxRent}만원
+                  월세: {minRent}만원 ~ {maxRent === 200 ? `${maxRent}만원+` : `${maxRent}만원`}
                 </Label>
-                <div className="px-2">
+                <div className="px-3">
                   <Slider
                     value={[minRent, maxRent]}
                     onValueChange={([min, max]) => {
@@ -161,7 +134,7 @@ export default function NewHome() {
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>0만원</span>
-                  <span>200만원</span>
+                  <span>200만원+</span>
                 </div>
               </div>
             </div>
