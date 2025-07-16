@@ -129,7 +129,9 @@ export default function PropertyDetail() {
     queryFn: async () => {
       const response = await fetch(`/api/properties/${id}/universities`);
       if (!response.ok) return [];
-      return response.json();
+      const data = await response.json();
+      console.log('Property Universities API Response:', data);
+      return data;
     },
   });
 
@@ -433,7 +435,10 @@ export default function PropertyDetail() {
                 )}
 
                 {/* 연결된 대학교 섹션 - 더 눈에 띄게 */}
-                {propertyUniversities && propertyUniversities.length > 0 && (
+                {(() => {
+                  console.log('Rendering universities section:', { propertyUniversities, length: propertyUniversities?.length });
+                  return propertyUniversities && propertyUniversities.length > 0;
+                })() && (
                   <div className="mt-6">
                     <h3 className="text-xl font-bold text-neutral-900 mb-4 flex items-center">
                       <div className="w-2 h-8 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full mr-3"></div>
