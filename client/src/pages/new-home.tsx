@@ -163,7 +163,7 @@ export default function NewHome() {
               {/* 월세 범위 */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-700">
-                  월세: {minRent}만원 ~ {maxRent === 200 ? `${maxRent}만원+` : `${maxRent}만원`}
+                  {getTranslatedText("월세", "monthly-rent")}: {minRent}{getTranslatedText("만원", "10k-won")} ~ {maxRent === 200 ? `${maxRent}${getTranslatedText("만원", "10k-won")}+` : `${maxRent}${getTranslatedText("만원", "10k-won")}`}
                 </Label>
                 <div className="px-3">
                   <Slider
@@ -194,13 +194,13 @@ export default function NewHome() {
                   onCheckedChange={setIncludeMaintenanceFee}
                 />
                 <Label htmlFor="maintenance-fee" className="text-sm text-gray-700">
-                  관리비 포함하여 계산
+                  {getTranslatedText("관리비 포함하여 계산", "include-maintenance")}
                 </Label>
               </div>
               
               <Button className="px-8" size="lg" onClick={handleSearch}>
                 <Search className="h-4 w-4 mr-2" />
-                매물 찾기
+                {getTranslatedText("매물 찾기", "search-properties")}
               </Button>
             </div>
           </div>
@@ -213,10 +213,10 @@ export default function NewHome() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               <GraduationCap className="h-8 w-8 inline mr-3 text-blue-600" />
-              대학교별 매물 찾기
+              {getTranslatedText("대학교별 매물 찾기", "university-property-search")}
             </h2>
             <p className="text-gray-600">
-              내가 다닐 대학교 근처의 안전하고 편리한 매물을 확인해보세요
+              {getTranslatedText("내가 다닐 대학교 근처의 안전하고 편리한 매물을 확인해보세요", "university-property-desc")}
             </p>
           </div>
           
@@ -246,10 +246,10 @@ export default function NewHome() {
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
                 <Star className="h-8 w-8 inline mr-3 text-yellow-500" />
-                추천 매물
+                {getTranslatedText("추천 매물", "recommended-properties")}
               </h2>
               <p className="text-gray-600">
-                하우징버디가 엄선한 외국인 유학생에게 인기 있는 매물들
+                {getTranslatedText("하우징버디가 엄선한 외국인 유학생에게 인기 있는 매물들", "recommended-desc")}
               </p>
             </div>
             <Link href="/properties">
