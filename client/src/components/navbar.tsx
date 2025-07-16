@@ -46,6 +46,9 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const { isAdmin, logout: adminLogout } = useAdmin();
   const { getTranslatedText, isTranslated } = useTranslation();
   
+  // 디버깅용 로그
+  console.log('Navbar - isAuthenticated:', isAuthenticated, 'isAdmin:', isAdmin);
+  
   // 매물 데이터를 가져와서 카테고리 추출 (옵셔널)
   const { data: properties = [] } = useQuery({
     queryKey: ["/api/properties"],
