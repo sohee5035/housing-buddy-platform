@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { 
   Home as HomeIcon,
   MapPin,
@@ -22,12 +23,19 @@ import {
   ArrowRight,
   Banknote,
   Calendar,
-  Won
+  Won,
+  Settings,
+  Shield
 } from "lucide-react";
 import { Link } from "wouter";
 import Navbar from "@/components/navbar";
 import FavoriteButton from "@/components/favorite-button";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { useAdmin } from "@/contexts/AdminContext";
+import AdminLogin from "@/components/admin-login";
+import AdminPanel from "@/components/admin-panel";
+import PropertyForm from "@/components/property-form";
+import CategoryManager from "@/components/category-manager";
 
 // 대학교 데이터
 const universities = [
@@ -46,8 +54,20 @@ export default function NewHome() {
   const [minRent, setMinRent] = useState<number>(0);
   const [maxRent, setMaxRent] = useState<number>(80);
   const [includeMaintenanceFee, setIncludeMaintenanceFee] = useState<boolean>(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [customCategories, setCustomCategories] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('customCategories');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   
   const { isTranslated, targetLanguage } = useTranslation();
+  const { isAdmin, logout } = useAdmin();
 
   const { data: properties = [], isLoading } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -340,6 +360,69 @@ export default function NewHome() {
           </div>
         </div>
       </section>
+
+      {/* 관리자 플로팅 버튼 */}
+      {!isAdmin && (
+        <Button
+          onClick={() => setShowAdminLogin(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 z-50"
+          size="sm"
+        >
+          <Shield className="h-6 w-6" />
+        </Button>
+      )}
+
+      {/* 관리자 로그인 후 패널 */}
+      {isAdmin && (
+        <AdminPanel
+          onCreateListing={() => setShowCreateModal(true)}
+          onCategoryManager={() => setShowCategoryManager(true)}
+          onTrashView={() => window.location.href = '/trash'}
+          onCommentsView={() => window.location.href = '/admin/comments'}
+          onLogout={logout}
+          className="fixed bottom-6 right-6 z-50"
+          trigger={
+            <Button className="w-14 h-14 rounded-full shadow-lg bg-green-600 hover:bg-green-700">
+              <Settings className="h-6 w-6" />
+            </Button>
+          }
+        />
+      )}
+
+      {/* 관리자 로그인 모달 */}
+      <AdminLogin 
+        isOpen={showAdminLogin} 
+        onClose={() => setShowAdminLogin(false)} 
+      />
+
+      {/* 매물 등록 모달 */}
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogTitle>새 매물 등록</DialogTitle>
+          <PropertyForm 
+            onSuccess={() => setShowCreateModal(false)}
+            onCancel={() => setShowCreateModal(false)}
+            availableCategories={[...new Set(['기타', ...customCategories])]}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* 카테고리 관리 모달 */}
+      <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
+        <DialogContent>
+          <DialogTitle>카테고리 관리</DialogTitle>
+          <CategoryManager
+            isOpen={showCategoryManager}
+            onClose={() => setShowCategoryManager(false)}
+            customCategories={customCategories}
+            onUpdateCategories={(categories) => {
+              setCustomCategories(categories);
+              localStorage.setItem('customCategories', JSON.stringify(categories));
+            }}
+            propertyCategories={[...new Set(properties.map(p => p.category).filter(Boolean))]}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
