@@ -422,19 +422,16 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProperties.map((property) => {
-              const handleCardClick = () => {
-                console.log('Card clicked, navigating to:', `/property/${property.id}`);
-                setLocation(`/property/${property.id}`);
-              };
-
-              return (
-                <div 
-                  key={property.id} 
-                  onClick={handleCardClick} 
-                  className="block cursor-pointer transition-transform hover:scale-105"
-                >
-                  <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
+            {filteredProperties.map((property) => (
+              <div 
+                key={property.id} 
+                onClick={() => {
+                  console.log('Card clicked, navigating to:', `/property/${property.id}`);
+                  setLocation(`/property/${property.id}`);
+                }}
+                className="cursor-pointer transition-transform hover:scale-105"
+              >
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
                     <div className="relative h-48 bg-neutral-200">
                       {property.photos && property.photos.length > 0 ? (
                         <img
@@ -540,8 +537,7 @@ export default function Home() {
                     </CardContent>
                   </Card>
                 </div>
-              );
-            })}
+              ))}
           </div>
         )}
       </main>
