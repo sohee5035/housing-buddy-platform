@@ -723,19 +723,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Translation service not configured" });
       }
 
-      // 한국어로 번역할 때는 소스 언어를 자동 감지하고, 다른 언어로 번역할 때는 한국어에서 번역
-      const requestBody: any = {
-        q: text,
-        target: targetLang,
-      };
-
       // 같은 언어로 번역하는 경우 원본 텍스트 그대로 반환
       if (targetLang === 'ko') {
         return res.json({ translatedText: text });
       }
 
-      // 한국어가 아닌 다른 언어로 번역할 때만 소스 언어 지정
-      requestBody.source = 'ko';
+      // 줄바꿈 보존을 위해 특별한 마커로 대체
+      const lineBreakMarker = '<<<LINEBREAK>>>';
+      const textWithMarkers = text.replace(/\n/g, lineBreakMarker);
+
+      // 한국어로 번역할 때는 소스 언어를 자동 감지하고, 다른 언어로 번역할 때는 한국어에서 번역
+      const requestBody: any = {
+        q: textWithMarkers,
+        target: targetLang,
+        source: 'ko',
+      };
 
       console.log("Making API request to Google Translate...");
       const response = await fetch(
@@ -757,7 +759,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const data = await response.json();
-      const translatedText = data.data.translations[0].translatedText;
+      let translatedText = data.data.translations[0].translatedText;
+      
+      // 마커를 다시 줄바꿈으로 복원
+      translatedText = translatedText.replace(new RegExp(lineBreakMarker, 'g'), '\n');
       
       res.json({ translatedText });
     } catch (error: any) {
