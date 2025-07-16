@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { apiRequest } from "@/lib/queryClient";
 
 import AdminLogin from "./admin-login";
 import AdminPanel from "./admin-panel";
@@ -83,27 +84,47 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'account-settings', text: '계정 설정' },
         { key: 'greeting-suffix', text: '님 안녕하세요!' },
         { key: 'admin-login', text: '관리자 로그인' },
-        { key: 'housing-buddy', text: 'Housing Buddy' }
+        { key: 'housing-buddy', text: 'Housing Buddy' },
+        { key: 'admin', text: '관리자' },
+        { key: 'new-property', text: '새 매물 등록' },
+        { key: 'category-management', text: '카테고리 관리' },
+        { key: 'login-required', text: '로그인이 필요합니다...' },
+        { key: 'login', text: '로그인' }
       ];
 
-      const response = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          texts: textsToTranslate,
-          targetLanguage: languageCode
-        })
-      });
+      const newTranslatedData: Record<string, string> = {};
+      
+      // 개별 텍스트 번역 요청
+      for (const item of textsToTranslate) {
+        try {
+          const response = await fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: item.text,
+              targetLang: languageCode
+            })
+          });
 
-      if (response.ok) {
-        const result = await response.json();
-        setIsTranslated(true);
-        setTranslatedData(result.translations);
-        toast({
-          title: "번역 완료",
-          description: `${currentLanguage.name}로 번역되었습니다.`
-        });
+          if (response.ok) {
+            const result = await response.json();
+            newTranslatedData[item.key] = result.translatedText || item.text;
+          } else {
+            newTranslatedData[item.key] = item.text;
+          }
+        } catch (error) {
+          console.error(`번역 실패 (${item.key}):`, error);
+          newTranslatedData[item.key] = item.text;
+        }
       }
+
+      setTranslatedData(newTranslatedData);
+      setIsTranslated(true);
+      
+      toast({
+        title: "번역 완료",
+        description: `${currentLanguage.name}로 번역되었습니다.`
+      });
     } catch (error) {
       console.error('번역 실패:', error);
       toast({
@@ -159,6 +180,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
       });
     }
   };
+
+
 
   return (
     <nav className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
