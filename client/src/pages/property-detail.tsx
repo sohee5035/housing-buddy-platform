@@ -345,6 +345,31 @@ export default function PropertyDetail() {
           <div className="space-y-6">
             <Card>
               <CardContent className="p-6">
+                {/* 연결된 대학교 정보 - 매물 제목 위에 표시 */}
+                {propertyUniversities && propertyUniversities.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex flex-wrap gap-2">
+                      {propertyUniversities.map((pu: any) => (
+                        <div 
+                          key={pu.universityId} 
+                          className="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium border border-blue-200"
+                        >
+                          <span className="text-base mr-2">{pu.university.icon}</span>
+                          <span className="font-bold">{pu.university.name}</span>
+                          {pu.distanceKm && (
+                            <span className="ml-2 text-xs bg-blue-200 px-2 py-0.5 rounded-full">
+                              {pu.distanceKm}km
+                            </span>
+                          )}
+                          {pu.isRecommended && (
+                            <span className="ml-2 text-xs">⭐</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-start justify-between mb-4">
                   <h1 className="text-2xl font-bold text-neutral-900 flex-1">
                     <SmartTextWithTooltips

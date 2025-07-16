@@ -1014,6 +1014,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get universities for a specific property
+  app.get("/api/properties/:id/universities", async (req: Request, res: Response) => {
+    try {
+      const propertyId = parseInt(req.params.id);
+      if (isNaN(propertyId)) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+
+      const universities = await storage.getPropertyUniversities(propertyId);
+      res.json(universities);
+    } catch (error) {
+      console.error("Error fetching property universities:", error);
+      res.status(500).json({ message: "Failed to fetch property universities" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
