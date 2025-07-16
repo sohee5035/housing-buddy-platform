@@ -70,7 +70,7 @@ export default function NewHome() {
     }
   });
   
-  const { isTranslated, targetLanguage } = useTranslation();
+  const { isTranslated, targetLanguage, getTranslatedText } = useTranslation();
   const { isAdmin, logout } = useAdmin();
 
   const { data: properties = [], isLoading } = useQuery<Property[]>({
@@ -130,13 +130,13 @@ export default function NewHome() {
         <div className="max-w-6xl mx-auto text-center">
           <div className="mb-8">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              한국에서 찾는 
-              <span className="text-blue-600 block mt-2">나의 첫 집</span>
+              {getTranslatedText("한국에서 찾는", "main-title-1")} 
+              <span className="text-blue-600 block mt-2">{getTranslatedText("나의 첫 집", "main-title-2")}</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              외국인 유학생을 위한 안전하고 편리한 주거 솔루션
+              {getTranslatedText("외국인 유학생을 위한 안전하고 편리한 주거 솔루션", "main-desc-1")}
               <br />
-              <span className="text-blue-500 font-medium">하우징버디</span>가 함께합니다
+              <span className="text-blue-500 font-medium">{getTranslatedText("하우징버디", "housing-buddy-name")}</span>{getTranslatedText("가 함께합니다", "main-desc-2")}
             </p>
           </div>
 
@@ -145,10 +145,10 @@ export default function NewHome() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* 대학교 선택 */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">대학교</Label>
+                <Label className="text-sm font-medium text-gray-700">{getTranslatedText("대학교", "university")}</Label>
                 <Select value={selectedUniversity} onValueChange={setSelectedUniversity}>
                   <SelectTrigger>
-                    <SelectValue placeholder="대학교 선택" />
+                    <SelectValue placeholder={getTranslatedText("대학교 선택", "university-select")} />
                   </SelectTrigger>
                   <SelectContent>
                     {universities.map(uni => (
