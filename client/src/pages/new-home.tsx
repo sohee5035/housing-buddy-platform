@@ -103,6 +103,28 @@ export default function NewHome() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       <Navbar />
       
+      {/* 상단 관리자 버튼 - 관리자 상태일 때만 표시 */}
+      {isAdmin && (
+        <div className="fixed top-20 right-4 z-50">
+          <AdminPanel
+            onCreateListing={() => setShowCreateModal(true)}
+            onCategoryManager={() => setShowCategoryManager(true)}
+            onTrashView={() => {}} // 휴지통 기능
+            onCommentsView={() => {}} // 문의 관리 기능
+            onLogout={() => {
+              localStorage.removeItem('housing-buddy-admin');
+              window.location.reload();
+            }}
+            trigger={
+              <Button className="bg-green-600 hover:bg-green-700 text-white shadow-lg">
+                <Settings className="h-4 w-4 mr-2" />
+                관리자
+              </Button>
+            }
+          />
+        </div>
+      )}
+      
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
