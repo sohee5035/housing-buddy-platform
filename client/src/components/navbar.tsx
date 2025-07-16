@@ -123,8 +123,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* 관리자 방패 버튼 - 항상 표시, 상태에 따라 색상 변경 */}
-            {isAdmin ? (
+            {/* 관리자 방패 버튼 - 로그인 후에만 표시 */}
+            {isAdmin && (
               <AdminPanel
                 onCreateListing={() => setShowCreateModal(true)}
                 onCategoryManager={() => setShowCategoryManager(true)}
@@ -137,16 +137,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                   </Button>
                 }
               />
-            ) : (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setShowAdminLogin(true)} 
-                title="관리자 로그인"
-                className="bg-blue-50 text-blue-600 hover:bg-blue-100"
-              >
-                <Shield className="h-4 w-4" />
-              </Button>
             )}
             
             {isAuthenticated ? (
@@ -216,8 +206,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
               </Button>
             )}
             
-            {/* 모바일 관리자 방패 버튼 - 항상 표시 */}
-            {isAdmin ? (
+            {/* 모바일 관리자 방패 버튼 - 로그인 후에만 표시 */}
+            {isAdmin && (
               <AdminPanel
                 onCreateListing={() => setShowCreateModal(true)}
                 onCategoryManager={() => setShowCategoryManager(true)}
@@ -230,16 +220,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                   </Button>
                 }
               />
-            ) : (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setShowAdminLogin(true)} 
-                title="관리자 로그인"
-                className="bg-blue-50 text-blue-600 hover:bg-blue-100"
-              >
-                <Shield className="h-4 w-4" />
-              </Button>
             )}
             
             {/* 모바일에서 사용자 인사말 또는 로그인 버튼 표시 */}
@@ -356,33 +336,17 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                         </Button>
                       </>
                     ) : (
-                      <>
-                        {!isAdmin && (
-                          <Button 
-                            variant="ghost" 
-                            className="w-full mb-2"
-                            onClick={() => {
-                              setShowAdminLogin(true);
-                              setIsMobileMenuOpen(false);
-                            }}
-                          >
-                            <Shield className="h-4 w-4 mr-2" />
-                            관리자 로그인
-                          </Button>
-                        )}
-                        
-                        <Button 
-                          variant="outline" 
-                          className="w-full"
-                          onClick={() => {
-                            handleLogin();
-                            setIsMobileMenuOpen(false);
-                          }}
-                        >
-                          <User className="h-4 w-4 mr-2" />
-                          로그인 / 회원가입
-                        </Button>
-                      </>
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => {
+                          handleLogin();
+                          setIsMobileMenuOpen(false);
+                        }}
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        로그인 / 회원가입
+                      </Button>
                     )}
                   </div>
                 </div>

@@ -441,6 +441,21 @@ export default function NewHome() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* 은밀한 관리자 로그인 버튼 - 로그인 전에만 표시 */}
+      {!isAdmin && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowAdminLogin(true)}
+            className="opacity-30 hover:opacity-70 transition-opacity bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm"
+            title="관리자 로그인"
+          >
+            <Shield className="h-4 w-4 text-gray-500" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
