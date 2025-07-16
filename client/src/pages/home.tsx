@@ -367,11 +367,22 @@ export default function Home() {
       {/* Property List */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-2">
-            {universityFilter && selectedUniversity ? 
-              `${selectedUniversity.name} 주변 매물` : 
-              translateUI('등록된 매물')}
-          </h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-3xl font-bold text-neutral-900">
+              {universityFilter && selectedUniversity ? 
+                `${selectedUniversity.name} 주변 매물` : 
+                translateUI('등록된 매물')}
+            </h2>
+            {universityFilter && selectedUniversity && (
+              <Button 
+                variant="outline" 
+                onClick={() => window.location.href = '/properties'}
+                className="text-sm"
+              >
+                전체보기
+              </Button>
+            )}
+          </div>
           <p className="text-neutral-600">
             {universityFilter && selectedUniversity ? 
               `${selectedUniversity.name} 관련 매물 ${filteredProperties.length}개를 찾았습니다` : 
@@ -462,6 +473,28 @@ export default function Home() {
                       />
                     </span>
                   </div>
+                  
+                  {/* 연결된 대학교 표시 */}
+                  {(() => {
+                    const propertyUniversities = allPropertyUniversities.filter(
+                      (pu: any) => pu.propertyId === property.id
+                    );
+                    const relatedUniversities = propertyUniversities.map((pu: any) => 
+                      universities.find((uni: any) => uni.id === pu.universityId)
+                    ).filter(Boolean);
+                    
+                    if (relatedUniversities.length > 0) {
+                      return (
+                        <div className="flex items-center text-xs text-blue-600 mb-2">
+                          <GraduationCap className="h-3 w-3 mr-1" />
+                          <span className="line-clamp-1">
+                            {relatedUniversities.map((uni: any) => uni.name).join(', ')} 근처
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                   
                   <div className="text-sm font-medium text-primary mb-3">
                     {formatPrice(property.deposit, property.monthlyRent)}
