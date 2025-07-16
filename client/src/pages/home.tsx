@@ -423,8 +423,11 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProperties.map((property) => (
-              <Link key={property.id} href={`/property/${property.id}`} className="block">
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <Card 
+                key={property.id} 
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full"
+                onClick={() => setLocation(`/property/${property.id}`)}
+              >
                   <div className="relative h-48 bg-neutral-200">
                     {property.photos && property.photos.length > 0 ? (
                       <img
@@ -518,7 +521,6 @@ export default function Home() {
                   </div>
                   </CardContent>
                 </Card>
-              </Link>
             ))}
           </div>
         )}
