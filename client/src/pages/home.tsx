@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X, Settings, Languages, Globe, RotateCcw, ShieldCheck, LogOut } from "lucide-react";
+import { Plus, Home as HomeIcon, MapPin, Calendar, Trash2, Tags, X, Settings, Languages, Globe, RotateCcw, ShieldCheck, LogOut, GraduationCap } from "lucide-react";
 import FavoriteButton from "@/components/favorite-button";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "@/contexts/TranslationContext";
