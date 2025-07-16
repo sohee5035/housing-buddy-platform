@@ -422,53 +422,53 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProperties.map((property) => (
-              <Card 
-                key={property.id} 
-                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full"
-                onClick={(e) => {
-                  // 하트 버튼이 아닌 경우에만 이동
-                  if (!(e.target as HTMLElement).closest('[data-favorite-button]')) {
-                    setLocation(`/property/${property.id}`);
-                  }
-                }}
-              >
-                  <div className="relative h-48 bg-neutral-200" onClick={() => setLocation(`/property/${property.id}`)}>
-                    {property.photos && property.photos.length > 0 ? (
-                      <img
-                        src={property.photos[0]}
-                        alt={property.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-neutral-500">
-                        <HomeIcon className="h-12 w-12" />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <CardContent className="p-4" onClick={() => setLocation(`/property/${property.id}`)}>
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-semibold text-neutral-900 hover:text-primary transition-colors line-clamp-1 flex-1">
-                        <SmartTextWithTooltips 
-                          text={isTranslated && translatedData[`title_${property.id}`] 
-                            ? translatedData[`title_${property.id}`] 
-                            : property.title}
-                          originalText={property.title}
-                          isTranslated={isTranslated}
+            {filteredProperties.map((property) => {
+              const handleCardClick = () => {
+                setLocation(`/property/${property.id}`);
+              };
+
+              return (
+                <div 
+                  key={property.id} 
+                  onClick={handleCardClick} 
+                  style={{cursor: 'pointer'}}
+                  className="block"
+                >
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
+                    <div className="relative h-48 bg-neutral-200">
+                      {property.photos && property.photos.length > 0 ? (
+                        <img
+                          src={property.photos[0]}
+                          alt={property.title}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         />
-                      </h3>
-                      <div 
-                        className="ml-2" 
-                        data-favorite-button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
-                      >
-                        <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
-                      </div>
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-neutral-500">
+                          <HomeIcon className="h-12 w-12" />
+                        </div>
+                      )}
                     </div>
+                    
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-semibold text-neutral-900 hover:text-primary transition-colors line-clamp-1 flex-1">
+                          <SmartTextWithTooltips 
+                            text={isTranslated && translatedData[`title_${property.id}`] 
+                              ? translatedData[`title_${property.id}`] 
+                              : property.title}
+                            originalText={property.title}
+                            isTranslated={isTranslated}
+                          />
+                        </h3>
+                        <div 
+                          className="ml-2" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
+                          <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
+                        </div>
+                      </div>
                     
                     <div className="flex items-start text-sm text-neutral-500 mb-2">
                       <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
@@ -526,11 +526,22 @@ export default function Home() {
                       <Calendar className="h-3 w-3 mr-1" />
                       {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
                     </div>
-                    <Button size="sm" variant="outline">{translateUI('상세보기')}</Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLocation(`/property/${property.id}`);
+                      }}
+                    >
+                      {translateUI('상세보기')}
+                    </Button>
                   </div>
-                  </CardContent>
-                </Card>
-            ))}
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })}
           </div>
         )}
       </main>
