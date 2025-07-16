@@ -365,17 +365,33 @@ export default function NewHome() {
         </div>
       </section>
 
-      {/* 숨겨진 관리자 트리거 - 항상 표시 (테스트) */}
-      <div
-        className="fixed bottom-4 right-4 w-8 h-8 cursor-pointer z-50 opacity-20 hover:opacity-50 transition-all duration-200 flex items-center justify-center bg-black/10 rounded-full backdrop-blur-sm"
-        onClick={() => {
-          console.log('방패 클릭, isAdmin:', isAdmin);
-          setShowAdminTrigger(!showAdminTrigger);
-        }}
-        title="관리자"
-      >
-        <Shield className="h-5 w-5 text-white drop-shadow-lg" />
-      </div>
+      {/* 숨겨진 관리자 트리거 - 비로그인 시에만 표시 */}
+      {!isAdmin && (
+        <div
+          className="fixed bottom-4 right-4 w-8 h-8 cursor-pointer z-50 opacity-20 hover:opacity-50 transition-all duration-200 flex items-center justify-center bg-black/10 rounded-full backdrop-blur-sm"
+          onClick={() => {
+            console.log('방패 클릭됨!');
+            setShowAdminTrigger(!showAdminTrigger);
+          }}
+          title="관리자"
+        >
+          <Shield className="h-5 w-5 text-white drop-shadow-lg" />
+        </div>
+      )}
+      
+      {/* 관리자 로그아웃 버튼 (테스트용) */}
+      {isAdmin && (
+        <div
+          className="fixed bottom-16 right-4 bg-red-500 text-white p-2 rounded cursor-pointer text-xs"
+          onClick={() => {
+            console.log('관리자 로그아웃');
+            localStorage.removeItem('housing-buddy-admin');
+            window.location.reload();
+          }}
+        >
+          로그아웃
+        </div>
+      )}
 
       {/* 관리자 버튼 - 트리거 클릭 시에만 표시 */}
       {showAdminTrigger && !isAdmin && (
