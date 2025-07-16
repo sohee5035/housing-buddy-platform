@@ -362,12 +362,14 @@ export default function NewHome() {
         </div>
       </section>
 
-      {/* 숨겨진 관리자 트리거 - 우측 하단 모서리 */}
-      <div
-        className="fixed bottom-0 right-0 w-8 h-8 cursor-pointer z-50 opacity-5 hover:opacity-20 transition-opacity"
-        onClick={() => setShowAdminTrigger(!showAdminTrigger)}
-        title="관리자"
-      />
+      {/* 숨겨진 관리자 트리거 - 비로그인 시에만 */}
+      {!isAdmin && (
+        <div
+          className="fixed bottom-0 right-0 w-8 h-8 cursor-pointer z-50 opacity-5 hover:opacity-20 transition-opacity"
+          onClick={() => setShowAdminTrigger(!showAdminTrigger)}
+          title="관리자"
+        />
+      )}
 
       {/* 관리자 버튼 - 트리거 클릭 시에만 표시 */}
       {showAdminTrigger && !isAdmin && (
@@ -381,38 +383,6 @@ export default function NewHome() {
         >
           <Shield className="h-5 w-5" />
         </Button>
-      )}
-
-      {/* 관리자 로그인 후 패널 */}
-      {showAdminTrigger && isAdmin && (
-        <AdminPanel
-          onCreateListing={() => {
-            setShowCreateModal(true);
-            setShowAdminTrigger(false);
-          }}
-          onCategoryManager={() => {
-            setShowCategoryManager(true);
-            setShowAdminTrigger(false);
-          }}
-          onTrashView={() => {
-            window.location.href = '/trash';
-            setShowAdminTrigger(false);
-          }}
-          onCommentsView={() => {
-            window.location.href = '/admin/comments';
-            setShowAdminTrigger(false);
-          }}
-          onLogout={() => {
-            logout();
-            setShowAdminTrigger(false);
-          }}
-          className="fixed bottom-6 right-6 z-50 animate-in fade-in duration-200"
-          trigger={
-            <Button className="w-12 h-12 rounded-full shadow-lg bg-green-600 hover:bg-green-700">
-              <Settings className="h-5 w-5" />
-            </Button>
-          }
-        />
       )}
 
       {/* 관리자 로그인 모달 */}

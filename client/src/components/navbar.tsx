@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Home, Plus, Menu, User, LogOut, Settings, Heart, MessageCircle, MapPin } from "lucide-react";
@@ -10,6 +11,9 @@ import { useTranslation } from "@/contexts/TranslationContext";
 
 import AdminLogin from "./admin-login";
 import AdminPanel from "./admin-panel";
+import PropertyForm from "./property-form";
+import CategoryManager from "./category-manager";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,14 +29,38 @@ interface NavbarProps {
 export default function Navbar({ onCreateListing }: NavbarProps) {
   const [location, setLocation] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [customCategories, setCustomCategories] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('customCategories');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   
   const { user, isAuthenticated, logout } = useAuth();
   const { toast } = useToast();
   const { isAdmin, logout: adminLogout } = useAdmin();
   const { getTranslatedText, isTranslated } = useTranslation();
+  
+  // 매물 데이터를 가져와서 카테고리 추출 (옵셔널)
+  const { data: properties = [] } = useQuery({
+    queryKey: ["/api/properties"],
+    queryFn: async () => {
+      try {
+        const response = await fetch("/api/properties");
+        if (!response.ok) return [];
+        return response.json();
+      } catch {
+        return [];
+      }
+    },
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const navItems = [
     { href: "/", label: "홈", active: location === "/", id: "home" },
@@ -95,16 +123,21 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* 관리자인 경우에만 매물 등록 버튼 표시 */}
-            {isAuthenticated && isAdmin && (
-              <Button
-                variant="outline"
-                onClick={onCreateListing}
-                className="border-primary text-primary hover:bg-primary hover:text-white"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                매물 등록
-              </Button>
+            {/* 관리자 패널 버튼 - 관리자 로그인 시에만 표시 */}
+            {isAdmin && (
+              <AdminPanel
+                onCreateListing={() => setShowCreateModal(true)}
+                onCategoryManager={() => setShowCategoryManager(true)}
+                onTrashView={() => setLocation('/trash')}
+                onCommentsView={() => setLocation('/admin/comments')}
+                onLogout={adminLogout}
+                trigger={
+                  <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white">
+                    <Settings className="h-4 w-4 mr-2" />
+                    관리자
+                  </Button>
+                }
+              />
             )}
             
             {isAuthenticated ? (
@@ -221,19 +254,33 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                           <p className="text-xs text-gray-600">{user?.email}</p>
                         </div>
                         
-                        {/* 관리자인 경우에만 사이드바 매물 등록 버튼 표시 */}
+                        {/* 관리자인 경우에만 사이드바 관리자 패널 버튼 표시 */}
                         {isAdmin && (
-                          <Button
-                            variant="outline"
-                            className="w-full mb-2"
-                            onClick={() => {
-                              onCreateListing?.();
+                          <AdminPanel
+                            onCreateListing={() => {
+                              setShowCreateModal(true);
                               setIsMobileMenuOpen(false);
                             }}
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            매물 등록
-                          </Button>
+                            onCategoryManager={() => {
+                              setShowCategoryManager(true);
+                              setIsMobileMenuOpen(false);
+                            }}
+                            onTrashView={() => {
+                              setLocation('/trash');
+                              setIsMobileMenuOpen(false);
+                            }}
+                            onCommentsView={() => {
+                              setLocation('/admin/comments');
+                              setIsMobileMenuOpen(false);
+                            }}
+                            onLogout={adminLogout}
+                            trigger={
+                              <Button variant="outline" className="w-full mb-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white">
+                                <Settings className="h-4 w-4 mr-2" />
+                                관리자
+                              </Button>
+                            }
+                          />
                         )}
                         
                         <Button 
@@ -300,18 +347,35 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         isOpen={showAdminLogin} 
         onClose={() => setShowAdminLogin(false)} 
       />
-      
-      {/* Admin Panel - Show when admin is logged in */}
-      {isAdmin && (
-        <AdminPanel
-          onCreateListing={onCreateListing || (() => {})}
-          onCategoryManager={() => {}}
-          onTrashView={() => {}}
-          onCommentsView={() => {}}
-          trigger={null}
-          className="hidden"
-        />
-      )}
+
+      {/* 매물 등록 모달 */}
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogTitle>새 매물 등록</DialogTitle>
+          <PropertyForm 
+            onSuccess={() => setShowCreateModal(false)}
+            onCancel={() => setShowCreateModal(false)}
+            availableCategories={[...new Set(['기타', ...customCategories])]}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* 카테고리 관리 모달 */}
+      <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
+        <DialogContent>
+          <DialogTitle>카테고리 관리</DialogTitle>
+          <CategoryManager
+            isOpen={showCategoryManager}
+            onClose={() => setShowCategoryManager(false)}
+            customCategories={customCategories}
+            onUpdateCategories={(categories) => {
+              setCustomCategories(categories);
+              localStorage.setItem('customCategories', JSON.stringify(categories));
+            }}
+            propertyCategories={[...new Set(properties.map((p: any) => p.category).filter(Boolean))]}
+          />
+        </DialogContent>
+      </Dialog>
     </nav>
   );
 }
