@@ -6,8 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TranslationProvider } from "@/contexts/TranslationContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 import Footer from "@/components/footer";
-import NewHome from "@/pages/new-home";
-import Home from "@/pages/home";
+import Home from "@/pages/new-home";
+import PropertyListPage from "@/pages/home";
 import PropertyDetail from "@/pages/property-detail";
 import Favorites from "@/pages/favorites";
 import Trash from "@/pages/trash";
@@ -22,8 +22,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/new-home" component={NewHome} />
-      <Route path="/properties" component={Home} />
+      <Route path="/properties" component={PropertyListPage} />
       <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/favorites" component={Favorites} />
       <Route path="/signup" component={SignupPage} />

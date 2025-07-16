@@ -38,7 +38,7 @@ export default function Home() {
   });
   const [, setLocation] = useLocation();
   
-  console.log('Home component rendered, setLocation:', typeof setLocation);
+
   
   // URL 쿼리 파라미터에서 대학교 ID 추출
   const urlParams = new URLSearchParams(window.location.search);
@@ -267,25 +267,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* 디버그 테스트 버튼 */}
-      <div style={{ 
-        position: 'fixed', 
-        top: '10px', 
-        right: '10px', 
-        zIndex: 9999,
-        backgroundColor: 'red',
-        color: 'white',
-        padding: '10px',
-        border: '3px solid black',
-        cursor: 'pointer'
-      }}
-      onClick={() => {
-        console.log('DEBUG BUTTON CLICKED!');
-        alert('DEBUG BUTTON CLICKED!');
-      }}>
-        DEBUG TEST
-      </div>
-      
       {/* Navbar */}
       <Navbar onCreateListing={() => setShowCreateModal(true)} />
       
@@ -442,48 +423,122 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <div>
-            <div 
-              style={{ 
-                border: '5px solid red',
-                padding: '20px',
-                cursor: 'pointer',
-                backgroundColor: 'yellow',
-                margin: '20px',
-                fontSize: '20px'
-              }}
-              onClick={() => {
-                console.log('SIMPLE TEST CLICKED');
-                alert('SIMPLE TEST CLICKED');
-              }}
-            >
-              클릭 테스트 - 이 박스를 클릭해보세요!
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProperties.map((property) => (
-                <div 
-                  key={property.id}
-                  style={{ 
-                    border: '2px solid red',
-                    padding: '10px',
-                    cursor: 'pointer',
-                    backgroundColor: 'white',
-                    borderRadius: '8px',
-                    margin: '8px'
-                  }}
-                  onClick={(e) => {
-                    console.log('Property card clicked:', property.id);
-                    alert(`매물 ${property.id} 클릭됨!`);
-                    setLocation(`/property/${property.id}`);
-                  }}
-                >
-                  <p>매물 ID: {property.id}</p>
-                  <h3>{property.title}</h3>
-                  <p>{property.address}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProperties.map((property) => (
+              <Card 
+                key={property.id} 
+                className="overflow-hidden hover:shadow-lg transition-shadow h-full cursor-pointer transition-transform hover:scale-105"
+                onClick={() => {
+                  setLocation(`/property/${property.id}`);
+                }}
+              >
+                <div className="relative h-48 bg-neutral-200">
+                  {property.photos && property.photos.length > 0 ? (
+                    <img
+                      src={property.photos[0]}
+                      alt={property.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-neutral-500">
+                      <HomeIcon className="h-12 w-12" />
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+                
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-neutral-900 hover:text-primary transition-colors line-clamp-1 flex-1">
+                      <SmartTextWithTooltips 
+                        text={isTranslated && translatedData[`title_${property.id}`] 
+                          ? translatedData[`title_${property.id}`] 
+                          : property.title}
+                        originalText={property.title}
+                        isTranslated={isTranslated}
+                      />
+                    </h3>
+                    <div 
+                      className="ml-2" 
+                      style={{ position: 'relative', zIndex: 10 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
+                    </div>
+                  </div>
+                
+                  <div className="flex items-start text-sm text-neutral-500 mb-2">
+                    <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="address-text">
+                        <SmartTextWithTooltips 
+                          text={isTranslated && translatedData[`address_${property.id}`] 
+                            ? translatedData[`address_${property.id}`] 
+                            : property.address}
+                          originalText={property.address}
+                          isTranslated={isTranslated}
+                        />
+                      </div>
+                    </div>
+                  </div>
+              
+                  {/* 연결된 대학교 표시 */}
+                  {(() => {
+                    const propertyUniversities = allPropertyUniversities.filter(
+                      (pu: any) => pu.propertyId === property.id
+                    );
+                    const relatedUniversities = propertyUniversities.map((pu: any) => 
+                      universities.find((uni: any) => uni.id === pu.universityId)
+                    ).filter(Boolean);
+                    
+                    if (relatedUniversities.length > 0) {
+                      return (
+                        <div className="flex items-center text-xs text-blue-600 mb-2">
+                          <GraduationCap className="h-3 w-3 mr-1" />
+                          <span className="line-clamp-1">
+                            {relatedUniversities.map((uni: any) => uni.name).join(', ')} 근처
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                  
+                  <div className="text-sm font-medium text-primary mb-3">
+                    {formatPrice(property.deposit, property.monthlyRent)}
+                  </div>
+                  
+                  <p className="text-sm text-neutral-600 line-clamp-2 mb-3">
+                    <SmartTextWithTooltips 
+                      text={isTranslated && translatedData[`description_${property.id}`] 
+                        ? translatedData[`description_${property.id}`] 
+                        : property.description}
+                      originalText={property.description}
+                      isTranslated={isTranslated}
+                    />
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-xs text-neutral-400">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      style={{ position: 'relative', zIndex: 10 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLocation(`/property/${property.id}`);
+                      }}
+                    >
+                      {translateUI('상세보기')}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         )}
       </main>
