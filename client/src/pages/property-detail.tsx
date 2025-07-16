@@ -353,10 +353,6 @@ export default function PropertyDetail() {
                   return propertyUniversities && propertyUniversities.length > 0;
                 })() && (
                   <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-3 flex items-center">
-                      <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
-                      근처 대학교
-                    </h3>
                     <div className="flex flex-wrap gap-2">
                       {propertyUniversities.map((pu: any) => (
                         <div 
