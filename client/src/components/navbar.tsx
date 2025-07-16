@@ -220,12 +220,16 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
               </div>
             ) : (
               <div className="flex items-center space-x-1">
-                {/* 관리자 로그인 버튼 */}
-                {!isAdmin && (
-                  <Button variant="ghost" size="icon" onClick={() => setShowAdminLogin(true)} title="관리자 로그인">
-                    <Shield className="h-4 w-4" />
-                  </Button>
-                )}
+                {/* 관리자 로그인 버튼 - 항상 표시 */}
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setShowAdminLogin(true)} 
+                  title="관리자 로그인"
+                  className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+                >
+                  <Shield className="h-4 w-4" />
+                </Button>
                 {/* 일반 로그인 버튼 */}
                 <Button variant="ghost" size="icon" onClick={handleLogin}>
                   <User className="h-5 w-5" />
