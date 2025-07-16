@@ -38,6 +38,8 @@ export default function Home() {
   });
   const [, setLocation] = useLocation();
   
+  console.log('Home component rendered, setLocation:', typeof setLocation);
+  
   // URL 쿼리 파라미터에서 대학교 ID 추출
   const urlParams = new URLSearchParams(window.location.search);
   const universityFilter = urlParams.get('university');
@@ -265,6 +267,25 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
+      {/* 디버그 테스트 버튼 */}
+      <div style={{ 
+        position: 'fixed', 
+        top: '10px', 
+        right: '10px', 
+        zIndex: 9999,
+        backgroundColor: 'red',
+        color: 'white',
+        padding: '10px',
+        border: '3px solid black',
+        cursor: 'pointer'
+      }}
+      onClick={() => {
+        console.log('DEBUG BUTTON CLICKED!');
+        alert('DEBUG BUTTON CLICKED!');
+      }}>
+        DEBUG TEST
+      </div>
+      
       {/* Navbar */}
       <Navbar onCreateListing={() => setShowCreateModal(true)} />
       
@@ -421,35 +442,48 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProperties.map((property) => (
-              <div 
-                key={property.id}
-                style={{ 
-                  border: '2px solid red',
-                  padding: '10px',
-                  cursor: 'pointer',
-                  backgroundColor: 'white',
-                  borderRadius: '8px',
-                  margin: '8px'
-                }}
-                onMouseEnter={() => console.log('Mouse enter')}
-                onMouseLeave={() => console.log('Mouse leave')}
-                onMouseDown={() => console.log('Mouse down')}
-                onMouseUp={() => console.log('Mouse up')}
-                onClick={(e) => {
-                  console.log('Card onClick triggered');
-                  console.log('Event target:', e.target);
-                  console.log('Current target:', e.currentTarget);
-                  alert('클릭됨!');
-                  setLocation(`/property/${property.id}`);
-                }}
-              >
-                <p>이 영역을 클릭해보세요 - 매물 ID: {property.id}</p>
-                <h3>{property.title}</h3>
-                <p>{property.address}</p>
-              </div>
-            ))}
+          <div>
+            <div 
+              style={{ 
+                border: '5px solid red',
+                padding: '20px',
+                cursor: 'pointer',
+                backgroundColor: 'yellow',
+                margin: '20px',
+                fontSize: '20px'
+              }}
+              onClick={() => {
+                console.log('SIMPLE TEST CLICKED');
+                alert('SIMPLE TEST CLICKED');
+              }}
+            >
+              클릭 테스트 - 이 박스를 클릭해보세요!
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProperties.map((property) => (
+                <div 
+                  key={property.id}
+                  style={{ 
+                    border: '2px solid red',
+                    padding: '10px',
+                    cursor: 'pointer',
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    margin: '8px'
+                  }}
+                  onClick={(e) => {
+                    console.log('Property card clicked:', property.id);
+                    alert(`매물 ${property.id} 클릭됨!`);
+                    setLocation(`/property/${property.id}`);
+                  }}
+                >
+                  <p>매물 ID: {property.id}</p>
+                  <h3>{property.title}</h3>
+                  <p>{property.address}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </main>
