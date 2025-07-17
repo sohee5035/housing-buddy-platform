@@ -91,6 +91,45 @@ export default function Home() {
     }
   }, [isTranslated, translatedData, targetLanguage, refetch]);
 
+  // localStorage에서 직접 번역 데이터 확인하는 추가 로직
+  useEffect(() => {
+    const checkStoredTranslation = () => {
+      try {
+        const storedData = localStorage.getItem('translatedData');
+        const storedTranslated = localStorage.getItem('isTranslated');
+        
+        if (storedData && storedTranslated === 'true') {
+          const parsed = JSON.parse(storedData);
+          const propertyKeys = Object.keys(parsed).filter(k => k.includes('title_') || k.includes('address_'));
+          
+          console.log('💾 localStorage에서 번역 데이터 확인:', {
+            hasStoredData: !!storedData,
+            isStoredTranslated: storedTranslated,
+            propertyKeysInStorage: propertyKeys,
+            contextHasData: Object.keys(translatedData).length > 0,
+            contextIsTranslated: isTranslated
+          });
+          
+          // 컨텍스트와 localStorage가 불일치하면 강제 동기화
+          if (propertyKeys.length > 0 && Object.keys(translatedData).length === 0) {
+            console.log('🔧 번역 데이터 불일치 감지, 강제 동기화 실행');
+            setTranslatedData(parsed);
+            setIsTranslated(true);
+          }
+        }
+      } catch (error) {
+        console.error('❌ localStorage 확인 중 오류:', error);
+      }
+    };
+
+    // 컴포넌트 마운트 시와 번역 상태 변경 시 확인
+    checkStoredTranslation();
+    
+    // 정기적으로 확인 (번역 완료 후 약간의 지연이 있을 수 있음)
+    const interval = setInterval(checkStoredTranslation, 1000);
+    return () => clearInterval(interval);
+  }, [translatedData, isTranslated, setTranslatedData, setIsTranslated]);
+
   const { data: properties = [], isLoading, error, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
     queryFn: async () => {

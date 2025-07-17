@@ -207,10 +207,14 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
             ...uiResult.translations,
             ...propertyResult.translations
           };
-          console.log('결합된 번역 데이터:', combinedTranslations);
-          console.log('매물 번역 키들:', Object.keys(propertyResult.translations));
-          console.log('매물 번역 데이터 세부사항:', propertyResult.translations);
+          console.log('🔄 navbar에서 결합된 번역 데이터:', Object.keys(combinedTranslations).length, '개');
+          console.log('🏠 매물 번역 키들:', Object.keys(propertyResult.translations));
+          console.log('📄 매물 번역 데이터 세부사항:', Object.entries(propertyResult.translations).slice(0, 4));
+          
+          // 강제로 상태 업데이트 보장
+          console.log('💾 번역 데이터 저장 시작...');
           saveTranslatedData(combinedTranslations);
+          console.log('✅ saveTranslatedData 호출 완료');
         } else {
           // 매물 번역 실패 시 UI 번역만 저장
           saveTranslatedData(uiResult.translations);
