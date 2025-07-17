@@ -99,6 +99,8 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
 
   // 번역 데이터 저장 시 로컬 스토리지에도 저장
   const saveTranslatedData = (data: Record<string, string>) => {
+    console.log('번역 데이터 저장:', Object.keys(data));
+    console.log('매물 관련 키들:', Object.keys(data).filter(k => k.includes('_')));
     setTranslatedData(data);
     localStorage.setItem('translatedData', JSON.stringify(data));
   };
