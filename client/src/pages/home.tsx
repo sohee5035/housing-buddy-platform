@@ -17,7 +17,7 @@ import { useTranslation } from "@/contexts/TranslationContext";
 import { useAdmin } from "@/contexts/AdminContext";
 import AdminLogin from "@/components/admin-login";
 import AdminPanel from "@/components/admin-panel";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar-fixed";
 import { translateText, supportedLanguages } from "@/lib/translate";
 import { useToast } from "@/hooks/use-toast";
 

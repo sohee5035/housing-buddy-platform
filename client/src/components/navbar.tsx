@@ -80,6 +80,11 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
     updateTargetLanguage(languageCode);
     setIsTranslating(true);
     
+    // 브라우저 캐시 강제 새로고침
+    console.log('🔥 언어 변경 시작:', languageCode);
+    
+    // 페이지 새로고침 제거 - UX 개선
+    
     // 일괄 번역 실행
     try {
       const textsToTranslate = [
@@ -161,7 +166,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
       ];
 
       // 번역 요청 키 목록 디버깅
-      console.log('번역 요청 키 목록:', textsToTranslate.map(t => t.key));
+      console.log('🔥 번역 요청 키 목록:', textsToTranslate.map(t => t.key));
+      console.log('🔥 총 번역 키 개수:', textsToTranslate.length);
       
       // 일괄 번역 API 호출
       const response = await fetch('/api/translate-batch', {

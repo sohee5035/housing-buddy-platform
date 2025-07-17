@@ -29,7 +29,7 @@ import {
   Shield
 } from "lucide-react";
 import { Link } from "wouter";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar-fixed";
 import FavoriteButton from "@/components/favorite-button";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useAdmin } from "@/contexts/AdminContext";
