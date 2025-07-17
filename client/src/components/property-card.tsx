@@ -33,12 +33,23 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
   // 전역 번역 데이터에서 해당 매물의 번역된 텍스트 가져오기
   const getTranslatedPropertyText = (field: string) => {
     if (!isTranslated) return null;
-    return translatedData[`${field}_${property.id}`] || null;
+    const key = `${field}_${property.id}`;
+    const translated = translatedData[key];
+    console.log(`번역 데이터 조회: ${key} →`, translated);
+    return translated || null;
   };
 
   const displayTitle = getTranslatedPropertyText('title') || property.title;
   const displayAddress = getTranslatedPropertyText('address') || property.address;
   const displayDescription = getTranslatedPropertyText('description') || property.description;
+  
+  console.log('PropertyCard 번역 상태:', { 
+    isTranslated, 
+    propertyId: property.id,
+    displayTitle,
+    originalTitle: property.title,
+    hasTranslatedData: Object.keys(translatedData).length > 0
+  });
 
   if (viewMode === "list") {
     return (

@@ -20,12 +20,23 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
 
   const getTranslatedPropertyText = (field: string) => {
     if (!isTranslated) return null;
-    return translatedData[`${field}_${property.id}`] || null;
+    const key = `${field}_${property.id}`;
+    const translated = translatedData[key];
+    console.log(`번역 데이터 조회 (Simple): ${key} →`, translated);
+    return translated || null;
   };
 
   const displayTitle = getTranslatedPropertyText('title') || property.title;
   const displayAddress = getTranslatedPropertyText('address') || property.address;
   const displayDescription = getTranslatedPropertyText('description') || property.description;
+  
+  console.log('PropertyCardSimple 번역 상태:', { 
+    isTranslated, 
+    propertyId: property.id,
+    displayTitle,
+    originalTitle: property.title,
+    hasTranslatedData: Object.keys(translatedData).length > 0
+  });
 
   const cardContent = (
     <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
