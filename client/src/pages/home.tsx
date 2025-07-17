@@ -69,7 +69,22 @@ export default function Home() {
         : "/api/properties";
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch properties");
-      return response.json();
+      const data = await response.json();
+      
+      // 이미지 디버깅: 매물 데이터 확인
+      console.log('🏠 홈페이지 매물 데이터:', {
+        propertiesCount: data.length,
+        firstPropertyPhotos: data[0]?.photos,
+        allProperties: data.map(p => ({
+          id: p.id,
+          title: p.title,
+          hasPhotos: !!p.photos,
+          photosCount: p.photos?.length || 0,
+          firstPhoto: p.photos?.[0]
+        }))
+      });
+      
+      return data;
     },
   });
   
