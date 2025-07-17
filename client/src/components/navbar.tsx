@@ -91,7 +91,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'account-settings', text: '계정 설정' },
         { key: 'greeting-suffix', text: '님 안녕하세요!' },
         { key: 'admin-login', text: '관리자 로그인' },
-        { key: 'housing-buddy', text: 'Housing Buddy' },
         { key: 'admin', text: '관리자' },
         { key: 'new-property', text: '새 매물 등록' },
         { key: 'category-management', text: '카테고리 관리' },
@@ -101,7 +100,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'main-title-1', text: '한국에서 찾는' },
         { key: 'main-title-2', text: '나의 첫 집' },
         { key: 'main-desc-new', text: '외국인을 위한 편리한 주거 솔루션' },
-        { key: 'housing-buddy-name', text: '하우징버디' },
         { key: 'meet-housing-buddy', text: '를 만나보세요' },
         { key: 'university', text: '대학교' },
         { key: 'university-select', text: '대학교 선택' },
@@ -253,7 +251,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center">
               <Home className="h-6 w-6 text-primary mr-2" />
-              <span className="text-xl font-bold text-neutral-900">{getTranslatedText("Housing Buddy", "housing-buddy")}</span>
+              <span className="text-xl font-bold text-neutral-900">Housing Buddy</span>
             </Link>
             
             {/* Desktop Navigation */}
@@ -462,7 +460,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 <div className="flex flex-col space-y-4 mt-8">
                   <div className="flex items-center mb-6">
                     <Home className="h-6 w-6 text-primary mr-2" />
-                    <span className="text-xl font-bold text-neutral-900">{getTranslatedText("Housing Buddy", "housing-buddy")}</span>
+                    <span className="text-xl font-bold text-neutral-900">Housing Buddy</span>
                   </div>
                   
                   {navItems.map((item) => (
