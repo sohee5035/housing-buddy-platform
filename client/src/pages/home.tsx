@@ -72,7 +72,7 @@ export default function Home() {
       const data = await response.json();
       
       // 이미지 디버깅: 매물 데이터 확인
-      console.log('🏠 홈페이지 매물 데이터:', {
+      console.log('🏠 홈페이지 매물 데이터 (업데이트):', {
         propertiesCount: data.length,
         firstPropertyPhotos: data[0]?.photos,
         allProperties: data.map(p => ({
