@@ -28,7 +28,7 @@ export default function CategoryManager({
   const { toast } = useToast();
 
   // 모든 카테고리 목록 (매물에서 사용 중인 것 + 커스텀)
-  const allCategories = Array.from(new Set([...(propertyCategories || []), ...(customCategories || [])]));
+  const allCategories = Array.from(new Set([...propertyCategories, ...customCategories]));
 
   const handleAddCategory = () => {
     if (newCategoryName.trim() && !allCategories.includes(newCategoryName.trim())) {
