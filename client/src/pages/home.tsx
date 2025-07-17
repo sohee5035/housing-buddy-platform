@@ -61,7 +61,7 @@ export default function Home() {
   );
 
   // 매물 목록 가져오기 (refetch 함수 포함)
-  const { data: properties = [], refetch } = useQuery({
+  const { data: properties = [], refetch, isLoading } = useQuery({
     queryKey: ["/api/properties"],
     queryFn: async () => {
       const url = universityFilter 
