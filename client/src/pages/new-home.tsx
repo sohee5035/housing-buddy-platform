@@ -247,7 +247,7 @@ export default function NewHome() {
                 {getTranslatedText("추천 매물", "recommended-properties")}
               </h2>
               <p className="text-gray-600">
-                {getTranslatedText("하우징버디가 엄선한 외국인 유학생에게 인기 있는 매물들", "recommended-desc")}
+                {getTranslatedText("하우징버디가 추천하는 매물", "recommended-desc")}
               </p>
             </div>
             <Link href="/properties">
