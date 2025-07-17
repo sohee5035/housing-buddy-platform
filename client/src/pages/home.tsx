@@ -392,8 +392,30 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
+            {/* 디버그 정보 표시 */}
+            <div className="bg-yellow-100 p-4 mb-4 rounded-lg text-sm">
+              <strong>번역 상태 디버그:</strong><br/>
+              - isTranslated: {String(isTranslated)}<br/>
+              - 현재 언어: {currentLanguage}<br/>
+              - 전체 번역 키 수: {Object.keys(translatedData).length}<br/>
+              - 매물 번역 키: {Object.keys(translatedData).filter(k => k.startsWith('title_') || k.startsWith('address_')).join(', ')}<br/>
+              - 첫 번째 매물 ID: {filteredProperties[0]?.id}<br/>
+              - 첫 번째 매물 번역 키 존재: {String(!!translatedData[`title_${filteredProperties[0]?.id}`])}<br/>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProperties.map((property) => {
+              // 디버그: 번역 상태 로그
+              console.log(`🏠 메인페이지 매물 ${property.id}:`, {
+                isTranslated,
+                propertyId: property.id,
+                hasTranslatedTitle: !!translatedData[`title_${property.id}`],
+                translatedKeys: Object.keys(translatedData).filter(k => k.includes(`_${property.id}`)),
+                allTranslatedKeys: Object.keys(translatedData).length,
+                originalTitle: property.title,
+                translatedTitle: translatedData[`title_${property.id}`]
+              });
+              
               // 번역된 텍스트 가져오기
               const translatedTitle = isTranslated && translatedData[`title_${property.id}`] 
                 ? translatedData[`title_${property.id}`] 
@@ -487,6 +509,7 @@ export default function Home() {
                 </Card>
               );
             })}
+            </div>
           </div>
         )}
       </main>
