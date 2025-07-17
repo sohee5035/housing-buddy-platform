@@ -135,7 +135,7 @@ export default function NewHome() {
               <span className="text-blue-600 block mt-2">{getTranslatedText("나의 첫 집", "main-title-2")}</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              {getTranslatedText("외국인을 위한 편리한 주거 솔루션", "main-desc-new")}, <span className="text-blue-500 font-medium">{getTranslatedText("하우징버디", "housing-buddy-name")}</span>{getTranslatedText("를 만나보세요", "meet-housing-buddy")}
+              {getTranslatedText("외국인을 위한 편리한 주거 솔루션", "main-desc-new")}, <span className="text-blue-500 font-medium">Housing Buddy</span>{getTranslatedText("를 만나보세요", "meet-housing-buddy")}
             </p>
           </div>
 
@@ -248,7 +248,7 @@ export default function NewHome() {
                 {getTranslatedText("추천 매물", "recommended-properties")}
               </h2>
               <p className="text-gray-600">
-                {getTranslatedText("하우징버디가 추천하는 매물", "recommended-desc")}
+                {getTranslatedText("Housing Buddy가 추천하는 매물", "recommended-desc")}
               </p>
             </div>
             <Link href="/properties">

@@ -110,7 +110,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'university-property-search', text: '대학교별 매물 찾기' },
         { key: 'university-property-desc', text: '내가 다닐 대학교 근처의 안전하고 편리한 매물을 확인해보세요' },
         { key: 'recommended-properties', text: '추천 매물' },
-        { key: 'recommended-desc', text: '하우징버디가 추천하는 매물' },
+        { key: 'recommended-desc', text: 'Housing Buddy가 추천하는 매물' },
         { key: 'new-badge', text: '신규' },
         { key: 'deposit', text: '보증금' },
         { key: 'won', text: '원' },
