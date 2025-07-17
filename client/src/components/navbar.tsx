@@ -573,19 +573,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                           {getTranslatedText("계정 설정", "account-settings")}
                         </Button>
                         
-                        {!isAdmin && (
-                          <Button 
-                            variant="ghost" 
-                            className="w-full mb-2"
-                            onClick={() => {
-                              setShowAdminLogin(true);
-                              setIsMobileMenuOpen(false);
-                            }}
-                          >
-                            <Settings className="h-4 w-4 mr-2" />
-                            {getTranslatedText("관리자 로그인", "admin-login")}
-                          </Button>
-                        )}
+
                         
                         <Button 
                           variant="ghost" 
