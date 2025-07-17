@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import PropertyForm from "@/components/property-form";
 import ImageGalleryModal from "@/components/image-gallery-modal";
 import FavoriteButton from "@/components/favorite-button";
+import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -228,48 +229,8 @@ export default function PropertyDetail() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* 첫 번째 줄: 타이틀과 뒤로가기 */}
-          <div className="flex items-center justify-between h-16 border-b border-neutral-100">
-            <div className="flex items-center">
-              <button 
-                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0 mr-4"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setLocation("/");
-                }}
-              >
-                <ArrowLeft className="h-6 w-6 text-neutral-600" />
-              </button>
-              <div className="flex items-center">
-                <HomeIcon className="h-8 w-8 text-primary mr-3" />
-                <h1 className="text-2xl font-bold text-neutral-900">Housing Buddy</h1>
-              </div>
-            </div>
-            
-            {/* Admin Panel Trigger */}
-            {isAdmin && (
-              <AdminPanel
-                onCreateListing={() => setShowEditModal(true)}
-                onCategoryManager={() => setShowCategoryManager(true)}
-                onTrashView={() => setShowTrashView(true)}
-                onCommentsView={() => setShowCommentsView(true)}
-                onEditProperty={() => setShowEditModal(true)}
-                onDeleteProperty={handleDelete}
-                currentPropertyId={property?.id}
-                trigger={
-                  <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">
-                    <ShieldCheck className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-700">관리자</span>
-                  </div>
-                }
-              />
-            )}
-          </div>
-        </div>
-      </header>
+      {/* Navbar */}
+      <Navbar />
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
