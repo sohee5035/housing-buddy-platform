@@ -43,12 +43,22 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
   const displayAddress = getTranslatedPropertyText('address') || property.address;
   const displayDescription = getTranslatedPropertyText('description') || property.description;
   
+  // 렌더링될 때마다 번역 상태 강제 확인
+  console.log(`[RENDER] PropertyCard ${property.id}:`, {
+    isTranslated,
+    title: displayTitle,
+    original: property.title,
+    isTranslatedTitle: displayTitle !== property.title
+  });
+  
   console.log('PropertyCard 번역 상태:', { 
     isTranslated, 
     propertyId: property.id,
     displayTitle,
     originalTitle: property.title,
-    hasTranslatedData: Object.keys(translatedData).length > 0
+    hasTranslatedData: Object.keys(translatedData).length > 0,
+    allTranslatedKeys: Object.keys(translatedData).filter(k => k.includes(`_${property.id}`)),
+    currentlyDisplayingTitle: displayTitle === property.title ? 'ORIGINAL' : 'TRANSLATED'
   });
 
   if (viewMode === "list") {
