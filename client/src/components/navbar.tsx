@@ -176,18 +176,23 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         setTranslatedData(result.translations);
         setIsTranslated(true);
         
+        // 토스트 메시지는 항상 한국어로 표시 (번역 방지)
+        const completionMessage = `${currentLanguage.name}로 번역되었습니다.`;
         toast({
           title: "번역 완료",
-          description: `${currentLanguage.name}로 번역되었습니다.`
+          description: completionMessage
         });
       } else {
         throw new Error('번역 API 오류');
       }
     } catch (error) {
       console.error('번역 실패:', error);
+      // 토스트 메시지는 항상 한국어로 표시 (번역 방지)
+      const errorTitle = "번역 실패";
+      const errorDescription = "번역 중 오류가 발생했습니다.";
       toast({
-        title: "번역 실패",
-        description: "번역 중 오류가 발생했습니다.",
+        title: errorTitle, 
+        description: errorDescription,
         variant: "destructive"
       });
     } finally {
