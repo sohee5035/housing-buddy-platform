@@ -20,14 +20,7 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
   const { logout: userLogout, isAuthenticated } = useAuth();
   const { toast } = useToast();
 
-  // 일반 사용자가 로그아웃되면 관리자 로그인 모달도 닫기
-  useEffect(() => {
-    if (!isAuthenticated && isOpen) {
-      console.log('🔧 일반 사용자 로그아웃 감지: 관리자 로그인 모달 닫기');
-      onClose();
-      setPassword("");
-    }
-  }, [isAuthenticated, isOpen, onClose]);
+  // 관리자 로그인 모달 상태 관리 (자동 닫기 로직 제거)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
