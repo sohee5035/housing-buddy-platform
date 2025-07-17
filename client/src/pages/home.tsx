@@ -74,15 +74,22 @@ export default function Home() {
   const { toast } = useToast();
   const { isAdmin, logout } = useAdmin();
 
-  // 번역 상태 변경 시 로깅
+  // 번역 상태 변경 시 로깅 및 강제 리렌더링
   useEffect(() => {
     console.log('🌍 홈 페이지 번역 상태 변경:', {
       isTranslated,
       targetLanguage,
       translatedDataKeys: Object.keys(translatedData),
-      translatedDataSample: Object.fromEntries(Object.entries(translatedData).slice(0, 3))
+      translatedDataSample: Object.fromEntries(Object.entries(translatedData).slice(0, 3)),
+      propertyTranslationKeys: Object.keys(translatedData).filter(k => k.includes('title_') || k.includes('address_'))
     });
-  }, [isTranslated, translatedData, targetLanguage]);
+    
+    // 매물 번역 데이터가 있을 때 강제 리렌더링
+    if (isTranslated && Object.keys(translatedData).some(k => k.includes('title_') || k.includes('address_'))) {
+      console.log('🔄 매물 번역 데이터 감지, 매물 목록 강제 새로고침');
+      refetch(); // 매물 데이터 강제 새로고침
+    }
+  }, [isTranslated, translatedData, targetLanguage, refetch]);
 
   const { data: properties = [], isLoading, error, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
