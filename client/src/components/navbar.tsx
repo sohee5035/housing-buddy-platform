@@ -127,7 +127,18 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'seongbuk-gu', text: '성북구' },
         { key: 'mapo-gu', text: '마포구' },
         { key: 'jongno-gu', text: '종로구' },
-        { key: 'dongdaemun-gu', text: '동대문구' }
+        { key: 'dongdaemun-gu', text: '동대문구' },
+        // 문의 내역 페이지 UI 텍스트들
+        { key: 'ui-내 문의 내역', text: '내 문의 내역' },
+        { key: 'ui-등록하신 문의와 관리자 답변을 확인할 수 있습니다.', text: '등록하신 문의와 관리자 답변을 확인할 수 있습니다.' },
+        { key: 'ui-문의 내역이 없습니다', text: '문의 내역이 없습니다' },
+        { key: 'ui-매물에 문의를 남겨보세요.', text: '매물에 문의를 남겨보세요.' },
+        { key: 'ui-매물 둘러보기', text: '매물 둘러보기' },
+        { key: 'ui-아직 관리자 답변이 없습니다. 곧 답변드리겠습니다.', text: '아직 관리자 답변이 없습니다. 곧 답변드리겠습니다.' },
+        { key: 'ui-로그인이 필요합니다', text: '로그인이 필요합니다' },
+        { key: 'ui-문의 내역을 확인하려면 로그인해주세요.', text: '문의 내역을 확인하려면 로그인해주세요.' },
+        { key: 'ui-로그인하기', text: '로그인하기' },
+        { key: 'ui-관심 매물을 확인하려면 로그인해주세요.', text: '관심 매물을 확인하려면 로그인해주세요.' }
       ];
 
       // 일괄 번역 API 호출
