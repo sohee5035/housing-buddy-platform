@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -17,8 +17,17 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAdmin();
-  const { logout: userLogout } = useAuth();
+  const { logout: userLogout, isAuthenticated } = useAuth();
   const { toast } = useToast();
+
+  // 일반 사용자가 로그아웃되면 관리자 로그인 모달도 닫기
+  useEffect(() => {
+    if (!isAuthenticated && isOpen) {
+      console.log('🔧 일반 사용자 로그아웃 감지: 관리자 로그인 모달 닫기');
+      onClose();
+      setPassword("");
+    }
+  }, [isAuthenticated, isOpen, onClose]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

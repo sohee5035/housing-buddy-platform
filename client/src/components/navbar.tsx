@@ -283,6 +283,12 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
       if (isAdmin) {
         adminLogout();
       }
+      // 모든 모달 닫기
+      setShowAdminLogin(false);
+      setShowCreateModal(false);
+      setShowCategoryManager(false);
+      setIsMobileMenuOpen(false);
+      
       toast({
         title: "로그아웃 완료",
         description: "성공적으로 로그아웃되었습니다.",
