@@ -53,7 +53,17 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
   
   const { login, register, resendVerification, isLoginLoading, isRegisterLoading } = useAuth();
   const { toast } = useToast();
-  const { getTranslatedText } = useTranslation();
+  const { getTranslatedText, isTranslated, translatedData } = useTranslation();
+  
+  // 디버깅: 번역 상태 확인
+  console.log('Simple Auth Modal - 번역 상태:', { 
+    isTranslated, 
+    hasTranslatedData: Object.keys(translatedData).length > 0,
+    sampleKeys: Object.keys(translatedData).slice(0, 5),
+    hasEmailKey: translatedData['email'],
+    hasPasswordKey: translatedData['password'],
+    hasLoginKey: translatedData['login']
+  });
 
   // Forms
   const loginForm = useForm<LoginForm>({

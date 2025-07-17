@@ -74,6 +74,9 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
       return;
     }
     
+    // 번역 상태 완전 초기화
+    setTranslatedData({});
+    setIsTranslated(false);
     updateTargetLanguage(languageCode);
     setIsTranslating(true);
     
@@ -157,6 +160,9 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'agree-privacy-required', text: '개인정보처리방침에 동의합니다 (필수)' }
       ];
 
+      // 번역 요청 키 목록 디버깅
+      console.log('번역 요청 키 목록:', textsToTranslate.map(t => t.key));
+      
       // 일괄 번역 API 호출
       const response = await fetch('/api/translate-batch', {
         method: 'POST',
