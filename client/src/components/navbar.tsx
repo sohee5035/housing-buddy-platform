@@ -209,6 +209,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
           };
           console.log('결합된 번역 데이터:', combinedTranslations);
           console.log('매물 번역 키들:', Object.keys(propertyResult.translations));
+          console.log('매물 번역 데이터 세부사항:', propertyResult.translations);
           saveTranslatedData(combinedTranslations);
         } else {
           // 매물 번역 실패 시 UI 번역만 저장

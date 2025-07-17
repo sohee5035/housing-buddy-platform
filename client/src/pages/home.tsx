@@ -449,13 +449,25 @@ export default function Home() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-lg font-semibold text-neutral-900 hover:text-primary transition-colors line-clamp-1 flex-1">
-                      <SmartTextWithTooltips 
-                        text={isTranslated && translatedData[`title_${property.id}`] 
+                      {(() => {
+                        const translatedTitle = isTranslated && translatedData[`title_${property.id}`] 
                           ? translatedData[`title_${property.id}`] 
-                          : property.title}
-                        originalText={property.title}
-                        isTranslated={isTranslated}
-                      />
+                          : property.title;
+                        console.log(`홈 페이지 매물 ${property.id} 번역:`, {
+                          isTranslated,
+                          originalTitle: property.title,
+                          translatedTitle,
+                          hasTranslatedData: !!translatedData[`title_${property.id}`],
+                          allTranslatedKeys: Object.keys(translatedData).filter(k => k.startsWith('title_'))
+                        });
+                        return (
+                          <SmartTextWithTooltips 
+                            text={translatedTitle}
+                            originalText={property.title}
+                            isTranslated={isTranslated}
+                          />
+                        );
+                      })()}
                     </h3>
                     <div 
                       className="ml-2" 
