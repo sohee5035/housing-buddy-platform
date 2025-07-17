@@ -61,14 +61,12 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
     isTranslatedTitle: displayTitle !== property.title
   });
   
-  console.log('PropertyCard 번역 상태:', { 
-    isTranslated, 
+  console.log('PropertyCard 이미지 디버깅:', { 
     propertyId: property.id,
-    displayTitle,
-    originalTitle: property.title,
-    hasTranslatedData: Object.keys(translatedData).length > 0,
-    allTranslatedKeys: Object.keys(translatedData).filter(k => k.includes(`_${property.id}`)),
-    currentlyDisplayingTitle: displayTitle === property.title ? 'ORIGINAL' : 'TRANSLATED'
+    hasPhotos: !!property.photos,
+    photosLength: property.photos?.length || 0,
+    firstPhoto: property.photos?.[0] || 'NO_PHOTO',
+    photos: property.photos
   });
 
   if (viewMode === "list") {
@@ -83,6 +81,8 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
                   src={property.photos[0]}
                   alt={displayTitle}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  onLoad={() => console.log('✅ 이미지 로딩 성공:', property.photos[0])}
+                  onError={(e) => console.error('❌ 이미지 로딩 실패:', property.photos[0], e)}
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-neutral-400">
@@ -217,6 +217,8 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
                 src={property.photos[0]}
                 alt={displayTitle}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                onLoad={() => console.log('✅ 그리드 이미지 로딩 성공:', property.photos[0])}
+                onError={(e) => console.error('❌ 그리드 이미지 로딩 실패:', property.photos[0], e)}
               />
             ) : (
               <div className="flex items-center justify-center h-full text-neutral-400">
