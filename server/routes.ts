@@ -838,12 +838,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { properties, targetLang } = req.body;
       
+      console.log('매물 번역 요청:', { 
+        propertiesCount: properties?.length, 
+        targetLang,
+        sampleProperty: properties?.[0]?.title
+      });
+      
       if (!properties || !Array.isArray(properties) || !targetLang) {
         return res.status(400).json({ message: "Properties array and target language are required" });
       }
 
       const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
       if (!apiKey) {
+        console.error('Google Translate API key not found');
         return res.status(500).json({ message: "Translation service not configured" });
       }
 
@@ -876,6 +883,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+      console.log('번역 API 호출 준비:', {
+        url,
+        textsCount: textsToTranslate.length,
+        targetLang,
+        sampleTexts: textsToTranslate.slice(0, 2)
+      });
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -899,6 +913,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         acc[key] = data.data.translations[index].translatedText;
         return acc;
       }, {} as Record<string, string>);
+
+      console.log('번역 완료:', {
+        resultKeys: Object.keys(result),
+        sampleTranslations: Object.entries(result).slice(0, 2)
+      });
 
       res.json({ translations: result });
     } catch (error: any) {
