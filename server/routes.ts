@@ -582,7 +582,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new property
   app.post("/api/properties", async (req, res) => {
     try {
-      const { selectedUniversities, ...propertyData } = req.body;
+      const { selectedUniversities, images, ...propertyData } = req.body;
+      
+      // Map images to photos if provided
+      if (images && Array.isArray(images)) {
+        propertyData.photos = images;
+      }
+      
       const validatedData = insertPropertySchema.parse(propertyData);
       const property = await storage.createProperty(validatedData);
       
@@ -608,7 +614,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/properties/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const { selectedUniversities, ...propertyData } = req.body;
+      const { selectedUniversities, images, ...propertyData } = req.body;
+      
+      // Map images to photos if provided
+      if (images && Array.isArray(images)) {
+        propertyData.photos = images;
+      }
+      
       const validatedData = insertPropertySchema.partial().parse(propertyData);
       const property = await storage.updateProperty(id, validatedData);
       
