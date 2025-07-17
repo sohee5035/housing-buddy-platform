@@ -833,6 +833,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/translate-properties - Translate property data
+  app.post("/api/translate-properties", async (req: Request, res: Response) => {
+    try {
+      const { properties, targetLang } = req.body;
+      
+      if (!properties || !Array.isArray(properties) || !targetLang) {
+        return res.status(400).json({ message: "Properties array and target language are required" });
+      }
+
+      const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: "Translation service not configured" });
+      }
+
+      // 같은 언어로 번역하는 경우 빈 번역 결과 반환
+      if (targetLang === 'ko') {
+        return res.json({ translations: {} });
+      }
+
+      // 번역할 모든 텍스트 수집
+      const textsToTranslate = [];
+      const textKeys = [];
+      
+      for (const property of properties) {
+        if (property.title) {
+          textsToTranslate.push(property.title);
+          textKeys.push(`title_${property.id}`);
+        }
+        if (property.address) {
+          textsToTranslate.push(property.address);
+          textKeys.push(`address_${property.id}`);
+        }
+        if (property.description) {
+          textsToTranslate.push(property.description);
+          textKeys.push(`description_${property.id}`);
+        }
+      }
+
+      if (textsToTranslate.length === 0) {
+        return res.json({ translations: {} });
+      }
+
+      const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          q: textsToTranslate,
+          target: targetLang,
+          source: 'ko'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Translation API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // 결과를 키-값 쌍으로 변환
+      const result = textKeys.reduce((acc, key, index) => {
+        acc[key] = data.data.translations[index].translatedText;
+        return acc;
+      }, {} as Record<string, string>);
+
+      res.json({ translations: result });
+    } catch (error: any) {
+      console.error("Property translation error:", error);
+      res.status(500).json({ message: "Property translation failed" });
+    }
+  });
+
   // Comment routes
   // Get comments for a property (본인 댓글만)
   app.get("/api/properties/:id/comments", async (req: Request, res: Response) => {

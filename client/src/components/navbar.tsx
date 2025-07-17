@@ -45,7 +45,16 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   const { user, isAuthenticated, logout } = useAuth();
   const { toast } = useToast();
   const { isAdmin, logout: adminLogout } = useAdmin();
-  const { getTranslatedText, isTranslated, isTranslating, targetLanguage, updateTargetLanguage, setIsTranslated, setIsTranslating, setTranslatedData } = useTranslation();
+  const { 
+    getTranslatedText, 
+    isTranslated, 
+    isTranslating, 
+    targetLanguage, 
+    updateTargetLanguage, 
+    setIsTranslating, 
+    saveTranslatedData,
+    saveIsTranslated
+  } = useTranslation();
   
   // 지원 언어 목록
   const languages = [
@@ -75,8 +84,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
     }
     
     // 번역 상태 완전 초기화
-    setTranslatedData({});
-    setIsTranslated(false);
+    saveTranslatedData({});
+    saveIsTranslated(false);
     updateTargetLanguage(languageCode);
     setIsTranslating(true);
     
@@ -161,8 +170,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
       // 번역 요청 키 목록 디버깅
       console.log('번역 요청 키 목록:', textsToTranslate.map(t => t.key));
       
-      // 일괄 번역 API 호출
-      const response = await fetch('/api/translate-batch', {
+      // UI 텍스트 번역 요청
+      const uiResponse = await fetch('/api/translate-batch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -171,15 +180,46 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         })
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        setTranslatedData(result.translations);
-        setIsTranslated(true);
-        
-        // 번역 완료 시 토스트 메시지 제거 (조용한 번역)
-      } else {
-        throw new Error('번역 API 오류');
+      if (!uiResponse.ok) {
+        throw new Error('UI 번역 API 오류');
       }
+
+      const uiResult = await uiResponse.json();
+      
+      // 매물 데이터 번역 요청
+      const propertiesResponse = await fetch('/api/properties');
+      if (propertiesResponse.ok) {
+        const properties = await propertiesResponse.json();
+        
+        const propertyResponse = await fetch('/api/translate-properties', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            properties: properties,
+            targetLang: languageCode
+          })
+        });
+
+        if (propertyResponse.ok) {
+          const propertyResult = await propertyResponse.json();
+          // UI 번역과 매물 번역 결합
+          const combinedTranslations = {
+            ...uiResult.translations,
+            ...propertyResult.translations
+          };
+          saveTranslatedData(combinedTranslations);
+        } else {
+          // 매물 번역 실패 시 UI 번역만 저장
+          saveTranslatedData(uiResult.translations);
+        }
+      } else {
+        // 매물 로딩 실패 시 UI 번역만 저장
+        saveTranslatedData(uiResult.translations);
+      }
+      
+      saveIsTranslated(true);
+      
+      // 번역 완료 시 토스트 메시지 제거 (조용한 번역)
     } catch (error) {
       console.error('번역 실패:', error);
       // 번역 실패 시에도 토스트 메시지 제거 (조용한 번역)

@@ -12,13 +12,30 @@ interface TranslationContextType {
   updateTargetLanguage: (language: string) => void;
   getTranslatedText: (originalText: string, key?: string) => string;
   clearTranslations: () => void;
+  saveTranslatedData: (data: Record<string, string>) => void;
+  saveIsTranslated: (translated: boolean) => void;
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
-  const [translatedData, setTranslatedData] = useState<Record<string, string>>({});
-  const [isTranslated, setIsTranslated] = useState(false);
+  const [translatedData, setTranslatedData] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem('translatedData');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [isTranslated, setIsTranslated] = useState(() => {
+    try {
+      const saved = localStorage.getItem('isTranslated');
+      const language = localStorage.getItem('selectedLanguage') || 'ko';
+      return saved === 'true' && language !== 'ko';
+    } catch {
+      return false;
+    }
+  });
   const [isTranslating, setIsTranslating] = useState(false);
   const [targetLanguage, setTargetLanguage] = useState(() => {
     try {
@@ -53,13 +70,27 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   const clearTranslations = () => {
     setTranslatedData({});
     setIsTranslated(false);
+    localStorage.removeItem('translatedData');
+    localStorage.removeItem('isTranslated');
   };
 
   const updateTargetLanguage = (language: string) => {
     setTargetLanguage(language);
     localStorage.setItem('selectedLanguage', language);
-    // 언어 변경 시 기존 번역 데이터 초기화
-    clearTranslations();
+    if (language === 'ko') {
+      clearTranslations();
+    }
+  };
+
+  // 번역 데이터 저장 시 로컬 스토리지에도 저장
+  const saveTranslatedData = (data: Record<string, string>) => {
+    setTranslatedData(data);
+    localStorage.setItem('translatedData', JSON.stringify(data));
+  };
+
+  const saveIsTranslated = (translated: boolean) => {
+    setIsTranslated(translated);
+    localStorage.setItem('isTranslated', translated.toString());
   };
 
   return (
@@ -74,7 +105,9 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       setTargetLanguage,
       updateTargetLanguage,
       getTranslatedText,
-      clearTranslations
+      clearTranslations,
+      saveTranslatedData,
+      saveIsTranslated
     }}>
       {children}
     </TranslationContext.Provider>
