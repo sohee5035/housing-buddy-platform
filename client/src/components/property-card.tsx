@@ -32,10 +32,13 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
 
   // 전역 번역 데이터에서 해당 매물의 번역된 텍스트 가져오기
   const getTranslatedPropertyText = (field: string) => {
-    if (!isTranslated) return null;
+    if (!isTranslated) {
+      console.log(`번역 안됨 상태: ${field}_${property.id}`);
+      return null;
+    }
     const key = `${field}_${property.id}`;
     const translated = translatedData[key];
-    console.log(`번역 데이터 조회: ${key} →`, translated);
+    console.log(`번역 데이터 조회: ${key} →`, translated, 'from data:', Object.keys(translatedData).filter(k => k.includes(`_${property.id}`)));
     return translated || null;
   };
 
