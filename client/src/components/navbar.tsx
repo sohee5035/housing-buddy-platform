@@ -155,7 +155,12 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'name', text: '이름' },
         { key: 'phone-optional', text: '전화번호 (선택사항)' },
         { key: 'agree-terms-required', text: '이용약관에 동의합니다 (필수)' },
-        { key: 'agree-privacy-required', text: '개인정보처리방침에 동의합니다 (필수)' }
+        { key: 'agree-privacy-required', text: '개인정보처리방침에 동의합니다 (필수)' },
+        // 토스트 메시지들
+        { key: 'translation-complete', text: '번역 완료' },
+        { key: 'translation-success-desc', text: '로 번역되었습니다.' },
+        { key: 'translation-failed', text: '번역 실패' },
+        { key: 'translation-error-desc', text: '번역 중 오류가 발생했습니다.' }
       ];
 
       // 번역 요청 키 목록 디버깅
@@ -176,10 +181,11 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         setTranslatedData(result.translations);
         setIsTranslated(true);
         
-        // 토스트 메시지는 항상 한국어로 표시 (번역 방지)
-        const completionMessage = `${currentLanguage.name}로 번역되었습니다.`;
+        // 토스트 메시지도 번역된 언어로 표시
+        const completionTitle = getTranslatedText("번역 완료", "translation-complete");
+        const completionMessage = `${currentLanguage.name}${getTranslatedText("로 번역되었습니다.", "translation-success-desc")}`;
         toast({
-          title: "번역 완료",
+          title: completionTitle,
           description: completionMessage
         });
       } else {
@@ -187,9 +193,9 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
       }
     } catch (error) {
       console.error('번역 실패:', error);
-      // 토스트 메시지는 항상 한국어로 표시 (번역 방지)
-      const errorTitle = "번역 실패";
-      const errorDescription = "번역 중 오류가 발생했습니다.";
+      // 토스트 메시지도 번역된 언어로 표시
+      const errorTitle = getTranslatedText("번역 실패", "translation-failed");
+      const errorDescription = getTranslatedText("번역 중 오류가 발생했습니다.", "translation-error-desc");
       toast({
         title: errorTitle, 
         description: errorDescription,
