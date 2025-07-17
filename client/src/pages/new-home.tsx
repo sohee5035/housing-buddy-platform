@@ -38,19 +38,21 @@ import AdminPanel from "@/components/admin-panel";
 import PropertyForm from "@/components/property-form";
 import CategoryManager from "@/components/category-manager";
 
-// 대학교 데이터
-const universities = [
-  { id: "snu", name: "서울대학교", nameEn: "Seoul National University", location: "관악구", icon: "🏛️" },
-  { id: "yonsei", name: "연세대학교", nameEn: "Yonsei University", location: "서대문구", icon: "🎓" },
-  { id: "korea", name: "고려대학교", nameEn: "Korea University", location: "성북구", icon: "📚" },
-  { id: "hongik", name: "홍익대학교", nameEn: "Hongik University", location: "마포구", icon: "🎨" },
-  { id: "ewha", name: "이화여자대학교", nameEn: "Ewha Womans University", location: "서대문구", icon: "🌸" },
-  { id: "sogang", name: "서강대학교", nameEn: "Sogang University", location: "마포구", icon: "⭐" },
-  { id: "skku", name: "성균관대학교", nameEn: "Sungkyunkwan University", location: "종로구", icon: "📖" },
-  { id: "kyunghee", name: "경희대학교", nameEn: "Kyung Hee University", location: "동대문구", icon: "🌍" },
-];
-
 export default function NewHome() {
+  const { isTranslated, targetLanguage, getTranslatedText } = useTranslation();
+  
+  // 대학교 데이터 (번역 지원)
+  const universities = [
+    { id: "snu", name: getTranslatedText("서울대학교", "seoul-national-university"), nameEn: "Seoul National University", location: getTranslatedText("관악구", "gwanak-gu"), icon: "🏛️" },
+    { id: "yonsei", name: getTranslatedText("연세대학교", "yonsei-university"), nameEn: "Yonsei University", location: getTranslatedText("서대문구", "seodaemun-gu"), icon: "🎓" },
+    { id: "korea", name: getTranslatedText("고려대학교", "korea-university"), nameEn: "Korea University", location: getTranslatedText("성북구", "seongbuk-gu"), icon: "📚" },
+    { id: "hongik", name: getTranslatedText("홍익대학교", "hongik-university"), nameEn: "Hongik University", location: getTranslatedText("마포구", "mapo-gu"), icon: "🎨" },
+    { id: "ewha", name: getTranslatedText("이화여자대학교", "ewha-womans-university"), nameEn: "Ewha Womans University", location: getTranslatedText("서대문구", "seodaemun-gu"), icon: "🌸" },
+    { id: "sogang", name: getTranslatedText("서강대학교", "sogang-university"), nameEn: "Sogang University", location: getTranslatedText("마포구", "mapo-gu"), icon: "⭐" },
+    { id: "skku", name: getTranslatedText("성균관대학교", "sungkyunkwan-university"), nameEn: "Sungkyunkwan University", location: getTranslatedText("종로구", "jongno-gu"), icon: "📖" },
+    { id: "kyunghee", name: getTranslatedText("경희대학교", "kyung-hee-university"), nameEn: "Kyung Hee University", location: getTranslatedText("동대문구", "dongdaemun-gu"), icon: "🌍" },
+  ];
+
   const [selectedUniversity, setSelectedUniversity] = useState<string>("");
   const [minRent, setMinRent] = useState<number>(0);
   const [maxRent, setMaxRent] = useState<number>(80);
@@ -70,7 +72,6 @@ export default function NewHome() {
     }
   });
   
-  const { isTranslated, targetLanguage, getTranslatedText } = useTranslation();
   const { isAdmin, logout } = useAdmin();
 
   const { data: properties = [], isLoading } = useQuery<Property[]>({

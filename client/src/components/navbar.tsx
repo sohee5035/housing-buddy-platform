@@ -111,7 +111,23 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'deposit', text: '보증금' },
         { key: 'won', text: '원' },
         { key: 'view-details', text: '자세히 보기' },
-        { key: 'view-all', text: '전체보기' }
+        { key: 'view-all', text: '전체보기' },
+        // 대학교 이름들
+        { key: 'seoul-national-university', text: '서울대학교' },
+        { key: 'yonsei-university', text: '연세대학교' },
+        { key: 'korea-university', text: '고려대학교' },
+        { key: 'hongik-university', text: '홍익대학교' },
+        { key: 'ewha-womans-university', text: '이화여자대학교' },
+        { key: 'sogang-university', text: '서강대학교' },
+        { key: 'sungkyunkwan-university', text: '성균관대학교' },
+        { key: 'kyung-hee-university', text: '경희대학교' },
+        // 지역명들
+        { key: 'gwanak-gu', text: '관악구' },
+        { key: 'seodaemun-gu', text: '서대문구' },
+        { key: 'seongbuk-gu', text: '성북구' },
+        { key: 'mapo-gu', text: '마포구' },
+        { key: 'jongno-gu', text: '종로구' },
+        { key: 'dongdaemun-gu', text: '동대문구' }
       ];
 
       // 일괄 번역 API 호출
