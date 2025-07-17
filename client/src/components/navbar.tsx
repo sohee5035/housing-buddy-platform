@@ -100,7 +100,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'logout', text: '로그아웃' },
         { key: 'account-settings', text: '계정 설정' },
         { key: 'greeting-suffix', text: '님 안녕하세요!' },
-        { key: 'admin-login', text: '관리자 로그인' },
         { key: 'admin', text: '관리자' },
         { key: 'new-property', text: '새 매물 등록' },
         { key: 'category-management', text: '카테고리 관리' },
@@ -411,12 +410,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  {!isAdmin && (
-                    <DropdownMenuItem onClick={() => setShowAdminLogin(true)}>
-                      <Settings className="h-4 w-4 mr-2" />
-                      {getTranslatedText("관리자 로그인", "admin-login")}
-                    </DropdownMenuItem>
-                  )}
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
                     {getTranslatedText("로그아웃", "logout")}
