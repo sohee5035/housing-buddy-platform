@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 // Validation schemas
 const loginSchema = z.object({
@@ -54,6 +55,7 @@ export default function SignupPage() {
   
   const { toast } = useToast();
   const { login, register, isLoginLoading, isRegisterLoading } = useAuth();
+  const { getTranslatedText } = useTranslation();
 
   // Login form
   const loginForm = useForm<LoginForm>({

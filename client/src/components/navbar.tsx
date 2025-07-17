@@ -141,7 +141,20 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'ui-로그인이 필요합니다', text: '로그인이 필요합니다' },
         { key: 'ui-문의 내역을 확인하려면 로그인해주세요.', text: '문의 내역을 확인하려면 로그인해주세요.' },
         { key: 'ui-로그인하기', text: '로그인하기' },
-        { key: 'ui-관심 매물을 확인하려면 로그인해주세요.', text: '관심 매물을 확인하려면 로그인해주세요.' }
+        { key: 'ui-관심 매물을 확인하려면 로그인해주세요.', text: '관심 매물을 확인하려면 로그인해주세요.' },
+        // 인증 모달 텍스트들
+        { key: 'auth-welcome', text: '한국의 외국인을 위한 부동산 플랫폼에 오신 것을 환영합니다' },
+        { key: 'email', text: '이메일' },
+        { key: 'password', text: '비밀번호' },
+        { key: 'signup', text: '회원가입' },
+        { key: 'verification-code', text: '인증번호' },
+        { key: 'code-sent', text: '발송완료' },
+        { key: 'verification-code-6digit', text: '인증번호 (6자리)' },
+        { key: 'password-confirm', text: '비밀번호 확인' },
+        { key: 'name', text: '이름' },
+        { key: 'phone-optional', text: '전화번호 (선택사항)' },
+        { key: 'agree-terms-required', text: '이용약관에 동의합니다 (필수)' },
+        { key: 'agree-privacy-required', text: '개인정보처리방침에 동의합니다 (필수)' }
       ];
 
       // 일괄 번역 API 호출

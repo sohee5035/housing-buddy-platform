@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/contexts/TranslationContext";
 import { Loader2, Mail, User, Lock, Phone } from "lucide-react";
 
 // Login Schema
@@ -52,6 +53,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
   
   const { login, register, resendVerification, isLoginLoading, isRegisterLoading } = useAuth();
   const { toast } = useToast();
+  const { getTranslatedText } = useTranslation();
 
   // Forms
   const loginForm = useForm<LoginForm>({
@@ -194,23 +196,23 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Housing Buddy</DialogTitle>
+          <DialogTitle>{getTranslatedText("Housing Buddy", "housing-buddy")}</DialogTitle>
           <DialogDescription>
-            한국의 외국인을 위한 부동산 플랫폼에 오신 것을 환영합니다
+            {getTranslatedText("한국의 외국인을 위한 부동산 플랫폼에 오신 것을 환영합니다", "auth-welcome")}
           </DialogDescription>
         </DialogHeader>
 
         <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as "login" | "register")}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">로그인</TabsTrigger>
-            <TabsTrigger value="register">회원가입</TabsTrigger>
+            <TabsTrigger value="login">{getTranslatedText("로그인", "login")}</TabsTrigger>
+            <TabsTrigger value="register">{getTranslatedText("회원가입", "signup")}</TabsTrigger>
           </TabsList>
 
           {/* 로그인 탭 */}
           <TabsContent value="login" className="space-y-4">
             <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="login-email">이메일</Label>
+                <Label htmlFor="login-email">{getTranslatedText("이메일", "email")}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -227,7 +229,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="login-password">비밀번호</Label>
+                <Label htmlFor="login-password">{getTranslatedText("비밀번호", "password")}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -245,7 +247,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
 
               <Button type="submit" className="w-full" disabled={isLoginLoading}>
                 {isLoginLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                로그인
+                {getTranslatedText("로그인", "login")}
               </Button>
             </form>
           </TabsContent>
@@ -255,7 +257,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
             <form onSubmit={registrationForm.handleSubmit(onRegister)} className="space-y-4">
               {/* 이메일 + 인증번호 발송 */}
               <div className="space-y-2">
-                <Label htmlFor="register-email">이메일</Label>
+                <Label htmlFor="register-email">{getTranslatedText("이메일", "email")}</Label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -273,7 +275,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
                     onClick={sendVerificationCode}
                     disabled={isCodeSent}
                   >
-                    {isCodeSent ? "발송완료" : "인증번호"}
+                    {isCodeSent ? getTranslatedText("발송완료", "code-sent") : getTranslatedText("인증번호", "verification-code")}
                   </Button>
                 </div>
                 {registrationForm.formState.errors.email && (
@@ -283,7 +285,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
 
               {/* 인증번호 입력 */}
               <div className="space-y-2">
-                <Label htmlFor="verification-code">인증번호 (6자리)</Label>
+                <Label htmlFor="verification-code">{getTranslatedText("인증번호 (6자리)", "verification-code-6digit")}</Label>
                 <Input
                   id="verification-code"
                   placeholder="123456"
@@ -297,7 +299,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
 
               {/* 비밀번호 */}
               <div className="space-y-2">
-                <Label htmlFor="register-password">비밀번호</Label>
+                <Label htmlFor="register-password">{getTranslatedText("비밀번호", "password")}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -315,7 +317,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
 
               {/* 비밀번호 확인 */}
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">비밀번호 확인</Label>
+                <Label htmlFor="confirm-password">{getTranslatedText("비밀번호 확인", "password-confirm")}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -333,7 +335,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
 
               {/* 이름 */}
               <div className="space-y-2">
-                <Label htmlFor="name">이름</Label>
+                <Label htmlFor="name">{getTranslatedText("이름", "name")}</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -350,7 +352,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
 
               {/* 전화번호 (선택사항) */}
               <div className="space-y-2">
-                <Label htmlFor="phone">전화번호 (선택사항)</Label>
+                <Label htmlFor="phone">{getTranslatedText("전화번호 (선택사항)", "phone-optional")}</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -373,7 +375,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
                     }
                   />
                   <Label htmlFor="terms" className="text-sm">
-                    이용약관에 동의합니다 (필수)
+                    {getTranslatedText("이용약관에 동의합니다 (필수)", "agree-terms-required")}
                   </Label>
                 </div>
                 {registrationForm.formState.errors.agreeToTerms && (
@@ -389,7 +391,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
                     }
                   />
                   <Label htmlFor="privacy" className="text-sm">
-                    개인정보처리방침에 동의합니다 (필수)
+                    {getTranslatedText("개인정보처리방침에 동의합니다 (필수)", "agree-privacy-required")}
                   </Label>
                 </div>
                 {registrationForm.formState.errors.agreeToPrivacy && (
@@ -399,7 +401,7 @@ export default function SimpleAuthModal({ isOpen, onClose }: SimpleAuthModalProp
 
               <Button type="submit" className="w-full" disabled={isRegisterLoading}>
                 {isRegisterLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                회원가입
+                {getTranslatedText("회원가입", "signup")}
               </Button>
             </form>
           </TabsContent>
