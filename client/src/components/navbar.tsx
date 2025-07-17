@@ -1,52 +1,41 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, Plus, Menu, User, LogOut, Settings, Heart, MessageCircle, MapPin, Shield, Languages, Globe } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { useAdmin } from "@/contexts/AdminContext";
-import { useTranslation } from "@/contexts/TranslationContext";
-import { apiRequest } from "@/lib/queryClient";
-
-import AdminLogin from "./admin-login";
-import AdminPanel from "./admin-panel";
-import PropertyForm from "./property-form";
-import CategoryManager from "./category-manager";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'wouter';
+import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from '@/contexts/TranslationContext';
+import { useAdmin } from '@/contexts/AdminContext';
+import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { Languages, ChevronDown, User, LogOut, Shield } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
-interface NavbarProps {
-  onCreateListing?: () => void;
-}
+import SimpleAuthModal from '@/components/simple-auth-modal';
+import AdminLogin from '@/components/admin-login';
+import PropertyForm from '@/components/property-form';
+import CategoryManager from '@/components/category-manager';
+import type { Property } from '@shared/schema';
 
-export default function Navbar({ onCreateListing }: NavbarProps) {
-  const [location, setLocation] = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showCategoryManager, setShowCategoryManager] = useState(false);
-  const [customCategories, setCustomCategories] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('customCategories');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-  
-  const { user, isAuthenticated, logout } = useAuth();
+export default function Navbar() {
+  const { user, logout } = useAuth();
+  const { getTranslatedText, isTranslated, targetLanguage, setTranslatedData, setIsTranslated, updateTargetLanguage } = useTranslation();
+  const { isAdmin } = useAdmin();
   const { toast } = useToast();
-  const { isAdmin, logout: adminLogout } = useAdmin();
-  const { getTranslatedText, isTranslated, isTranslating, targetLanguage, updateTargetLanguage, setIsTranslated, setIsTranslating, setTranslatedData } = useTranslation();
   
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  const [isPropertyFormOpen, setIsPropertyFormOpen] = useState(false);
+  const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   // 지원 언어 목록
   const languages = [
     { code: 'ko', name: '한국어', flag: '🇰🇷' },
@@ -56,7 +45,14 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
     { code: 'es', name: 'Español', flag: '🇪🇸' },
     { code: 'fr', name: 'Français', flag: '🇫🇷' },
     { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+    { code: 'pt', name: 'Português', flag: '🇵🇹' },
     { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+    { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+    { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+    { code: 'id', name: 'Bahasa Indonesia', flag: '🇮🇩' },
+    { code: 'ms', name: 'Bahasa Melayu', flag: '🇲🇾' },
     { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
     { code: 'th', name: 'ไทย', flag: '🇹🇭' }
   ];
@@ -82,8 +78,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
     
     // 브라우저 캐시 강제 새로고침
     console.log('🔥 언어 변경 시작:', languageCode);
-    
-    // 페이지 새로고침 제거 - UX 개선
     
     // 일괄 번역 실행
     try {
@@ -131,17 +125,18 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'ewha-womans-university', text: '이화여자대학교' },
         { key: 'sogang-university', text: '서강대학교' },
         { key: 'sungkyunkwan-university', text: '성균관대학교' },
-        { key: 'kyung-hee-university', text: '경희대학교' },
-        // 지역명들
+        { key: 'hanyang-university', text: '한양대학교' },
+        // 지역 이름들
         { key: 'gwanak-gu', text: '관악구' },
         { key: 'seodaemun-gu', text: '서대문구' },
         { key: 'seongbuk-gu', text: '성북구' },
         { key: 'mapo-gu', text: '마포구' },
         { key: 'jongno-gu', text: '종로구' },
-        { key: 'dongdaemun-gu', text: '동대문구' },
-        // 문의 내역 페이지 UI 텍스트들
-        { key: 'ui-내 문의 내역', text: '내 문의 내역' },
-        { key: 'ui-등록하신 문의와 관리자 답변을 확인할 수 있습니다.', text: '등록하신 문의와 관리자 답변을 확인할 수 있습니다.' },
+        { key: 'jangan-gu', text: '장안구' },
+        // 내 페이지 텍스트들
+        { key: 'ui-관심 매물이 없습니다', text: '관심 매물이 없습니다' },
+        { key: 'ui-마음에 드는 매물을 찾아 하트를 눌러보세요.', text: '마음에 드는 매물을 찾아 하트를 눌러보세요.' },
+        { key: 'ui-매물 둘러보기', text: '매물 둘러보기' },
         { key: 'ui-문의 내역이 없습니다', text: '문의 내역이 없습니다' },
         { key: 'ui-매물에 문의를 남겨보세요.', text: '매물에 문의를 남겨보세요.' },
         { key: 'ui-매물 둘러보기', text: '매물 둘러보기' },
@@ -150,7 +145,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
         { key: 'ui-문의 내역을 확인하려면 로그인해주세요.', text: '문의 내역을 확인하려면 로그인해주세요.' },
         { key: 'ui-로그인하기', text: '로그인하기' },
         { key: 'ui-관심 매물을 확인하려면 로그인해주세요.', text: '관심 매물을 확인하려면 로그인해주세요.' },
-        // 인증 모달 텍스트들
+        // 인증 모달 텍스트들 - 새로 추가된 키들
         { key: 'auth-welcome', text: '한국의 외국인을 위한 부동산 플랫폼에 오신 것을 환영합니다' },
         { key: 'email', text: '이메일' },
         { key: 'password', text: '비밀번호' },
@@ -166,8 +161,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
       ];
 
       // 번역 요청 키 목록 디버깅
-      console.log('🔥 번역 요청 키 목록:', textsToTranslate.map(t => t.key));
-      console.log('🔥 총 번역 키 개수:', textsToTranslate.length);
+      console.log('🔥🔥🔥 번역 요청 키 목록:', textsToTranslate.map(t => t.key));
+      console.log('🔥🔥🔥 총 번역 키 개수:', textsToTranslate.length);
       
       // 일괄 번역 API 호출
       const response = await fetch('/api/translate-batch', {
@@ -181,6 +176,7 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
       if (response.ok) {
         const result = await response.json();
+        console.log('🔥🔥🔥 번역 결과:', Object.keys(result.translations));
         setTranslatedData(result.translations);
         setIsTranslated(true);
         
@@ -204,416 +200,155 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
   };
   
   // 매물 데이터를 가져와서 카테고리 추출 (옵셔널)
-  const { data: properties = [] } = useQuery({
-    queryKey: ["/api/properties"],
+  const { data: properties } = useQuery<Property[]>({
+    queryKey: ['/api/properties'],
     queryFn: async () => {
-      try {
-        const response = await fetch("/api/properties");
-        if (!response.ok) return [];
-        return response.json();
-      } catch {
-        return [];
-      }
-    },
-    retry: false,
-    staleTime: 5 * 60 * 1000,
+      const response = await fetch('/api/properties');
+      if (!response.ok) throw new Error('Failed to fetch properties');
+      return response.json();
+    }
   });
 
-  const navItems = [
-    { href: "/", label: getTranslatedText("홈", "home"), active: location === "/", id: "home" },
-    { href: "/favorites", label: getTranslatedText("관심 매물", "favorites"), active: location === "/favorites", id: "favorites" },
-    { href: "/my-inquiries", label: getTranslatedText("문의 내역", "inquiries"), active: location === "/my-inquiries", id: "inquiries" },
-  ];
-
-  const handleLogin = () => {
-    setLocation("/signup");
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      // 관리자 로그아웃 시 관리자 상태도 초기화
-      if (isAdmin) {
-        adminLogout();
-      }
-      toast({
-        title: "로그아웃 완료",
-        description: "성공적으로 로그아웃되었습니다.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "로그아웃 실패",
-        description: error.message || "로그아웃 중 오류가 발생했습니다.",
-        variant: "destructive",
-      });
-    }
-  };
-
-
-
   return (
-    <nav className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo and Navigation */}
-          <div className="flex items-center space-x-8">
-            <Link href="/" className="flex items-center">
-              <Home className="h-6 w-6 text-primary mr-2" />
-              <span className="text-xl font-bold text-neutral-900">{getTranslatedText("Housing Buddy", "housing-buddy")}</span>
-            </Link>
-            
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex space-x-6">
-              {navItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className={`transition-colors ${
-                    item.active
-                      ? "text-primary font-medium"
-                      : "text-neutral-700 hover:text-primary"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-16 items-center justify-between px-4">
+        <div className="flex items-center space-x-6">
+          <Link href="/">
+            <div className="flex items-center space-x-2">
+              <div className="text-2xl font-bold text-primary">
+                {getTranslatedText('Housing Buddy', 'housing-buddy')}
+              </div>
             </div>
-          </div>
-
-          {/* Desktop Actions */}
+          </Link>
+          
           <div className="hidden md:flex items-center space-x-4">
-            {/* 언어 선택 드롭다운 */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2" disabled={isTranslating}>
-                  <Languages className={`h-4 w-4 ${isTranslating ? 'animate-spin' : ''}`} />
-                  <span className="text-sm">{currentLanguage.flag}</span>
-                  {isTranslating && <span className="text-xs ml-1">번역중...</span>}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {languages.map((language) => {
-                  // 실제 활성 언어 확인: 한국어이거나, 번역이 되어있고 해당 언어가 선택된 경우
-                  const isActiveLanguage = language.code === 'ko' 
-                    ? (!isTranslated || targetLanguage === 'ko')
-                    : (isTranslated && targetLanguage === language.code);
-                  
-                  return (
-                    <DropdownMenuItem
-                      key={language.code}
-                      onClick={() => handleLanguageChange(language.code)}
-                      className={isActiveLanguage ? "bg-blue-50" : ""}
-                    >
-                      <span className="mr-2">{language.flag}</span>
-                      {language.name}
-                      {isActiveLanguage && (
-                        <span className="ml-auto text-blue-600">✓</span>
-                      )}
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* 관리자 방패 버튼 - 로그인 후에만 표시 */}
-            {isAdmin && (
-              <AdminPanel
-                onCreateListing={() => setShowCreateModal(true)}
-                onCategoryManager={() => setShowCategoryManager(true)}
-                onTrashView={() => setLocation('/trash')}
-                onCommentsView={() => setLocation('/admin/comments')}
-                onLogout={adminLogout}
-                trigger={
-                  <Button className="bg-blue-600 text-white hover:bg-blue-700">
-                    <Shield className="h-4 w-4" />
-                  </Button>
-                }
-              />
-            )}
-            
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="flex items-center space-x-2">
-                      <User className="h-5 w-5" />
-                      <span className="hidden lg:inline">{user?.name}</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem disabled>
-                    <User className="h-4 w-4 mr-2" />
-                    {user?.email}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Settings className="h-4 w-4 mr-2" />
-                    {getTranslatedText("계정 설정", "account-settings")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/favorites" className="w-full flex items-center">
-                      <Heart className="h-4 w-4 mr-2" />
-                      {getTranslatedText("관심 매물", "favorites")}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/my-inquiries" className="w-full flex items-center">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      {getTranslatedText("문의 내역", "inquiries")}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  {!isAdmin && (
-                    <DropdownMenuItem onClick={() => setShowAdminLogin(true)}>
-                      <Settings className="h-4 w-4 mr-2" />
-                      {getTranslatedText("관리자 로그인", "admin-login")}
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    {getTranslatedText("로그아웃", "logout")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ) : (
-              /* 로그인하지 않은 경우 로그인 버튼만 표시 */
-              <Button variant="ghost" size="icon" onClick={handleLogin}>
-                <User className="h-5 w-5" />
+            <Link href="/">
+              <Button variant="ghost" className="text-sm">
+                {getTranslatedText('홈', 'home')}
               </Button>
-            )}
-          </div>
-
-          {/* Mobile Menu */}
-          <div className="md:hidden flex items-center space-x-1">
-            {/* 모바일 언어 선택 */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" disabled={isTranslating}>
-                  <Languages className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {languages.map((language) => {
-                  // 실제 활성 언어 확인: 한국어이거나, 번역이 되어있고 해당 언어가 선택된 경우
-                  const isActiveLanguage = language.code === 'ko' 
-                    ? (!isTranslated || targetLanguage === 'ko')
-                    : (isTranslated && targetLanguage === language.code);
-                  
-                  return (
-                    <DropdownMenuItem
-                      key={language.code}
-                      onClick={() => handleLanguageChange(language.code)}
-                      className={isActiveLanguage ? "bg-blue-50" : ""}
-                    >
-                      <span className="mr-2">{language.flag}</span>
-                      {language.name}
-                      {isActiveLanguage && (
-                        <span className="ml-auto text-blue-600">✓</span>
-                      )}
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* 관리자인 경우에만 모바일 매물 등록 버튼 표시 */}
-            {isAuthenticated && isAdmin && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onCreateListing}
-                className="border-primary text-primary"
-              >
-                <Plus className="h-4 w-4" />
+            </Link>
+            <Link href="/favorites">
+              <Button variant="ghost" className="text-sm">
+                {getTranslatedText('관심 매물', 'favorites')}
               </Button>
-            )}
-            
-            {/* 모바일 관리자 방패 버튼 - 로그인 후에만 표시 */}
-            {isAdmin && (
-              <AdminPanel
-                onCreateListing={() => setShowCreateModal(true)}
-                onCategoryManager={() => setShowCategoryManager(true)}
-                onTrashView={() => setLocation('/trash')}
-                onCommentsView={() => setLocation('/admin/comments')}
-                onLogout={adminLogout}
-                trigger={
-                  <Button variant="ghost" size="icon" className="bg-blue-600 text-white hover:bg-blue-700">
-                    <Shield className="h-4 w-4" />
-                  </Button>
-                }
-              />
-            )}
-            
-            {/* 모바일에서 사용자 인사말 또는 로그인 버튼 표시 */}
-            {isAuthenticated ? (
-              <div className="flex items-center text-sm text-neutral-700 bg-neutral-50 px-3 py-1 rounded-full">
-                <span className="font-medium">
-                  {user?.name}{getTranslatedText("님 안녕하세요!", "greeting-suffix")}
-                </span>
-              </div>
-            ) : (
-              <Button variant="ghost" size="icon" onClick={handleLogin}>
-                <User className="h-5 w-5" />
+            </Link>
+            <Link href="/my-inquiries">
+              <Button variant="ghost" className="text-sm">
+                {getTranslatedText('문의 내역', 'inquiries')}
               </Button>
-            )}
-            
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px]">
-                <div className="flex flex-col space-y-4 mt-8">
-                  <div className="flex items-center mb-6">
-                    <Home className="h-6 w-6 text-primary mr-2" />
-                    <span className="text-xl font-bold text-neutral-900">{getTranslatedText("Housing Buddy", "housing-buddy")}</span>
-                  </div>
-                  
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={item.href}
-                      className={`text-left px-4 py-2 rounded-lg transition-colors ${
-                        item.active
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "text-neutral-700 hover:bg-neutral-100"
-                      }`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                  
-                  <div className="border-t pt-4 mt-4">
-                    {isAuthenticated ? (
-                      <>
-                        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                          <p className="text-sm font-medium">{user?.name}</p>
-                          <p className="text-xs text-gray-600">{user?.email}</p>
-                        </div>
-                        
-                        {/* 관리자인 경우에만 사이드바 관리자 패널 버튼 표시 */}
-                        {isAdmin && (
-                          <AdminPanel
-                            onCreateListing={() => {
-                              setShowCreateModal(true);
-                              setIsMobileMenuOpen(false);
-                            }}
-                            onCategoryManager={() => {
-                              setShowCategoryManager(true);
-                              setIsMobileMenuOpen(false);
-                            }}
-                            onTrashView={() => {
-                              setLocation('/trash');
-                              setIsMobileMenuOpen(false);
-                            }}
-                            onCommentsView={() => {
-                              setLocation('/admin/comments');
-                              setIsMobileMenuOpen(false);
-                            }}
-                            onLogout={adminLogout}
-                            trigger={
-                              <Button variant="outline" className="w-full mb-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white">
-                                <Settings className="h-4 w-4 mr-2" />
-                                {getTranslatedText("관리자", "admin")}
-                              </Button>
-                            }
-                          />
-                        )}
-                        
-                        <Button 
-                          variant="ghost" 
-                          className="w-full mb-2"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          <Settings className="h-4 w-4 mr-2" />
-                          {getTranslatedText("계정 설정", "account-settings")}
-                        </Button>
-                        
-                        {!isAdmin && (
-                          <Button 
-                            variant="ghost" 
-                            className="w-full mb-2"
-                            onClick={() => {
-                              setShowAdminLogin(true);
-                              setIsMobileMenuOpen(false);
-                            }}
-                          >
-                            <Settings className="h-4 w-4 mr-2" />
-                            {getTranslatedText("관리자 로그인", "admin-login")}
-                          </Button>
-                        )}
-                        
-                        <Button 
-                          variant="ghost" 
-                          className="w-full"
-                          onClick={() => {
-                            handleLogout();
-                            setIsMobileMenuOpen(false);
-                          }}
-                        >
-                          <LogOut className="h-4 w-4 mr-2" />
-                          {getTranslatedText("로그아웃", "logout")}
-                        </Button>
-                      </>
-                    ) : (
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => {
-                          handleLogin();
-                          setIsMobileMenuOpen(false);
-                        }}
-                      >
-                        <User className="h-4 w-4 mr-2" />
-                        {getTranslatedText("로그인 / 회원가입", "login-signup")}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
+            </Link>
           </div>
         </div>
+
+        <div className="flex items-center space-x-4">
+          {/* 언어 선택 드롭다운 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" disabled={isTranslating}>
+                <Languages className="h-4 w-4 mr-2" />
+                <span>{currentLanguage.flag}</span>
+                <span className="ml-2">{currentLanguage.name}</span>
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {languages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.code}
+                  onClick={() => handleLanguageChange(lang.code)}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex items-center">
+                    <span className="mr-2">{lang.flag}</span>
+                    <span>{lang.name}</span>
+                  </div>
+                  {currentLanguage.code === lang.code && (
+                    <span className="text-primary">✓</span>
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* 사용자 메뉴 */}
+          {user ? (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-muted-foreground">
+                {user.username}{getTranslatedText('님 안녕하세요!', 'greeting-suffix')}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <User className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    {getTranslatedText('로그아웃', 'logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <Button onClick={() => setIsAuthModalOpen(true)} variant="default">
+              {getTranslatedText('로그인 / 회원가입', 'login-signup')}
+            </Button>
+          )}
+
+          {/* 관리자 UI */}
+          {isAdmin && (
+            <div className="flex items-center space-x-2">
+              <Link href="/admin">
+                <Button variant="outline" size="sm">
+                  <Shield className="h-4 w-4 mr-2" />
+                  {getTranslatedText('관리자', 'admin')}
+                </Button>
+              </Link>
+              <div className="flex items-center space-x-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsPropertyFormOpen(true)}
+                >
+                  {getTranslatedText('새 매물 등록', 'new-property')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsCategoryManagerOpen(true)}
+                >
+                  {getTranslatedText('카테고리 관리', 'category-management')}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* 비로그인 상태의 관리자 로그인 버튼 */}
+          {!user && !isAdmin && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsAdminLoginOpen(true)}
+              className="fixed bottom-4 right-4 z-50 rounded-full p-3"
+            >
+              <Shield className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
-      
 
-      {/* Admin Login Modal */}
-      <AdminLogin 
-        isOpen={showAdminLogin} 
-        onClose={() => setShowAdminLogin(false)} 
+      {/* 모달들 */}
+      <SimpleAuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AdminLogin isOpen={isAdminLoginOpen} onOpenChange={setIsAdminLoginOpen} />
+      <PropertyForm isOpen={isPropertyFormOpen} onOpenChange={setIsPropertyFormOpen} />
+      <CategoryManager 
+        isOpen={isCategoryManagerOpen} 
+        onClose={() => setIsCategoryManagerOpen(false)}
+        customCategories={[]}
+        onUpdateCategories={() => {}}
+        propertyCategories={[]}
       />
-
-      {/* 매물 등록 모달 */}
-      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogTitle>{getTranslatedText("새 매물 등록", "new-property")}</DialogTitle>
-          <PropertyForm 
-            onSuccess={() => setShowCreateModal(false)}
-            onCancel={() => setShowCreateModal(false)}
-            availableCategories={[...new Set(['기타', ...customCategories])]}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* 카테고리 관리 모달 */}
-      <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
-        <DialogContent>
-          <DialogTitle>{getTranslatedText("카테고리 관리", "category-management")}</DialogTitle>
-          <CategoryManager
-            isOpen={showCategoryManager}
-            onClose={() => setShowCategoryManager(false)}
-            customCategories={customCategories}
-            onUpdateCategories={(categories) => {
-              setCustomCategories(categories);
-              localStorage.setItem('customCategories', JSON.stringify(categories));
-            }}
-            propertyCategories={[...new Set(properties.map((p: any) => p.category).filter(Boolean))]}
-          />
-        </DialogContent>
-      </Dialog>
     </nav>
   );
 }

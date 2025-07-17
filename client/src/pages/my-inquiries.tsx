@@ -7,7 +7,7 @@ import { Comment } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import Navbar from "@/components/navbar-fixed";
+import Navbar from "@/components/navbar";
 import { useTranslation } from "@/contexts/TranslationContext";
 
 export default function MyInquiries() {

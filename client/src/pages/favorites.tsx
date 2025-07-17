@@ -7,7 +7,7 @@ import { Heart, HomeIcon, MapPin, Calendar } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useToast } from "@/hooks/use-toast";
-import Navbar from "@/components/navbar-fixed";
+import Navbar from "@/components/navbar";
 import SmartTextWithTooltips from "@/components/smart-text-with-tooltips";
 import type { Property } from "@shared/schema";
 
