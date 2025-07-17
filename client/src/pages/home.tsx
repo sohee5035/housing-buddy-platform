@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Property } from "@shared/schema";
 import PropertyForm from "@/components/property-form";
@@ -73,6 +73,16 @@ export default function Home() {
   } = useTranslation();
   const { toast } = useToast();
   const { isAdmin, logout } = useAdmin();
+
+  // 번역 상태 변경 시 로깅
+  useEffect(() => {
+    console.log('🌍 홈 페이지 번역 상태 변경:', {
+      isTranslated,
+      targetLanguage,
+      translatedDataKeys: Object.keys(translatedData),
+      translatedDataSample: Object.fromEntries(Object.entries(translatedData).slice(0, 3))
+    });
+  }, [isTranslated, translatedData, targetLanguage]);
 
   const { data: properties = [], isLoading, error, refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -393,14 +403,23 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProperties.map((property) => (
-              <PropertyCard 
-                key={`property-${property.id}-${targetLanguage}-${isTranslated}`}
-                property={property}
-                onTranslate={() => {}} // 빈 함수 - 메인 페이지에서는 개별 번역 버튼 불필요
-                viewMode="grid"
-              />
-            ))}
+            {(() => {
+              console.log('📋 매물 렌더링 직전 상태:', {
+                propertiesCount: filteredProperties.length,
+                isTranslated,
+                targetLanguage,
+                translatedDataKeys: Object.keys(translatedData),
+                propertyIds: filteredProperties.map(p => p.id)
+              });
+              return filteredProperties.map((property) => (
+                <PropertyCard 
+                  key={`property-${property.id}-${targetLanguage}-${isTranslated}-${Object.keys(translatedData).length}`}
+                  property={property}
+                  onTranslate={() => {}} // 빈 함수 - 메인 페이지에서는 개별 번역 버튼 불필요
+                  viewMode="grid"
+                />
+              ));
+            })()}
           </div>
         )}
       </main>
