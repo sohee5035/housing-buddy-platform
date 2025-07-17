@@ -33,7 +33,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     if (password === '1234') {
       // 관리자 로그인 시 일반 사용자 로그아웃
       console.log('🔧 관리자 로그인: 일반 사용자 자동 로그아웃');
-      userLogout.mutate();
+      userLogout().catch(err => console.log('일반 사용자 로그아웃 실패:', err));
       
       setIsAdmin(true);
       localStorage.setItem('housing-buddy-admin', 'true');
