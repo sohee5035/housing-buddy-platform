@@ -99,10 +99,19 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
 
   // 번역 데이터 저장 시 로컬 스토리지에도 저장
   const saveTranslatedData = (data: Record<string, string>) => {
-    console.log('번역 데이터 저장:', Object.keys(data));
-    console.log('매물 관련 키들:', Object.keys(data).filter(k => k.includes('_')));
+    console.log('🔥 TranslationContext - 번역 데이터 저장:', Object.keys(data).length, '개 키');
+    console.log('🏠 매물 관련 키들:', Object.keys(data).filter(k => k.includes('title_') || k.includes('address_')));
+    console.log('📄 매물 번역 데이터 샘플:', 
+      Object.entries(data).filter(([k]) => k.includes('title_') || k.includes('address_')).slice(0, 4)
+    );
+    
     setTranslatedData(data);
     localStorage.setItem('translatedData', JSON.stringify(data));
+    
+    // 상태 업데이트 후 즉시 확인
+    setTimeout(() => {
+      console.log('✅ 상태 업데이트 확인 - isTranslated:', isTranslated, 'dataKeys:', Object.keys(translatedData).length);
+    }, 100);
   };
 
   const saveIsTranslated = (translated: boolean) => {
