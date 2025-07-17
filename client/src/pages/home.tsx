@@ -100,95 +100,63 @@ export default function Home() {
 
 
 
-  // Translation mutation for bulk translating all properties
+  // Translation mutation using bulk translation API
   const translateMutation = useMutation({
     mutationFn: async ({ targetLang }: { targetLang: string }) => {
-      const translations: Record<string, string> = {};
+      console.log('메인 페이지 매물 번역 시작:', { targetLang, propertiesCount: properties.length });
       
-      for (const property of properties) {
-        // Translate each text field
-        const fieldsToTranslate = [
-          { key: `title_${property.id}`, text: property.title },
-          { key: `address_${property.id}`, text: property.address },
-          { key: `description_${property.id}`, text: property.description },
-          { key: `category_${property.id}`, text: property.category || '기타' },
-        ];
-        
-        if (property.otherInfo) {
-          fieldsToTranslate.push({ key: `otherInfo_${property.id}`, text: property.otherInfo });
-        }
+      // 매물 번역 API 호출
+      const response = await fetch('/api/translate-properties', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          properties: properties,
+          targetLang: targetLang
+        }),
+      });
 
-        for (const field of fieldsToTranslate) {
-          try {
-            const result = await translateText(field.text, targetLang);
-            translations[field.key] = result.translatedText;
-          } catch (error) {
-            console.error(`Failed to translate ${field.key}:`, error);
-            translations[field.key] = field.text; // Fallback to original
-          }
-        }
+      if (!response.ok) {
+        throw new Error(`Translation failed: ${response.statusText}`);
       }
+
+      const data = await response.json();
+      console.log('매물 번역 응답:', data);
       
-      // UI 텍스트 번역 추가 (인사말 포함)
-      if (targetLang !== 'ko') {
-        const uiTexts = [
-          { key: 'greeting-suffix', text: '님 안녕하세요!' },
-        ];
-        
-        for (const uiText of uiTexts) {
-          try {
-            const result = await translateText(uiText.text, targetLang);
-            translations[uiText.key] = result.translatedText;
-          } catch (error) {
-            console.error(`Failed to translate ${uiText.key}:`, error);
-            translations[uiText.key] = uiText.text;
-          }
-        }
-      }
-      
-      return translations;
+      return data.translations || {};
     },
     onSuccess: (translations) => {
-      console.log('Translation successful, setting data:', translations);
+      console.log('메인 페이지 번역 성공:', { translationsCount: Object.keys(translations).length, translations });
       setTranslatedData(prevData => ({
         ...prevData,
         ...translations
       }));
       setIsTranslated(true);
       setTargetLanguage(targetLanguage);
-      toast({
-        title: "번역 완료",
-        description: `모든 매물이 ${supportedLanguages.find(l => l.code === targetLanguage)?.name}로 번역되었습니다.`,
-      });
+      // 조용한 번역 - 토스트 메시지 제거
+      console.log(`매물 번역 완료: ${supportedLanguages.find(l => l.code === targetLanguage)?.name}`);
     },
     onError: (error) => {
-      toast({
-        title: "번역 실패",
-        description: "번역 중 오류가 발생했습니다. 다시 시도해주세요.",
-        variant: "destructive",
-      });
+      console.error('메인 페이지 번역 실패:', error);
+      // 조용한 번역 - 토스트 메시지 제거
     },
   });
 
   const handleTranslateAll = () => {
     if (properties.length === 0) {
-      toast({
-        title: "번역할 매물이 없습니다",
-        description: "먼저 매물을 등록해주세요.",
-        variant: "destructive",
-      });
+      console.log('번역할 매물이 없습니다');
       return;
     }
     
+    console.log('매물 번역 시작:', { targetLanguage, propertiesCount: properties.length });
     translateMutation.mutate({ targetLang: targetLanguage });
   };
 
   const handleRestoreOriginal = () => {
     clearTranslations();
-    toast({
-      title: "원본 복원",
-      description: "모든 매물이 원래 한국어로 복원되었습니다.",
-    });
+    console.log('원본 텍스트로 복원 완료');
+    // 조용한 번역 - 토스트 메시지 제거
   };
 
   // UI 텍스트 번역 함수
