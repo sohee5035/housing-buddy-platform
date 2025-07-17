@@ -395,7 +395,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProperties.map((property) => (
               <PropertyCard 
-                key={`${property.id}-${isTranslated}-${Object.keys(translatedData).length}`}
+                key={`property-${property.id}-${targetLanguage}-${isTranslated}`}
                 property={property}
                 onTranslate={() => {}} // 빈 함수 - 메인 페이지에서는 개별 번역 버튼 불필요
                 viewMode="grid"
