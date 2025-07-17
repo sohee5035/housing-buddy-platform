@@ -53,7 +53,8 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
     updateTargetLanguage, 
     setIsTranslating, 
     saveTranslatedData,
-    saveIsTranslated
+    saveIsTranslated,
+    savePropertyTranslation
   } = useTranslation();
   
   // 지원 언어 목록
@@ -202,19 +203,33 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
 
         if (propertyResponse.ok) {
           const propertyResult = await propertyResponse.json();
-          // UI 번역과 매물 번역 결합
-          const combinedTranslations = {
-            ...uiResult.translations,
-            ...propertyResult.translations
-          };
-          console.log('🔄 navbar에서 결합된 번역 데이터:', Object.keys(combinedTranslations).length, '개');
-          console.log('🏠 매물 번역 키들:', Object.keys(propertyResult.translations));
-          console.log('📄 매물 번역 데이터 세부사항:', Object.entries(propertyResult.translations).slice(0, 4));
           
-          // 강제로 상태 업데이트 보장
-          console.log('💾 번역 데이터 저장 시작...');
-          saveTranslatedData(combinedTranslations);
-          console.log('✅ saveTranslatedData 호출 완료');
+          // 매물별로 번역 데이터 저장
+          const propertyTranslations = propertyResult.translations;
+          console.log('🏠 매물별 번역 데이터 저장 시작:', Object.keys(propertyTranslations));
+          
+          // 매물 ID별로 번역 데이터 분류하여 저장
+          const propertyIds = properties.map(p => p.id);
+          propertyIds.forEach(propertyId => {
+            const titleKey = `title_${propertyId}`;
+            const addressKey = `address_${propertyId}`;
+            const descKey = `description_${propertyId}`;
+            
+            if (propertyTranslations[titleKey] || propertyTranslations[addressKey]) {
+              const translatedProperty = {
+                title: propertyTranslations[titleKey],
+                address: propertyTranslations[addressKey],
+                description: propertyTranslations[descKey]
+              };
+              
+              console.log(`💾 매물 ${propertyId} 번역 데이터 저장:`, translatedProperty);
+              savePropertyTranslation(propertyId.toString(), translatedProperty);
+            }
+          });
+          
+          // UI 번역만 기존 시스템에 저장
+          console.log('💾 UI 번역 데이터 저장...');
+          saveTranslatedData(uiResult.translations);
         } else {
           // 매물 번역 실패 시 UI 번역만 저장
           saveTranslatedData(uiResult.translations);

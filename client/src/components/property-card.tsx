@@ -27,34 +27,31 @@ export default function PropertyCard({ property, onTranslate, viewMode = "grid" 
   
   const { 
     isTranslated, 
-    translatedData
+    translatedData,
+    getPropertyTranslation
   } = useTranslation();
 
-  // 매물 카드가 렌더링될 때마다 로그 출력  
-  console.log(`🏠 PropertyCard ${property.id} 렌더링 시작:`, {
+  // 매물별 번역 데이터 가져오기
+  const propertyTranslation = getPropertyTranslation(property.id.toString());
+  
+  console.log(`🏠 PropertyCard ${property.id} 렌더링:`, {
     isTranslated,
-    targetLanguage: 'unknown', // TranslationContext에서 가져오지 않음
-    translatedDataKeys: Object.keys(translatedData).filter(k => k.includes(`_${property.id}`)),
-    totalTranslatedKeys: Object.keys(translatedData).length,
-    propertyTitle: property.title,
-    propertyAddress: property.address
+    hasPropertyTranslation: !!propertyTranslation,
+    propertyTranslation,
+    originalTitle: property.title,
+    originalAddress: property.address
   });
 
-  // 전역 번역 데이터에서 해당 매물의 번역된 텍스트 가져오기
-  const getTranslatedPropertyText = (field: string) => {
-    if (!isTranslated) {
-      console.log(`번역 안됨 상태: ${field}_${property.id}`);
-      return null;
-    }
-    const key = `${field}_${property.id}`;
-    const translated = translatedData[key];
-    console.log(`번역 데이터 조회: ${key} →`, translated, 'from data:', Object.keys(translatedData).filter(k => k.includes(`_${property.id}`)));
-    return translated || null;
-  };
-
-  const displayTitle = getTranslatedPropertyText('title') || property.title;
-  const displayAddress = getTranslatedPropertyText('address') || property.address;
-  const displayDescription = getTranslatedPropertyText('description') || property.description;
+  // 번역된 텍스트 또는 원본 텍스트 사용
+  const displayTitle = (isTranslated && propertyTranslation?.title) || property.title;
+  const displayAddress = (isTranslated && propertyTranslation?.address) || property.address;
+  const displayDescription = (isTranslated && propertyTranslation?.description) || property.description;
+  
+  console.log(`📝 PropertyCard ${property.id} 표시 텍스트:`, {
+    displayTitle,
+    displayAddress,
+    usedTranslation: isTranslated && !!propertyTranslation
+  });
   
   // 렌더링될 때마다 번역 상태 강제 확인
   console.log(`[RENDER] PropertyCard ${property.id}:`, {

@@ -5,6 +5,7 @@ interface TranslationContextType {
   isTranslated: boolean;
   isTranslating: boolean;
   targetLanguage: string;
+  propertyTranslations: Record<string, any>;
   setTranslatedData: (data: Record<string, string>) => void;
   setIsTranslated: (translated: boolean) => void;
   setIsTranslating: (translating: boolean) => void;
@@ -14,6 +15,8 @@ interface TranslationContextType {
   clearTranslations: () => void;
   saveTranslatedData: (data: Record<string, string>) => void;
   saveIsTranslated: (translated: boolean) => void;
+  savePropertyTranslation: (propertyId: string, translatedProperty: any) => void;
+  getPropertyTranslation: (propertyId: string) => any;
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
@@ -46,6 +49,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       return 'ko';
     }
   });
+  const [propertyTranslations, setPropertyTranslations] = useState<Record<string, any>>({});
 
   const getTranslatedText = (originalText: string, key?: string) => {
     console.log('getTranslatedText 호출:', {
@@ -119,6 +123,22 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('isTranslated', translated.toString());
   };
 
+  // 매물별 번역 데이터 저장
+  const savePropertyTranslation = (propertyId: string, translatedProperty: any) => {
+    console.log('💾 매물 번역 데이터 저장:', { propertyId, translatedProperty });
+    setPropertyTranslations(prev => ({
+      ...prev,
+      [propertyId]: translatedProperty
+    }));
+  };
+
+  // 매물별 번역 데이터 가져오기
+  const getPropertyTranslation = (propertyId: string) => {
+    const translation = propertyTranslations[propertyId];
+    console.log('📖 매물 번역 데이터 조회:', { propertyId, hasTranslation: !!translation });
+    return translation || null;
+  };
+
   // 페이지 로딩 시 번역 상태 복원
   useEffect(() => {
     const restoreTranslationState = () => {
@@ -152,6 +172,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       isTranslated,
       isTranslating,
       targetLanguage,
+      propertyTranslations,
       setTranslatedData,
       setIsTranslated,
       setIsTranslating,
@@ -160,7 +181,9 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       getTranslatedText,
       clearTranslations,
       saveTranslatedData,
-      saveIsTranslated
+      saveIsTranslated,
+      savePropertyTranslation,
+      getPropertyTranslation
     }}>
       {children}
     </TranslationContext.Provider>
