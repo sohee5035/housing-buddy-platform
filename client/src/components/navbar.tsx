@@ -61,7 +61,10 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
     { code: 'th', name: 'ไทย', flag: '🇹🇭' }
   ];
 
-  const currentLanguage = languages.find(lang => lang.code === targetLanguage) || languages[0];
+  // 현재 언어 표시: 실제로 번역이 적용되어 있으면 해당 언어, 아니면 한국어
+  const currentLanguage = (isTranslated && targetLanguage !== 'ko') 
+    ? languages.find(lang => lang.code === targetLanguage) || languages[0]
+    : languages[0]; // 한국어
   
   // 언어 변경 및 번역 함수
   const handleLanguageChange = async (languageCode: string) => {
@@ -264,19 +267,26 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {languages.map((language) => (
-                  <DropdownMenuItem
-                    key={language.code}
-                    onClick={() => handleLanguageChange(language.code)}
-                    className={targetLanguage === language.code ? "bg-blue-50" : ""}
-                  >
-                    <span className="mr-2">{language.flag}</span>
-                    {language.name}
-                    {targetLanguage === language.code && (
-                      <span className="ml-auto text-blue-600">✓</span>
-                    )}
-                  </DropdownMenuItem>
-                ))}
+                {languages.map((language) => {
+                  // 실제 활성 언어 확인: 한국어이거나, 번역이 되어있고 해당 언어가 선택된 경우
+                  const isActiveLanguage = language.code === 'ko' 
+                    ? (!isTranslated || targetLanguage === 'ko')
+                    : (isTranslated && targetLanguage === language.code);
+                  
+                  return (
+                    <DropdownMenuItem
+                      key={language.code}
+                      onClick={() => handleLanguageChange(language.code)}
+                      className={isActiveLanguage ? "bg-blue-50" : ""}
+                    >
+                      <span className="mr-2">{language.flag}</span>
+                      {language.name}
+                      {isActiveLanguage && (
+                        <span className="ml-auto text-blue-600">✓</span>
+                      )}
+                    </DropdownMenuItem>
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -359,19 +369,26 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {languages.map((language) => (
-                  <DropdownMenuItem
-                    key={language.code}
-                    onClick={() => handleLanguageChange(language.code)}
-                    className={targetLanguage === language.code ? "bg-blue-50" : ""}
-                  >
-                    <span className="mr-2">{language.flag}</span>
-                    {language.name}
-                    {targetLanguage === language.code && (
-                      <span className="ml-auto text-blue-600">✓</span>
-                    )}
-                  </DropdownMenuItem>
-                ))}
+                {languages.map((language) => {
+                  // 실제 활성 언어 확인: 한국어이거나, 번역이 되어있고 해당 언어가 선택된 경우
+                  const isActiveLanguage = language.code === 'ko' 
+                    ? (!isTranslated || targetLanguage === 'ko')
+                    : (isTranslated && targetLanguage === language.code);
+                  
+                  return (
+                    <DropdownMenuItem
+                      key={language.code}
+                      onClick={() => handleLanguageChange(language.code)}
+                      className={isActiveLanguage ? "bg-blue-50" : ""}
+                    >
+                      <span className="mr-2">{language.flag}</span>
+                      {language.name}
+                      {isActiveLanguage && (
+                        <span className="ml-auto text-blue-600">✓</span>
+                      )}
+                    </DropdownMenuItem>
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
 
