@@ -730,8 +730,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const requestBody: any = {
         q: textWithMarkers,
-        target: targetLang,
-        source: 'ko',
+        target: targetLang
+        // source 언어 자동 감지 (source 파라미터 제거)
       };
 
       const response = await fetch(
@@ -794,8 +794,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const requestBody: any = {
         q: textsToTranslate,
-        target: targetLang,
-        source: 'ko',
+        target: targetLang
+        // source 언어 자동 감지 (source 파라미터 제거)
       };
 
       const response = await fetch(
@@ -897,8 +897,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         body: JSON.stringify({
           q: textsToTranslate,
-          target: targetLang,
-          source: 'ko'
+          target: targetLang
+          // source 언어 자동 감지 (source 파라미터 제거)
         })
       });
 
