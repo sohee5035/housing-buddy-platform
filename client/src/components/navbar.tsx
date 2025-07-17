@@ -411,12 +411,6 @@ export default function Navbar({ onCreateListing }: NavbarProps) {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  {!isAdmin && (
-                    <DropdownMenuItem onClick={() => setShowAdminLogin(true)}>
-                      <Settings className="h-4 w-4 mr-2" />
-                      {getTranslatedText("관리자 로그인", "admin-login")}
-                    </DropdownMenuItem>
-                  )}
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
                     {getTranslatedText("로그아웃", "logout")}
