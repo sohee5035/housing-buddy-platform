@@ -59,6 +59,19 @@ export default function Home() {
   const selectedUniversity = universities.find(
     (uni: any) => uni.id === parseInt(universityFilter || '0')
   );
+
+  // 매물 목록 가져오기 (refetch 함수 포함)
+  const { data: properties = [], refetch } = useQuery({
+    queryKey: ["/api/properties"],
+    queryFn: async () => {
+      const url = universityFilter 
+        ? `/api/properties?university=${universityFilter}` 
+        : "/api/properties";
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch properties");
+      return response.json();
+    },
+  });
   
   // Translation context
   const { 
@@ -129,33 +142,6 @@ export default function Home() {
     const interval = setInterval(checkStoredTranslation, 1000);
     return () => clearInterval(interval);
   }, [translatedData, isTranslated, setTranslatedData, setIsTranslated]);
-
-  const { data: properties = [], isLoading, error, refetch } = useQuery<Property[]>({
-    queryKey: ["/api/properties"],
-    queryFn: async () => {
-      const response = await fetch("/api/properties", {
-        cache: 'no-cache',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      const data = await response.json();
-      return Array.isArray(data) ? data : [];
-    },
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    retry: (failureCount, error) => {
-      console.log(`❌ 재시도 ${failureCount}번째:`, error);
-      return failureCount < 3;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  });
-
-
 
   // Translation mutation using bulk translation API
   const translateMutation = useMutation({
