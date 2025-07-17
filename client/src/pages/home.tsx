@@ -393,14 +393,100 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProperties.map((property) => (
-              <PropertyCard 
-                key={`${property.id}-${isTranslated}-${Object.keys(translatedData).length}`}
-                property={property}
-                onTranslate={() => {}} // 빈 함수 - 메인 페이지에서는 개별 번역 버튼 불필요
-                viewMode="grid"
-              />
-            ))}
+            {filteredProperties.map((property) => {
+              // 번역된 텍스트 가져오기
+              const translatedTitle = isTranslated && translatedData[`title_${property.id}`] 
+                ? translatedData[`title_${property.id}`] 
+                : property.title;
+              const translatedAddress = isTranslated && translatedData[`address_${property.id}`] 
+                ? translatedData[`address_${property.id}`] 
+                : property.address;
+              
+              // 디버그용 정보 표시
+              const debugInfo = `번역상태: ${isTranslated}, 제목키: title_${property.id}, 원본: ${property.title}, 번역: ${translatedTitle}`;
+              
+              return (
+                <Card 
+                  key={`${property.id}-${isTranslated}-${Object.keys(translatedData).length}`}
+                  className="overflow-hidden hover:shadow-lg transition-shadow h-full cursor-pointer transition-transform hover:scale-105"
+                  onClick={() => {
+                    setLocation(`/property/${property.id}`);
+                  }}
+                  title={debugInfo} // 호버 시 디버그 정보 표시
+                >
+                  <div className="relative h-48 bg-neutral-200">
+                    {property.photos && property.photos.length > 0 ? (
+                      <img
+                        src={property.photos[0]}
+                        alt={translatedTitle}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-neutral-500">
+                        <HomeIcon className="h-12 w-12" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-neutral-900 hover:text-primary transition-colors line-clamp-1 flex-1">
+                        {translatedTitle}
+                        {isTranslated && translatedData[`title_${property.id}`] && (
+                          <span className="text-xs text-green-600 ml-2">✓번역됨</span>
+                        )}
+                      </h3>
+                      <div 
+                        className="ml-2" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        <FavoriteButton propertyId={property.id} size="md" variant="ghost" />
+                      </div>
+                    </div>
+                  
+                    <div className="flex items-start text-sm text-neutral-500 mb-2">
+                      <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        {translatedAddress}
+                        {isTranslated && translatedData[`address_${property.id}`] && (
+                          <span className="text-xs text-green-600 ml-2">✓번역됨</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center text-sm font-semibold text-neutral-900">
+                        <span className="text-blue-600 mr-1">{translateUI('보증금')}</span>
+                        <span>{property.deposit ? (property.deposit / 10000).toLocaleString() : '0'}{translateUI('만원')}</span>
+                      </div>
+                      <div className="text-xs text-neutral-500">
+                        {property.monthlyRent ? `${translateUI('월세')} ${(property.monthlyRent / 10000).toLocaleString()}${translateUI('만원')}` : translateUI('월세미정')}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-xs text-neutral-400">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {property.createdAt && new Date(property.createdAt).toLocaleDateString('ko-KR')}
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="text-xs h-7"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLocation(`/property/${property.id}`);
+                        }}
+                      >
+                        {translateUI('상세보기')}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </main>
