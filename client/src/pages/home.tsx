@@ -458,7 +458,8 @@ export default function Home() {
                           originalTitle: property.title,
                           translatedTitle,
                           hasTranslatedData: !!translatedData[`title_${property.id}`],
-                          allTranslatedKeys: Object.keys(translatedData).filter(k => k.startsWith('title_'))
+                          allTranslatedKeys: Object.keys(translatedData).filter(k => k.startsWith('title_')),
+                          allTranslatedData: translatedData
                         });
                         return (
                           <SmartTextWithTooltips 
