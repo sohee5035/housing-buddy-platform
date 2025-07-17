@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface TranslationContextType {
   translatedData: Record<string, string>;
@@ -31,7 +31,9 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     try {
       const saved = localStorage.getItem('isTranslated');
       const language = localStorage.getItem('selectedLanguage') || 'ko';
-      return saved === 'true' && language !== 'ko';
+      const savedData = localStorage.getItem('translatedData');
+      console.log('번역 상태 복원:', { saved, language, hasData: !!savedData });
+      return saved === 'true' && language !== 'ko' && !!savedData;
     } catch {
       return false;
     }
@@ -79,6 +81,19 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('selectedLanguage', language);
     if (language === 'ko') {
       clearTranslations();
+    } else {
+      // 한국어가 아닌 언어로 변경 시, 기존 번역 데이터가 있다면 번역 상태 유지
+      const savedData = localStorage.getItem('translatedData');
+      if (savedData) {
+        try {
+          const parsedData = JSON.parse(savedData);
+          if (Object.keys(parsedData).length > 0) {
+            saveIsTranslated(true);
+          }
+        } catch (e) {
+          console.error('번역 데이터 파싱 오류:', e);
+        }
+      }
     }
   };
 
@@ -92,6 +107,33 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     setIsTranslated(translated);
     localStorage.setItem('isTranslated', translated.toString());
   };
+
+  // 페이지 로딩 시 번역 상태 복원
+  useEffect(() => {
+    const restoreTranslationState = () => {
+      try {
+        const saved = localStorage.getItem('isTranslated');
+        const language = localStorage.getItem('selectedLanguage') || 'ko';
+        const savedData = localStorage.getItem('translatedData');
+        
+        console.log('번역 상태 복원 시도:', { saved, language, hasData: !!savedData });
+        
+        if (saved === 'true' && language !== 'ko' && savedData) {
+          const parsedData = JSON.parse(savedData);
+          if (Object.keys(parsedData).length > 0) {
+            setTranslatedData(parsedData);
+            setIsTranslated(true);
+            setTargetLanguage(language);
+            console.log('번역 상태 복원 성공:', Object.keys(parsedData).length, '개 키');
+          }
+        }
+      } catch (error) {
+        console.error('번역 상태 복원 실패:', error);
+      }
+    };
+
+    restoreTranslationState();
+  }, []);
 
   return (
     <TranslationContext.Provider value={{
