@@ -49,6 +49,14 @@ export function useAuth() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
+      // 일반 사용자 로그인 시 관리자 로그아웃
+      const adminStatus = localStorage.getItem('housing-buddy-admin');
+      if (adminStatus === 'true') {
+        console.log('🔧 일반 사용자 로그인: 관리자 자동 로그아웃');
+        localStorage.removeItem('housing-buddy-admin');
+        window.location.reload(); // 관리자 상태 완전 초기화
+      }
+      
       return apiRequest("POST", "/api/auth/login", credentials);
     },
     onSuccess: () => {
